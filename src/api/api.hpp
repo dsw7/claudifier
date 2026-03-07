@@ -13,8 +13,6 @@ struct Err {
 
 using MessageResult = std::expected<std::string, Err>;
 
-std::string unpack_error(const std::string &output);
-
 class Curl {
 public:
     Curl();
@@ -29,5 +27,7 @@ private:
     CURL *curl_ = nullptr;
     std::string user_api_key_;
 };
+
+std::string unpack_error(const std::string &output);
 
 } // namespace api
