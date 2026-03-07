@@ -18,6 +18,23 @@ std::string pack_post_fields_(const std::string &content)
     return post_fields.dump();
 }
 
+api::OkMessage unpack_200_response_(const std::string &response)
+{
+    const nlohmann::json json = api::parse_response(response);
+
+    if (json["type"] != "message") {
+        throw std::runtime_error("Malformed message response. Response is not a message");
+    }
+
+    api::OkMessage ok;
+    ok.input_tokens = json["usage"]["input_tokens"];
+    ok.model = json["model"];
+    ok.output = json["content"][0]["text"];
+    ok.output_tokens = json["usage"]["output_tokens"];
+    ok.raw_response = json.dump(4);
+    return ok;
+}
+
 } // namespace
 
 namespace api {
@@ -52,7 +69,7 @@ MessageResult Curl::create_message(const std::string &input)
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return OkMessage { response };
+        return unpack_200_response_(response);
     }
 
     return std::unexpected(Err { http_status_code, unpack_error(response) });

@@ -7,7 +7,11 @@
 namespace api {
 
 struct OkMessage {
-    std::string message;
+    int input_tokens = 0;
+    int output_tokens = 0;
+    std::string model;
+    std::string output;
+    std::string raw_response;
 };
 
 struct Err {
