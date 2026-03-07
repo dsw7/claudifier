@@ -28,6 +28,4 @@ private:
     std::string user_api_key_;
 };
 
-std::string unpack_error(const std::string &output);
-
 } // namespace api
