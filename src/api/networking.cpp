@@ -1,9 +1,13 @@
 #include "networking.hpp"
 
 #include <cstdlib>
+#include <fmt/core.h>
+#include <json.hpp>
 #include <stdexcept>
 
 namespace {
+
+using json = nlohmann::json;
 
 size_t write_callback_(char *ptr, size_t size, size_t nmemb, std::string *data)
 {
@@ -69,8 +73,13 @@ std::string Curl::create_message(const std::string &input)
 
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
-    const std::string post_fields = input;
-    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
+    const json post_fields_json = {
+        { "max_tokens", 1024 },
+        { "messages", { { { "content", input }, { "role", "user" } } } },
+        { "model", "claude-opus-4-6" }
+    };
+    const std::string post_fields_str = post_fields_json.dump();
+    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields_str.c_str());
 
     std::string output;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &output);
