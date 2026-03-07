@@ -19,7 +19,7 @@ set(SRC_FILES
   api/networking.cpp
   main.cpp
 )
-include_directories(api)
+include_directories(api external)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
@@ -28,6 +28,22 @@ find_package(fmt)
 
 if(NOT fmt_FOUND)
   message(FATAL_ERROR "Is the {fmt} package installed?")
+endif()
+
+# nlohmann/json.hpp
+message(STATUS "Checking for nlohmann/json.hpp")
+
+set(NLOHMANN_JSON_HPP_DL "${CMAKE_SOURCE_DIR}/external/json.hpp")
+if(EXISTS ${NLOHMANN_JSON_HPP_DL})
+  message(STATUS "${NLOHMANN_JSON_HPP_DL} already exists. Skipping download")
+else()
+  message(STATUS "Downloading nlohmann/json.hpp")
+  file(
+    DOWNLOAD
+    "https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp"
+    ${NLOHMANN_JSON_HPP_DL}
+    SHOW_PROGRESS
+  )
 endif()
 # -----------------------------------------------------------------------------------------------------------
 
