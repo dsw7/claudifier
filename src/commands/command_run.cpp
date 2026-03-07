@@ -26,10 +26,10 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-void create_message_(const std::string &model)
+void create_message_(const std::string &prompt, const std::string &model)
 {
     api::Curl curl;
-    const auto result = curl.create_message("What is 3 + 5?", model);
+    const auto result = curl.create_message(prompt, model);
 
     if (result) {
         fmt::print("{}\n", result->output);
@@ -78,7 +78,8 @@ void command_run(int argc, char **argv)
         return;
     }
 
-    create_message_(model);
+    const std::string prompt = "What is 3 + 5?";
+    create_message_(prompt, model);
 }
 
 } // namespace commands
