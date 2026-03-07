@@ -21,4 +21,5 @@ set(SRC_FILES
 )
 
 add_executable(cl ${SRC_FILES})
+target_link_libraries(cl curl) 
 install(TARGETS cl DESTINATION ${CMAKE_INSTALL_PREFIX})
