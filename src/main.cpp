@@ -10,7 +10,8 @@ using api::Curl;
 void create_message()
 {
     Curl curl;
-    const auto result = curl.create_message("What is 3 + 5?");
+    const std::string model = "claude-opus-4-6";
+    const auto result = curl.create_message("What is 3 + 5?", model);
 
     if (result) {
         fmt::print("{}\n", result->output);
