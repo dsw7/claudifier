@@ -73,7 +73,7 @@ MessageResult Curl::create_message(const std::string &input)
         return unpack_200_response_(response);
     }
 
-    return std::unexpected(Err { http_status_code, unpack_error(response) });
+    return std::unexpected(unpack_error(response));
 }
 
 } // namespace api

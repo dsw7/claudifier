@@ -4,8 +4,9 @@
 #include <string>
 
 struct Err {
-    long code = -1;
-    std::string message;
+    std::string errmsg;
+    std::string raw_response;
+    std::string error_type;
 };
 
 struct OkMessage {

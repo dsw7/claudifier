@@ -22,7 +22,7 @@ nlohmann::json parse_response(const std::string &response)
     return json;
 }
 
-std::string unpack_error(const std::string &response)
+Err unpack_error(const std::string &response)
 {
     const nlohmann::json json = parse_response(response);
 
@@ -30,7 +30,11 @@ std::string unpack_error(const std::string &response)
         throw std::runtime_error("Malformed error response. Response is not an error");
     }
 
-    return json["error"]["message"];
+    Err e;
+    e.errmsg = json["error"]["message"];
+    e.error_type = json["error"]["type"];
+    e.raw_response = json.dump(4);
+    return e;
 }
 
 } // namespace api
