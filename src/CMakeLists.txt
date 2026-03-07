@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(Claudifier VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 
@@ -51,5 +51,5 @@ endif()
 # -----------------------------------------------------------------------------------------------------------
 
 add_executable(cl ${SRC_FILES})
-target_link_libraries(cl curl fmt::fmt)
+target_link_libraries(cl curl fmt::fmt pthread)
 install(TARGETS cl DESTINATION ${CMAKE_INSTALL_PREFIX})
