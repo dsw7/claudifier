@@ -13,7 +13,6 @@ void create_message()
     if (output) {
         fmt::print("{}\n", output->message);
     } else {
-        // throw std::runtime_error(output.error().message);
         throw std::runtime_error(output.error().message);
     }
 }

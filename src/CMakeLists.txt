@@ -18,7 +18,7 @@ add_compile_definitions(
 set(SRC_FILES
   api/api.cpp
   api/create_message.cpp
-  api/parse_error.cpp
+  api/parse_utils.cpp
   main.cpp
 )
 include_directories(api external)
