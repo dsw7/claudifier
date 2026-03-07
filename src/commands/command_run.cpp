@@ -2,12 +2,16 @@
 
 #include "api.hpp"
 
+#include <array>
+#include <atomic>
+#include <chrono>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 namespace {
 
@@ -27,6 +31,25 @@ Options:
 )";
 
     fmt::print("{}\n", messages);
+}
+
+std::atomic<bool> timer_enabled_(false);
+
+void time_api_call_()
+{
+    const std::chrono::duration delay = std::chrono::milliseconds(100);
+
+    static std::array spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
+    const int num_frames = spinner.size();
+
+    while (timer_enabled_.load()) {
+        for (int i = 0; i < num_frames; ++i) {
+            std::cout << "\r" << spinner[i] << std::flush;
+            std::this_thread::sleep_for(delay);
+        }
+    }
+
+    std::cout << " \r" << std::flush;
 }
 
 void create_message_(const std::string &prompt, const std::string &model)
