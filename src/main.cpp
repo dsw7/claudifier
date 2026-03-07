@@ -1,24 +1,8 @@
-#include "api.hpp"
+#include "command_run.hpp"
 
 #include <fmt/core.h>
-#include <iostream>
 #include <stdexcept>
 #include <string>
-
-using api::Curl;
-
-void create_message()
-{
-    Curl curl;
-    const std::string model = "claude-opus-4-6";
-    const auto result = curl.create_message("What is 3 + 5?", model);
-
-    if (result) {
-        fmt::print("{}\n", result->output);
-    } else {
-        throw std::runtime_error(result.error().errmsg);
-    }
-}
 
 void print_help()
 {
@@ -30,19 +14,19 @@ void print_help()
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        fmt::print(stderr, "Invalid argument. Try '-h' or '--help' for more information.\n");
-        return EXIT_FAILURE;
+    if (argc < 2) {
+        commands::command_run();
+        return EXIT_SUCCESS;
     }
 
-    std::string arg = argv[1];
+    const std::string arg = argv[1];
 
     if (arg == "-h" || arg == "--help") {
         print_help();
         return EXIT_SUCCESS;
     } else if (arg == "run") {
         try {
-            create_message();
+            commands::command_run();
         } catch (const std::runtime_error &e) {
             fmt::print(stderr, "{}\n", e.what());
             return EXIT_FAILURE;

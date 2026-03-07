@@ -6,7 +6,9 @@ BUILD_DIR_PROD = $(BUILD_DIR)/prod
 .DEFAULT_GOAL = compile
 
 format:
-	@clang-format -i --verbose --style=file src/*.cpp src/api/*.cpp src/api/*.hpp
+	@clang-format -i --verbose --style=file src/*.cpp \
+		src/api/*.cpp src/api/*.hpp \
+		src/commands/*.cpp src/commands/*.hpp
 
 compile: format
 	@cmake -S src -B $(BUILD_DIR_PROD)
