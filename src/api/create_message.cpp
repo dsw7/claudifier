@@ -8,12 +8,12 @@
 
 namespace {
 
-std::string pack_post_fields_(const std::string &content)
+std::string pack_post_fields_(const std::string &content, const std::string &model)
 {
     const nlohmann::json post_fields = {
         { "max_tokens", 1024 },
         { "messages", { { { "content", content }, { "role", "user" } } } },
-        { "model", "claude-opus-4-6" }
+        { "model", model }
     };
 
     return post_fields.dump();
@@ -40,7 +40,7 @@ OkMessage unpack_200_response_(const std::string &response)
 
 namespace api {
 
-MessageResult Curl::create_message(const std::string &input)
+MessageResult Curl::create_message(const std::string &input, const std::string &model)
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
@@ -51,7 +51,7 @@ MessageResult Curl::create_message(const std::string &input)
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = pack_post_fields_(input);
+    const std::string post_fields = pack_post_fields_(input, model);
     curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
