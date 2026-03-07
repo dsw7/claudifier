@@ -1,9 +1,9 @@
-#include "networking.hpp"
+#include "api.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
 
-using networking::Curl;
+using api::Curl;
 
 int main()
 {

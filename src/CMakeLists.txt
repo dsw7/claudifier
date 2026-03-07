@@ -16,7 +16,8 @@ add_compile_definitions(
 )
 
 set(SRC_FILES
-  api/networking.cpp
+  api/api.cpp
+  api/create_message.cpp
   main.cpp
 )
 include_directories(api external)

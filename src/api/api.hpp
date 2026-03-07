@@ -3,7 +3,7 @@
 #include <curl/curl.h>
 #include <string>
 
-namespace networking {
+namespace api {
 
 class Curl {
 public:
@@ -18,6 +18,8 @@ public:
 private:
     CURL *curl_ = nullptr;
     curl_slist *headers_ = nullptr;
+
+    std::string user_api_key_;
 };
 
-} // namespace networking
+} // namespace api
