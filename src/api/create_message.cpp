@@ -1,5 +1,7 @@
 #include "api.hpp"
 
+#include "utils.hpp"
+
 #include <json.hpp>
 #include <stdexcept>
 
@@ -20,9 +22,9 @@ std::string set_post_fields_(const std::string &content)
 
 namespace api {
 
-std::string Curl::create_message(const std::string &input)
+MessageResult Curl::create_message(const std::string &input)
 {
-    curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/message");
+    curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
 
     curl_slist *headers = nullptr;
@@ -53,7 +55,7 @@ std::string Curl::create_message(const std::string &input)
         return output;
     }
 
-    throw std::runtime_error(output);
+    return std::unexpected(Err { http_status_code, unpack_error(output) });
 }
 
 } // namespace api

@@ -1,9 +1,19 @@
 #pragma once
 
 #include <curl/curl.h>
+#include <expected>
 #include <string>
 
 namespace api {
+
+struct Err {
+    long code = -1;
+    std::string message;
+};
+
+using MessageResult = std::expected<std::string, Err>;
+
+std::string unpack_error(const std::string &output);
 
 class Curl {
 public:
@@ -13,7 +23,7 @@ public:
     Curl(const Curl &) = delete;
     Curl &operator=(const Curl &) = delete;
 
-    std::string create_message(const std::string &input);
+    MessageResult create_message(const std::string &input);
 
 private:
     CURL *curl_ = nullptr;

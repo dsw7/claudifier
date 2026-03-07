@@ -8,8 +8,13 @@ using api::Curl;
 void create_message()
 {
     Curl curl;
-    const std::string output = curl.create_message("What is 3 + 5?");
-    fmt::print("{}\n", output);
+    const auto output = curl.create_message("What is 3 + 5?");
+
+    if (output) {
+        fmt::print("{}\n", *output);
+    } else {
+        throw std::runtime_error(output.error().message);
+    }
 }
 
 int main()
