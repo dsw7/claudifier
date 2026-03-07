@@ -51,10 +51,6 @@ Curl::Curl()
 
 Curl::~Curl()
 {
-    if (this->headers_) {
-        curl_slist_free_all(this->headers_);
-    }
-
     if (this->curl_) {
         curl_easy_cleanup(this->curl_);
     }

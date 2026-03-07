@@ -13,10 +13,11 @@ namespace api {
 
 std::string Curl::create_message(const std::string &input)
 {
-    this->headers_ = curl_slist_append(this->headers_, ("X-Api-Key: " + this->user_api_key_).c_str());
-    this->headers_ = curl_slist_append(this->headers_, "Content-Type: application/json");
-    this->headers_ = curl_slist_append(this->headers_, "anthropic-version: 2023-06-01");
-    curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, this->headers_);
+    curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, ("X-Api-Key: " + this->user_api_key_).c_str());
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
+    curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
@@ -32,6 +33,8 @@ std::string Curl::create_message(const std::string &input)
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &output);
 
     const CURLcode code = curl_easy_perform(this->curl_);
+    curl_slist_free_all(headers);
+
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
     }
