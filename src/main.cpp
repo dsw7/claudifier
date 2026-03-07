@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-void print_help()
+void print_help_messages()
 {
     fmt::print("Usage: program [option]\n");
     fmt::print("Options:\n");
@@ -19,21 +19,23 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
-    const std::string arg = argv[1];
+    const std::string command = argv[1];
 
-    if (arg == "-h" || arg == "--help") {
-        print_help();
+    if (command == "-h" or command == "--help") {
+        print_help_messages();
         return EXIT_SUCCESS;
-    } else if (arg == "run") {
-        try {
+    }
+
+    try {
+        if (command == "run") {
             commands::command_run();
-        } catch (const std::runtime_error &e) {
-            fmt::print(stderr, "{}\n", e.what());
-            return EXIT_FAILURE;
+        } else {
+            throw std::runtime_error("Received unknown command. Re-run with -h or --help");
         }
-        return EXIT_SUCCESS;
-    } else {
-        fmt::print(stderr, "Unknown command '{}'. Try '-h' or '--help' for more information.\n", arg);
+    } catch (const std::runtime_error &e) {
+        fmt::print(stderr, "{}\n", e.what());
         return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
 }
