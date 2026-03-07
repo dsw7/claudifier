@@ -2,9 +2,14 @@
 
 #include <cstdlib>
 #include <stdexcept>
-#include <string>
 
 namespace {
+
+size_t write_callback_(char *ptr, size_t size, size_t nmemb, std::string *data)
+{
+    data->append(ptr, size * nmemb);
+    return size * nmemb;
+}
 
 std::string load_user_api_key_()
 {
@@ -27,8 +32,37 @@ std::string get_user_api_key_()
 
 namespace networking {
 
-void create_message()
+Curl::Curl()
 {
+    if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0) {
+        throw std::runtime_error("Something went wrong when initializing libcurl");
+    }
+
+    this->curl_ = curl_easy_init();
+
+    if (this->curl_ == nullptr) {
+        throw std::runtime_error("Something went wrong when starting libcurl easy session");
+    }
+
+    curl_easy_setopt(this->curl_, CURLOPT_WRITEFUNCTION, write_callback_);
+}
+
+Curl::~Curl()
+{
+    if (this->headers_) {
+        curl_slist_free_all(this->headers_);
+    }
+
+    if (this->curl_) {
+        curl_easy_cleanup(this->curl_);
+    }
+
+    curl_global_cleanup();
+}
+
+std::string Curl::create_message(const std::string &input)
+{
+    return input;
 }
 
 } // namespace networking
