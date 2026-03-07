@@ -16,9 +16,10 @@ add_compile_definitions(
 )
 
 set(SRC_FILES
+  api/networking.cpp
   main.cpp
-  networking.cpp
 )
+include_directories(api)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
