@@ -49,7 +49,7 @@ void print_build_information()
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        commands::command_run();
+        commands::command_run(argc, argv);
         return EXIT_SUCCESS;
     }
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     try {
         if (command == "run") {
-            commands::command_run();
+            commands::command_run(argc, argv);
         } else {
             throw std::runtime_error("Received unknown command. Re-run with -h or --help");
         }
