@@ -17,6 +17,7 @@ add_compile_definitions(
 
 set(SRC_FILES
   main.cpp
+  networking.cpp
 )
 
 add_executable(cl ${SRC_FILES})
