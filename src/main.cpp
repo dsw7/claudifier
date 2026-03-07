@@ -1,6 +1,7 @@
 #include "command_run.hpp"
 
 #include <fmt/core.h>
+#include <json.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -29,6 +30,22 @@ Try 'cl <subcommand> [-h | --help]' for subcommand specific help.
     fmt::print("{}\n", messages);
 }
 
+void print_build_information()
+{
+    nlohmann::json data;
+
+    data["build_date"] = BUILD_DATE;
+    data["version"] = PROJECT_VERSION;
+
+#ifdef TESTING_ENABLED
+    data["build_type"] = "Testing";
+#else
+    data["build_type"] = "Production";
+#endif
+
+    fmt::print("{}\n", data.dump(2));
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
@@ -40,6 +57,11 @@ int main(int argc, char *argv[])
 
     if (command == "-h" or command == "--help") {
         print_help_messages();
+        return EXIT_SUCCESS;
+    }
+
+    if (command == "-v" or command == "--version") {
+        print_build_information();
         return EXIT_SUCCESS;
     }
 
