@@ -11,8 +11,9 @@ void create_message()
     const auto output = curl.create_message("What is 3 + 5?");
 
     if (output) {
-        fmt::print("{}\n", *output);
+        fmt::print("{}\n", output->message);
     } else {
+        // throw std::runtime_error(output.error().message);
         throw std::runtime_error(output.error().message);
     }
 }

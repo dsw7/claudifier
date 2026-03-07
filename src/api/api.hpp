@@ -6,12 +6,16 @@
 
 namespace api {
 
+struct OkMessage {
+    std::string message;
+};
+
 struct Err {
     long code = -1;
     std::string message;
 };
 
-using MessageResult = std::expected<std::string, Err>;
+using MessageResult = std::expected<OkMessage, Err>;
 
 class Curl {
 public:

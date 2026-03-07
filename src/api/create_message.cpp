@@ -36,8 +36,8 @@ MessageResult Curl::create_message(const std::string &input)
     const std::string post_fields = set_post_fields_(input);
     curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
-    std::string output;
-    curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &output);
+    std::string response;
+    curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
 
     const CURLcode code = curl_easy_perform(this->curl_);
 
@@ -52,10 +52,10 @@ MessageResult Curl::create_message(const std::string &input)
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return output;
+        return OkMessage { response };
     }
 
-    return std::unexpected(Err { http_status_code, parse_error(output) });
+    return std::unexpected(Err { http_status_code, parse_error(response) });
 }
 
 } // namespace api
