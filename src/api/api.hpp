@@ -1,25 +1,11 @@
 #pragma once
 
+#include "responses.hpp"
+
 #include <curl/curl.h>
-#include <expected>
 #include <string>
 
 namespace api {
-
-struct OkMessage {
-    int input_tokens = 0;
-    int output_tokens = 0;
-    std::string model;
-    std::string output;
-    std::string raw_response;
-};
-
-struct Err {
-    long code = -1;
-    std::string message;
-};
-
-using MessageResult = std::expected<OkMessage, Err>;
 
 class Curl {
 public:

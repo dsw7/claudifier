@@ -1,6 +1,7 @@
 #include "api.hpp"
 
 #include "parse_utils.hpp"
+#include "responses.hpp"
 
 #include <json.hpp>
 #include <stdexcept>
@@ -18,7 +19,7 @@ std::string pack_post_fields_(const std::string &content)
     return post_fields.dump();
 }
 
-api::OkMessage unpack_200_response_(const std::string &response)
+OkMessage unpack_200_response_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
@@ -26,7 +27,7 @@ api::OkMessage unpack_200_response_(const std::string &response)
         throw std::runtime_error("Malformed message response. Response is not a message");
     }
 
-    api::OkMessage ok;
+    OkMessage ok;
     ok.input_tokens = json["usage"]["input_tokens"];
     ok.model = json["model"];
     ok.output = json["content"][0]["text"];
