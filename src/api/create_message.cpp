@@ -5,7 +5,16 @@
 
 namespace {
 
-using json = nlohmann::json;
+std::string set_post_fields_(const std::string &content)
+{
+    const nlohmann::json post_fields = {
+        { "max_tokens", 1024 },
+        { "messages", { { { "content", content }, { "role", "user" } } } },
+        { "model", "claude-opus-4-6" }
+    };
+
+    return post_fields.dump();
+}
 
 } // namespace
 
@@ -13,27 +22,25 @@ namespace api {
 
 std::string Curl::create_message(const std::string &input)
 {
+    curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/message");
+    curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
+
     curl_slist *headers = nullptr;
     headers = curl_slist_append(headers, ("X-Api-Key: " + this->user_api_key_).c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
-    curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
-    curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
-    const json post_fields_json = {
-        { "max_tokens", 1024 },
-        { "messages", { { { "content", input }, { "role", "user" } } } },
-        { "model", "claude-opus-4-6" }
-    };
-    const std::string post_fields_str = post_fields_json.dump();
-    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields_str.c_str());
+    const std::string post_fields = set_post_fields_(input);
+    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string output;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &output);
 
     const CURLcode code = curl_easy_perform(this->curl_);
+
     curl_slist_free_all(headers);
+    headers = nullptr;
 
     if (code != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(code));
