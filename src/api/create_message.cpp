@@ -7,7 +7,7 @@
 
 namespace {
 
-std::string set_post_fields_(const std::string &content)
+std::string pack_post_fields_(const std::string &content)
 {
     const nlohmann::json post_fields = {
         { "max_tokens", 1024 },
@@ -33,7 +33,7 @@ MessageResult Curl::create_message(const std::string &input)
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = set_post_fields_(input);
+    const std::string post_fields = pack_post_fields_(input);
     curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
@@ -55,7 +55,7 @@ MessageResult Curl::create_message(const std::string &input)
         return OkMessage { response };
     }
 
-    return std::unexpected(Err { http_status_code, parse_error(response) });
+    return std::unexpected(Err { http_status_code, unpack_error(response) });
 }
 
 } // namespace api

@@ -22,7 +22,7 @@ nlohmann::json parse_response(const std::string &response)
     return json;
 }
 
-std::string parse_error(const std::string &response)
+std::string unpack_error(const std::string &response)
 {
     const nlohmann::json json = parse_response(response);
 
