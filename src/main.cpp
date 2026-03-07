@@ -6,10 +6,27 @@
 
 void print_help_messages()
 {
-    fmt::print("Usage: program [option]\n");
-    fmt::print("Options:\n");
-    fmt::print("  -h, --help   Show help menu\n");
-    fmt::print("  run          Run the create_message function\n");
+    fmt::print("-- Claudifier | v{}\n", PROJECT_VERSION);
+    fmt::print("-- Copyright (C) 2026-{} by David Weber\n", CURRENT_YEAR);
+
+    const std::string messages = R"(-- Site: https://github.com/dsw7/Claudifier
+
+A command line Claude API toolkit.
+
+Usage:
+  cl [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help     Print help information and exit
+  -v, --version  Print version and exit
+
+Commands:
+  run            Run a query against an appropriate model
+
+Try 'cl <subcommand> [-h | --help]' for subcommand specific help.
+)";
+
+    fmt::print("{}\n", messages);
 }
 
 int main(int argc, char *argv[])
