@@ -1,6 +1,6 @@
 #include "api.hpp"
 
-#include "utils.hpp"
+#include "parse_error.hpp"
 
 #include <json.hpp>
 #include <stdexcept>
@@ -55,7 +55,7 @@ MessageResult Curl::create_message(const std::string &input)
         return output;
     }
 
-    return std::unexpected(Err { http_status_code, unpack_error(output) });
+    return std::unexpected(Err { http_status_code, parse_error(output) });
 }
 
 } // namespace api

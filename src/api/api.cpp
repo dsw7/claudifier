@@ -1,7 +1,5 @@
 #include "api.hpp"
 
-#include "utils.hpp"
-
 #include <cstdlib>
 #include <json.hpp>
 #include <stdexcept>
@@ -59,21 +57,6 @@ Curl::~Curl()
     }
 
     curl_global_cleanup();
-}
-
-std::string unpack_error(const std::string &output)
-{
-    const nlohmann::json json = utils::parse_json(output);
-
-    if (not json.contains("error")) {
-        throw std::runtime_error("Malformed error response. No error object could be found");
-    }
-
-    if (not json["error"].contains("message")) {
-        throw std::runtime_error("Malformed error response. No message could be found");
-    }
-
-    return json["error"]["message"];
 }
 
 } // namespace api
