@@ -1,6 +1,6 @@
 #include "networking.hpp"
 
-#include <iostream>
+#include <fmt/core.h>
 #include <stdexcept>
 
 using networking::Curl;
@@ -11,10 +11,11 @@ int main()
 
     try {
         const std::string output = curl.create_message("What is 3 + 5?");
-        std::cout << output << '\n';
+        fmt::print("{}\n", output);
     } catch (const std::runtime_error &e) {
-        std::cerr << e.what() << '\n';
+        fmt::print(stderr, "{}\n", e.what());
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

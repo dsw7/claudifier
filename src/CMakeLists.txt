@@ -20,6 +20,16 @@ set(SRC_FILES
   networking.cpp
 )
 
+# -----------------------------------------------------------------------------------------------------------
+# External dependencies
+message(STATUS "Locating {fmt} library")
+find_package(fmt)
+
+if(NOT fmt_FOUND)
+  message(FATAL_ERROR "Is the {fmt} package installed?")
+endif()
+# -----------------------------------------------------------------------------------------------------------
+
 add_executable(cl ${SRC_FILES})
-target_link_libraries(cl curl) 
+target_link_libraries(cl curl fmt::fmt)
 install(TARGETS cl DESTINATION ${CMAKE_INSTALL_PREFIX})
