@@ -19,8 +19,9 @@ set(SRC_FILES
   api/api.cpp
   api/create_message.cpp
   main.cpp
+  utils.cpp
 )
-include_directories(api external)
+include_directories(. api external)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
