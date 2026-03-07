@@ -1,6 +1,7 @@
 #include "command_run.hpp"
 
 #include "api.hpp"
+#include "responses.hpp"
 
 #include <array>
 #include <atomic>
@@ -54,8 +55,28 @@ void time_api_call_()
 
 void create_message_(const std::string &prompt, const std::string &model)
 {
-    api::Curl curl;
-    const auto result = curl.create_message(prompt, model);
+    timer_enabled_.store(true);
+    std::thread timer(time_api_call_);
+
+    bool query_failed = false;
+    MessageResult result;
+    std::string errmsg;
+
+    try {
+        api::Curl curl;
+        result = curl.create_message(prompt, model);
+    } catch (std::runtime_error &e) {
+        query_failed = true;
+        errmsg = e.what();
+    }
+
+    timer_enabled_.store(false);
+    timer.join();
+
+    if (query_failed) {
+        fmt::print(stderr, "{}\n", errmsg);
+        throw std::runtime_error("Cannot proceed");
+    }
 
     if (result) {
         fmt::print("{}\n", result->output);
