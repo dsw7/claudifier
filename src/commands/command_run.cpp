@@ -15,7 +15,7 @@ void help_run_command_()
 {
     const std::string messages = R"(Create a message according to a prompt.
 Messaging using the run command is stateless.
-The prompt is read in interactively.
+The prompt can be read in interactively or via command line argument.
 
 Usage:
   cl run [OPTIONS]
