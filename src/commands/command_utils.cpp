@@ -2,8 +2,29 @@
 
 #include <array>
 #include <chrono>
+#include <fmt/core.h>
 #include <iostream>
 #include <thread>
+
+namespace {
+
+constexpr std::string get_line_()
+{
+    std::string line;
+
+    for (int i = 0; i < 100; i++) {
+        line += "\u2500";
+    }
+
+    return line;
+}
+
+} // namespace
+
+void print_line()
+{
+    fmt::print("{}\n", get_line_());
+}
 
 namespace threading {
 
