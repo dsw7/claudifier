@@ -4,15 +4,25 @@
 #include <chrono>
 #include <fmt/core.h>
 #include <iostream>
+#include <string>
+#include <sys/ioctl.h>
 #include <thread>
+#include <unistd.h>
 
 namespace {
 
-constexpr std::string get_line_()
+std::string get_line_()
 {
     std::string line;
+    int width = 100;
 
-    for (int i = 0; i < 100; i++) {
+    if (isatty(STDOUT_FILENO)) {
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        width = w.ws_col;
+    }
+
+    for (int i = 0; i < width; i++) {
         line += "\u2500";
     }
 
@@ -23,7 +33,8 @@ constexpr std::string get_line_()
 
 void print_line()
 {
-    fmt::print("{}\n", get_line_());
+    static std::string line = get_line_();
+    fmt::print("{}\n", line);
 }
 
 namespace threading {
