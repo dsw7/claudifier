@@ -31,11 +31,15 @@ std::string get_line_()
 
 } // namespace
 
+namespace utils {
+
 void print_line()
 {
     static std::string line = get_line_();
     fmt::print("{}\n", line);
 }
+
+} // namespace utils
 
 namespace threading {
 

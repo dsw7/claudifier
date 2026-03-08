@@ -2,7 +2,9 @@
 
 #include <atomic>
 
+namespace utils {
 void print_line();
+}
 
 namespace threading {
 extern std::atomic<bool> timer_enabled;
