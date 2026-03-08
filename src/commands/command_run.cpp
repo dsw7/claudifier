@@ -39,7 +39,8 @@ std::string select_prompt_(const std::optional<std::string> &prompt_from_cli)
     }
 
     std::string prompt_from_stdin;
-    fmt::print("Input: ");
+    print_line();
+    fmt::print("\033[1mInput:\033[0m ");
     std::getline(std::cin, prompt_from_stdin);
     return prompt_from_stdin;
 }
@@ -79,11 +80,13 @@ MessageResult create_message_(const std::string &prompt, const std::string &mode
 void print_results_(const MessageResult &result)
 {
     print_line();
-    fmt::print("Output:\n{}\n\n", result->output);
+    fmt::print("\033[1mOutput: \033[32m{}\033[0m\n", result->output);
     print_line();
+    fmt::print("\033[1mUsage:\033[0m\n");
     fmt::print("Model: {}\n", result->model);
     fmt::print("Input tokens: {}\n", result->input_tokens);
     fmt::print("Output tokens: {}\n", result->output_tokens);
+    print_line();
 }
 
 } // namespace
