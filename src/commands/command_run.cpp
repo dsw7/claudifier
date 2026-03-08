@@ -78,7 +78,12 @@ MessageResult create_message_(const std::string &prompt, const std::string &mode
 
 void print_results_(const MessageResult &result)
 {
-    fmt::print("{}\n", result->output);
+    print_line();
+    fmt::print("Output:\n{}\n\n", result->output);
+    print_line();
+    fmt::print("Model: {}\n", result->model);
+    fmt::print("Input tokens: {}\n", result->input_tokens);
+    fmt::print("Output tokens: {}\n", result->output_tokens);
 }
 
 } // namespace
