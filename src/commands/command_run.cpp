@@ -65,7 +65,7 @@ void create_message_(const std::string &prompt, const std::string &model)
     try {
         api::Curl curl;
         result = curl.create_message(prompt, model);
-    } catch (std::runtime_error &e) {
+    } catch (const std::runtime_error &e) {
         query_failed = true;
         errmsg = e.what();
     }
