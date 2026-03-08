@@ -34,6 +34,18 @@ Options:
     fmt::print("{}\n", messages);
 }
 
+std::string select_prompt_(const std::optional<std::string> &prompt_from_cli)
+{
+    if (prompt_from_cli.has_value()) {
+        return *prompt_from_cli;
+    }
+
+    std::string prompt_from_stdin;
+    fmt::print("Input: ");
+    std::getline(std::cin, prompt_from_stdin);
+    return prompt_from_stdin;
+}
+
 std::atomic<bool> timer_enabled_(false);
 
 void time_api_call_()
@@ -53,7 +65,7 @@ void time_api_call_()
     std::cout << " \r" << std::flush;
 }
 
-void create_message_(const std::string &prompt, const std::string &model)
+MessageResult create_message_(const std::string &prompt, const std::string &model)
 {
     timer_enabled_.store(true);
     std::thread timer(time_api_call_);
@@ -78,11 +90,16 @@ void create_message_(const std::string &prompt, const std::string &model)
         throw std::runtime_error("Cannot proceed");
     }
 
-    if (result) {
-        fmt::print("{}\n", result->output);
-    } else {
+    if (not result) {
         throw std::runtime_error(result.error().errmsg);
     }
+
+    return result;
+}
+
+void print_results_(const MessageResult &result)
+{
+    fmt::print("{}\n", result->output);
 }
 
 } // namespace
@@ -93,7 +110,7 @@ void command_run(int argc, char **argv)
 {
     bool print_help = false;
     std::string model = "claude-opus-4-6";
-    std::optional<std::string> prompt;
+    std::optional<std::string> prompt_from_cli;
 
     while (true) {
         static struct option long_options[] = {
@@ -118,7 +135,7 @@ void command_run(int argc, char **argv)
                 model = optarg;
                 break;
             case 'p':
-                prompt = optarg;
+                prompt_from_cli = optarg;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -130,12 +147,9 @@ void command_run(int argc, char **argv)
         return;
     }
 
-    if (not prompt.has_value()) {
-        fmt::print("Enter prompt: ");
-        std::getline(std::cin, prompt.emplace());
-    }
-
-    create_message_(*prompt, model);
+    const std::string prompt = select_prompt_(prompt_from_cli);
+    const MessageResult result = create_message_(prompt, model);
+    print_results_(result);
 }
 
 } // namespace commands
