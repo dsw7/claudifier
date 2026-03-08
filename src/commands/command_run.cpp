@@ -1,11 +1,9 @@
 #include "command_run.hpp"
 
 #include "api.hpp"
+#include "command_utils.hpp"
 #include "responses.hpp"
 
-#include <array>
-#include <atomic>
-#include <chrono>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
@@ -46,29 +44,10 @@ std::string select_prompt_(const std::optional<std::string> &prompt_from_cli)
     return prompt_from_stdin;
 }
 
-std::atomic<bool> timer_enabled_(false);
-
-void time_api_call_()
-{
-    const std::chrono::duration delay = std::chrono::milliseconds(100);
-
-    static std::array spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
-    const int num_frames = spinner.size();
-
-    while (timer_enabled_.load()) {
-        for (int i = 0; i < num_frames; ++i) {
-            std::cout << "\r" << spinner[i] << std::flush;
-            std::this_thread::sleep_for(delay);
-        }
-    }
-
-    std::cout << " \r" << std::flush;
-}
-
 MessageResult create_message_(const std::string &prompt, const std::string &model)
 {
-    timer_enabled_.store(true);
-    std::thread timer(time_api_call_);
+    threading::timer_enabled.store(true);
+    std::thread timer(threading::time_api_call);
 
     bool query_failed = false;
     MessageResult result;
@@ -82,7 +61,7 @@ MessageResult create_message_(const std::string &prompt, const std::string &mode
         errmsg = e.what();
     }
 
-    timer_enabled_.store(false);
+    threading::timer_enabled.store(false);
     timer.join();
 
     if (query_failed) {
