@@ -3,7 +3,6 @@
 #include "api.hpp"
 #include "command_utils.hpp"
 #include "read_cli.hpp"
-#include "responses.hpp"
 
 #include <fmt/core.h>
 #include <iostream>
@@ -24,18 +23,18 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-MessageResult create_message_(const ModelMessages &mod_messages)
+ModelMessagesResult create_message_(const ModelMessages &model)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
 
     bool query_failed = false;
-    MessageResult result;
+    std::expected<ModelMessagesResult, Err> model_result;
     std::string errmsg;
 
     try {
         api::Curl curl;
-        result = curl.create_message(mod_messages);
+        model_result = curl.create_message(model);
     } catch (const std::runtime_error &e) {
         query_failed = true;
         errmsg = e.what();
@@ -49,22 +48,22 @@ MessageResult create_message_(const ModelMessages &mod_messages)
         throw std::runtime_error("Cannot proceed");
     }
 
-    if (not result) {
-        throw std::runtime_error(result.error().errmsg);
+    if (not model_result) {
+        throw std::runtime_error(model_result.error().errmsg);
     }
 
-    return result;
+    return *model_result;
 }
 
-void print_results_(const MessageResult &result)
+void print_results_(const ModelMessagesResult &model)
 {
     utils::print_line();
-    fmt::print("\033[1mOutput: \033[32m{}\033[0m\n", result->output);
+    fmt::print("\033[1mOutput: \033[32m{}\033[0m\n", model.output);
     utils::print_line();
     fmt::print("\033[1mUsage:\033[0m\n");
-    fmt::print("Model: {}\n", result->model);
-    fmt::print("Input tokens: {}\n", result->input_tokens);
-    fmt::print("Output tokens: {}\n", result->output_tokens);
+    fmt::print("Model: {}\n", model.llm_model);
+    fmt::print("Input tokens: {}\n", model.input_tokens);
+    fmt::print("Output tokens: {}\n", model.output_tokens);
     utils::print_line();
 }
 
@@ -74,15 +73,15 @@ namespace commands {
 
 void command_run(int argc, char **argv)
 {
-    ModelMessages mod_messages;
-    read_cli(argc, argv, mod_messages);
+    ModelMessages model;
+    read_cli(argc, argv, model);
 
-    if (mod_messages.prompt.empty()) {
-        mod_messages.prompt = read_prompt_from_stdin_();
+    if (model.prompt.empty()) {
+        model.prompt = read_prompt_from_stdin_();
     }
 
-    const MessageResult result = create_message_(mod_messages);
-    print_results_(result);
+    const ModelMessagesResult model_result = create_message_(model);
+    print_results_(model_result);
 }
 
 } // namespace commands

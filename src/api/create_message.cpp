@@ -1,7 +1,6 @@
 #include "api.hpp"
 
 #include "parse_utils.hpp"
-#include "responses.hpp"
 
 #include <json.hpp>
 #include <stdexcept>
@@ -19,7 +18,7 @@ std::string model_to_post_fields_(const ModelMessages &model)
     return post_fields.dump();
 }
 
-OkMessage unpack_200_response_(const std::string &response)
+ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
@@ -27,9 +26,9 @@ OkMessage unpack_200_response_(const std::string &response)
         throw std::runtime_error("Malformed message response. Response is not a message");
     }
 
-    OkMessage ok;
+    ModelMessagesResult ok;
     ok.input_tokens = json["usage"]["input_tokens"];
-    ok.model = json["model"];
+    ok.llm_model = json["model"];
     ok.output = json["content"][0]["text"];
     ok.output_tokens = json["usage"]["output_tokens"];
     ok.raw_response = json.dump(4);
@@ -40,7 +39,7 @@ OkMessage unpack_200_response_(const std::string &response)
 
 namespace api {
 
-MessageResult Curl::create_message(const ModelMessages &model)
+std::expected<ModelMessagesResult, Err> Curl::create_message(const ModelMessages &model)
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
@@ -70,7 +69,7 @@ MessageResult Curl::create_message(const ModelMessages &model)
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return unpack_200_response_(response);
+        return unpack_200_response_to_model_(response);
     }
 
     return std::unexpected(unpack_error(response));
