@@ -7,6 +7,7 @@
 // -------------------
 
 struct ModelMessages {
+    int token_limit = 1024;
     std::string llm_model = "claude-opus-4-6";
     std::string prompt;
 };

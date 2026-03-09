@@ -1,5 +1,7 @@
 #include "read_cli.hpp"
 
+#include "command_utils.hpp"
+
 #include <fmt/core.h>
 #include <getopt.h>
 #include <stdexcept>
@@ -19,6 +21,7 @@ Options:
   -h, --help                     Print help information and exit
   -m, --model=MODEL              Specify a valid messages model
   -p, --prompt=PROMPT            Specify the prompt message
+  -l, --limit=LIMIT              Specify token limit
 )";
 
     fmt::print("{}\n", messages);
@@ -37,11 +40,12 @@ void read_cli(int argc, char **argv, ModelMessages &model)
             { "help", no_argument, 0, 'h' },
             { "model", required_argument, 0, 'm' },
             { "prompt", required_argument, 0, 'p' },
+            { "limit", required_argument, 0, 'l' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:p:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hm:p:l:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -56,6 +60,9 @@ void read_cli(int argc, char **argv, ModelMessages &model)
                 break;
             case 'p':
                 model.prompt = optarg;
+                break;
+            case 'l':
+                model.token_limit = utils::string_to_int(optarg);
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));

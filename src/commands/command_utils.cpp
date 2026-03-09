@@ -4,7 +4,7 @@
 #include <chrono>
 #include <fmt/core.h>
 #include <iostream>
-#include <string>
+#include <stdexcept>
 #include <sys/ioctl.h>
 #include <thread>
 #include <unistd.h>
@@ -37,6 +37,24 @@ void print_line()
 {
     static std::string line = get_line_();
     fmt::print("{}\n", line);
+}
+
+int string_to_int(const std::string &str)
+{
+    if (str.empty()) {
+        throw std::runtime_error("Cannot convert string to int. Input string is empty");
+    }
+
+    int i = 0;
+
+    try {
+        i = std::stoi(str);
+    } catch (const std::invalid_argument &e) {
+        const std::string errmsg = fmt::format("{}\nFailed to convert '{}' to int", e.what(), str);
+        throw std::runtime_error(errmsg);
+    }
+
+    return i;
 }
 
 } // namespace utils
