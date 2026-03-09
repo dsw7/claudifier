@@ -2,12 +2,11 @@
 
 #include "api.hpp"
 #include "command_utils.hpp"
+#include "read_cli.hpp"
 #include "responses.hpp"
 
 #include <fmt/core.h>
-#include <getopt.h>
 #include <iostream>
-#include <optional>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -32,17 +31,15 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-std::string select_prompt_(const std::optional<std::string> &prompt_from_cli)
+std::string read_prompt_from_stdin_()
 {
-    if (prompt_from_cli.has_value()) {
-        return *prompt_from_cli;
-    }
-
-    std::string prompt_from_stdin;
     utils::print_line();
     fmt::print("\033[1mInput:\033[0m ");
-    std::getline(std::cin, prompt_from_stdin);
-    return prompt_from_stdin;
+
+    std::string prompt;
+    std::getline(std::cin, prompt);
+
+    return prompt;
 }
 
 MessageResult create_message_(const std::string &prompt, const std::string &model)
@@ -95,47 +92,16 @@ namespace commands {
 
 void command_run(int argc, char **argv)
 {
-    bool print_help = false;
-    std::string model = "claude-opus-4-6";
-    std::optional<std::string> prompt_from_cli;
+    ParamsRun params;
+    read_cli(argc, argv, params);
 
-    while (true) {
-        static struct option long_options[] = {
-            { "help", no_argument, 0, 'h' },
-            { "model", required_argument, 0, 'm' },
-            { "prompt", required_argument, 0, 'p' },
-            { 0, 0, 0, 0 },
-        };
-
-        int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:p:", long_options, &option_index);
-
-        if (c == -1) {
-            break;
-        }
-
-        switch (c) {
-            case 'h':
-                print_help = true;
-                break;
-            case 'm':
-                model = optarg;
-                break;
-            case 'p':
-                prompt_from_cli = optarg;
-                break;
-            default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
-        }
-    };
-
-    if (print_help) {
+    if (params.print_help_and_exit) {
         help_run_command_();
         return;
     }
 
-    const std::string prompt = select_prompt_(prompt_from_cli);
-    const MessageResult result = create_message_(prompt, model);
+    const std::string prompt = params.prompt.empty() ? read_prompt_from_stdin_() : params.prompt;
+    const MessageResult result = create_message_(prompt, params.model);
     print_results_(result);
 }
 

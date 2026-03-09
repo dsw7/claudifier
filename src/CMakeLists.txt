@@ -21,6 +21,7 @@ set(SRC_FILES
   api/parse_utils.cpp
   commands/command_run.cpp
   commands/command_utils.cpp
+  commands/read_cli.cpp
   main.cpp
 )
 include_directories(api commands external)
