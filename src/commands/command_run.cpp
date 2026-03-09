@@ -42,7 +42,7 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-MessageResult create_message_(const std::string &prompt, const std::string &model)
+MessageResult create_message_(const ModelMessages &mod_messages)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
@@ -53,7 +53,7 @@ MessageResult create_message_(const std::string &prompt, const std::string &mode
 
     try {
         api::Curl curl;
-        result = curl.create_message(prompt, model);
+        result = curl.create_message(mod_messages);
     } catch (const std::runtime_error &e) {
         query_failed = true;
         errmsg = e.what();
@@ -92,16 +92,19 @@ namespace commands {
 
 void command_run(int argc, char **argv)
 {
-    ParamsRun params;
-    read_cli(argc, argv, params);
+    ModelMessages mod_messages;
+    read_cli(argc, argv, mod_messages);
 
-    if (params.print_help_and_exit) {
+    if (mod_messages.print_help_and_exit) {
         help_run_command_();
         return;
     }
 
-    const std::string prompt = params.prompt.empty() ? read_prompt_from_stdin_() : params.prompt;
-    const MessageResult result = create_message_(prompt, params.model);
+    if (mod_messages.prompt.empty()) {
+        mod_messages.prompt = read_prompt_from_stdin_();
+    }
+
+    const MessageResult result = create_message_(mod_messages);
     print_results_(result);
 }
 

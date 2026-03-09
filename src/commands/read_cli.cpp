@@ -6,7 +6,7 @@
 
 namespace commands {
 
-void read_cli(int argc, char **argv, ParamsRun &params)
+void read_cli(int argc, char **argv, ModelMessages &model)
 {
     while (true) {
         static struct option long_options[] = {
@@ -25,13 +25,13 @@ void read_cli(int argc, char **argv, ParamsRun &params)
 
         switch (c) {
             case 'h':
-                params.print_help_and_exit = true;
+                model.print_help_and_exit = true;
                 break;
             case 'm':
-                params.model = optarg;
+                model.llm_model = optarg;
                 break;
             case 'p':
-                params.prompt = optarg;
+                model.prompt = optarg;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
