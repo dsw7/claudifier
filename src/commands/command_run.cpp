@@ -13,24 +13,6 @@
 
 namespace {
 
-void help_run_command_()
-{
-    const std::string messages = R"(Create a message according to a prompt.
-Messaging using the run command is stateless.
-The prompt can be read in interactively or via command line argument.
-
-Usage:
-  cl run [OPTIONS]
-
-Options:
-  -h, --help                     Print help information and exit
-  -m, --model=MODEL              Specify a valid messages model
-  -p, --prompt=PROMPT            Specify the prompt message
-)";
-
-    fmt::print("{}\n", messages);
-}
-
 std::string read_prompt_from_stdin_()
 {
     utils::print_line();
@@ -94,11 +76,6 @@ void command_run(int argc, char **argv)
 {
     ModelMessages mod_messages;
     read_cli(argc, argv, mod_messages);
-
-    if (mod_messages.print_help_and_exit) {
-        help_run_command_();
-        return;
-    }
 
     if (mod_messages.prompt.empty()) {
         mod_messages.prompt = read_prompt_from_stdin_();
