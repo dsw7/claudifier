@@ -16,8 +16,8 @@ add_compile_definitions(
 )
 
 set(SRC_FILES
-  api/api.cpp
-  api/create_message.cpp
+  api/query_messages_api.cpp
+  api/curl_base.cpp
   api/parse_utils.cpp
   commands/command_run.cpp
   commands/command_utils.cpp

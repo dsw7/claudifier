@@ -1,4 +1,4 @@
-#include "api.hpp"
+#include "query_messages_api.hpp"
 
 #include "parse_utils.hpp"
 
@@ -39,7 +39,7 @@ ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
 
 namespace api {
 
-std::expected<ModelMessagesResult, Err> Curl::create_message(const ModelMessages &model)
+std::expected<ModelMessagesResult, Err> CreateMessage::query_api(const ModelMessages &model)
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);

@@ -1,4 +1,4 @@
-#include "api.hpp"
+#include "curl_base.hpp"
 
 #include <cstdlib>
 #include <json.hpp>
@@ -33,7 +33,7 @@ std::string get_user_api_key_()
 
 namespace api {
 
-Curl::Curl()
+CurlBase::CurlBase()
 {
     this->user_api_key_ = get_user_api_key_();
 
@@ -50,7 +50,7 @@ Curl::Curl()
     curl_easy_setopt(this->curl_, CURLOPT_WRITEFUNCTION, write_callback_);
 }
 
-Curl::~Curl()
+CurlBase::~CurlBase()
 {
     if (this->curl_) {
         curl_easy_cleanup(this->curl_);

@@ -1,7 +1,7 @@
 #include "command_run.hpp"
 
-#include "api.hpp"
 #include "command_utils.hpp"
+#include "query_messages_api.hpp"
 #include "read_cli.hpp"
 
 #include <fmt/core.h>
@@ -33,8 +33,8 @@ ModelMessagesResult create_message_(const ModelMessages &model)
     std::string errmsg;
 
     try {
-        api::Curl curl;
-        model_result = curl.create_message(model);
+        api::CreateMessage handle;
+        model_result = handle.query_api(model);
     } catch (const std::runtime_error &e) {
         query_failed = true;
         errmsg = e.what();
