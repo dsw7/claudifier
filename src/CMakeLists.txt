@@ -52,6 +52,6 @@ else()
 endif()
 # -----------------------------------------------------------------------------------------------------------
 
-add_executable(cl ${SRC_FILES})
-target_link_libraries(cl curl fmt::fmt pthread)
-install(TARGETS cl DESTINATION ${CMAKE_INSTALL_PREFIX})
+add_executable(claudifier ${SRC_FILES})
+target_link_libraries(claudifier curl fmt::fmt pthread)
+install(TARGETS claudifier DESTINATION ${CMAKE_INSTALL_PREFIX})
