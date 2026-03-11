@@ -8,6 +8,9 @@
 
 namespace {
 
+using OptInt = std::optional<int>;
+using OptStr = std::optional<std::string>;
+
 ModelListModelsResult unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
@@ -23,13 +26,31 @@ ModelListModelsResult unpack_200_response_to_model_(const std::string &response)
     return ok;
 }
 
+std::string build_url_(const OptInt limit, const OptStr &last_id)
+{
+    std::string url;
+
+    if (limit && last_id) {
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&last_id= {}", *limit, *last_id);
+    } else if (!limit && last_id) {
+        url = fmt::format("https://api.anthropic.com/v1/models?last_id={}", *last_id);
+    } else if (limit && !last_id) {
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", *limit);
+    } else {
+        url = "https://api.anthropic.com/v1/models";
+    }
+
+    return url;
+}
+
 } // namespace
 
 namespace api {
 
-std::expected<ModelListModelsResult, Err> GetModels::query_api()
+std::expected<ModelListModelsResult, Err> GetModels::query_api(const OptInt limit, const OptStr &last_id)
 {
-    curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/models");
+    const std::string endpoint = build_url_(limit, last_id);
+    curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());
     curl_easy_setopt(this->curl_, CURLOPT_HTTPGET, 1L);
 
     curl_slist *headers = nullptr;
