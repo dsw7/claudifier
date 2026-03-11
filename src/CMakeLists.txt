@@ -20,6 +20,7 @@ set(SRC_FILES
   api/curl_base.cpp
   api/parse_utils.cpp
   commands/command_run.cpp
+  commands/command_models.cpp
   commands/command_utils.cpp
   commands/read_cli.cpp
   main.cpp
