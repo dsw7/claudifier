@@ -8,7 +8,6 @@
 
 namespace {
 
-using OptInt = std::optional<int>;
 using OptStr = std::optional<std::string>;
 
 ModelListModelsResult unpack_200_response_to_model_(const std::string &response)
@@ -26,18 +25,14 @@ ModelListModelsResult unpack_200_response_to_model_(const std::string &response)
     return ok;
 }
 
-std::string build_url_(const OptInt limit, const OptStr &last_id)
+std::string build_url_(const int limit, const OptStr &last_id)
 {
     std::string url;
 
-    if (limit && last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&last_id= {}", *limit, *last_id);
-    } else if (!limit && last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?last_id={}", *last_id);
-    } else if (limit && !last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", *limit);
+    if (last_id) {
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&last_id={}", limit, *last_id);
     } else {
-        url = "https://api.anthropic.com/v1/models";
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
     }
 
     return url;
@@ -47,7 +42,7 @@ std::string build_url_(const OptInt limit, const OptStr &last_id)
 
 namespace api {
 
-std::expected<ModelListModelsResult, Err> GetModels::query_api(const OptInt limit, const OptStr &last_id)
+std::expected<ModelListModelsResult, Err> GetModels::query_api(const int limit, const OptStr &last_id)
 {
     const std::string endpoint = build_url_(limit, last_id);
     curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());
