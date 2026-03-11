@@ -47,7 +47,7 @@ std::string build_url_(const int limit, const std::optional<std::string> &last_i
     std::string url;
 
     if (last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&last_id={}", limit, *last_id);
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&after_id={}", limit, *last_id);
     } else {
         url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
     }
