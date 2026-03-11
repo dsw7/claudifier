@@ -9,6 +9,25 @@
 
 namespace {
 
+void print_page_(const ModelListModelsResult &page)
+{
+    static bool print_header = true;
+
+    if (print_header) {
+        fmt::print("{:<10}{:<25}{:<25}{}\n", "Page", "Display name", "Created at", "Model ID");
+        fmt::print("{:<10}{:<25}{:<25}{}\n", "----", "------------", "----------", "--------");
+        print_header = false;
+    }
+
+    static int page_num = 1;
+
+    for (const auto &data: page.data) {
+        fmt::print("{:<10}{:<25}{:<25}{}\n", page_num, data.display_name, data.created_at, data.id);
+    }
+
+    page_num++;
+}
+
 void get_models_list_(int limit)
 {
     api::GetModels handle;
@@ -21,10 +40,7 @@ void get_models_list_(int limit)
             throw std::runtime_error(model_result.error().errmsg);
         }
 
-        for (const auto &data: model_result->data) {
-            fmt::print("{} {}\n", data.id, data.created_at);
-        }
-
+        print_page_(*model_result);
         last_id = model_result->last_id;
 
         if (not model_result->has_more) {
