@@ -12,6 +12,10 @@ struct ModelMessages {
     std::string prompt;
 };
 
+struct ModelListModels {
+    int limit = 1000;
+};
+
 // models for responses
 // -------------------
 
@@ -26,5 +30,9 @@ struct ModelMessagesResult {
     int output_tokens = 0;
     std::string llm_model;
     std::string output;
+    std::string raw_response;
+};
+
+struct ModelListModelsResult {
     std::string raw_response;
 };
