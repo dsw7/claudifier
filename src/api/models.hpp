@@ -2,6 +2,7 @@
 
 #include <expected>
 #include <string>
+#include <vector>
 
 // models for requests
 // -------------------
@@ -33,6 +34,20 @@ struct ModelMessagesResult {
     std::string raw_response;
 };
 
+struct ModelData {
+    std::string created_at;
+    std::string display_name;
+    std::string id;
+};
+
 struct ModelListModelsResult {
+    bool has_more = false;
+    std::string last_id;
     std::string raw_response;
+    std::vector<ModelData> data;
+
+    void add_data(const std::string &created_at, const std::string &display_name, const std::string &id)
+    {
+        this->data.push_back(ModelData { created_at, display_name, id });
+    }
 };
