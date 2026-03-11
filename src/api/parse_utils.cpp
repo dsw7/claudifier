@@ -15,16 +15,16 @@ nlohmann::json parse_response(const std::string &response)
         throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
     }
 
-    if (not json.contains("type")) {
-        throw std::runtime_error("Malformed error response. Could not deduce response type.");
-    }
-
     return json;
 }
 
 Err unpack_error(const std::string &response)
 {
     const nlohmann::json json = parse_response(response);
+
+    if (not json.contains("type")) {
+        throw std::runtime_error("Malformed error response. Could not deduce response type.");
+    }
 
     if (json["type"] != "error") {
         throw std::runtime_error("Malformed error response. Response is not an error");

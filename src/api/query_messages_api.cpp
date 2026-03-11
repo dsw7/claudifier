@@ -22,6 +22,10 @@ ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
+    if (not json.contains("type")) {
+        throw std::runtime_error("Malformed error response. Could not deduce response type.");
+    }
+
     if (json["type"] != "message") {
         throw std::runtime_error("Malformed message response. Response is not a message");
     }
