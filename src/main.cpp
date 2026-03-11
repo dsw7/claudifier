@@ -1,3 +1,4 @@
+#include "command_models.hpp"
 #include "command_run.hpp"
 
 #include <fmt/core.h>
@@ -23,6 +24,7 @@ Options:
 
 Commands:
   run            Run a query against an appropriate model
+  models         Get list of available models
 
 Try 'cl <subcommand> [-h | --help]' for subcommand specific help.
 )";
@@ -68,6 +70,8 @@ int main(int argc, char *argv[])
     try {
         if (command == "run") {
             commands::command_run(argc, argv);
+        } else if (command == "models") {
+            commands::command_models(argc, argv);
         } else {
             throw std::runtime_error("Received unknown command. Re-run with -h or --help");
         }
