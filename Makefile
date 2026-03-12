@@ -1,4 +1,4 @@
-.PHONY = format compile clean
+.PHONY = format compile clean py
 
 BUILD_DIR = build
 BUILD_DIR_PROD = $(BUILD_DIR)/prod
@@ -16,3 +16,8 @@ compile: format
 
 clean:
 	@rm -rfv $(BUILD_DIR)
+
+py:
+	@black tests/*.py
+	@pylint --exit-zero tests/*.py
+	@mypy --strict tests/*.py
