@@ -1,13 +1,13 @@
 #include "command_models.hpp"
 #include "command_run.hpp"
 
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <json.hpp>
 #include <stdexcept>
 #include <string>
 
 #ifndef TESTING_ENABLED
-#include <fmt/color.h>
 constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 #endif
 

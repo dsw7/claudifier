@@ -4,18 +4,25 @@
 #include "query_messages_api.hpp"
 #include "read_cli.hpp"
 
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <thread>
 
+#ifdef TESTING_ENABLED
+#include <json.hpp>
+#else
+constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
+#endif
+
 namespace {
 
 std::string read_prompt_from_stdin_()
 {
     utils::print_line();
-    fmt::print("\033[1mInput:\033[0m ");
+    fmt::print(fmt::emphasis::bold, "Input: ");
 
     std::string prompt;
     std::getline(std::cin, prompt);
@@ -44,8 +51,7 @@ ModelMessagesResult create_message_(const ModelMessages &model)
     timer.join();
 
     if (query_failed) {
-        fmt::print(stderr, "{}\n", errmsg);
-        throw std::runtime_error("Cannot proceed");
+        throw std::runtime_error(fmt::format("Failed to create message: '{}'", errmsg));
     }
 
     if (not model_result) {
@@ -55,16 +61,28 @@ ModelMessagesResult create_message_(const ModelMessages &model)
     return *model_result;
 }
 
-void print_results_(const ModelMessagesResult &model)
+void print_results_to_stdout_(const ModelMessagesResult &model)
 {
+#ifdef TESTING_ENABLED
+    const nlohmann::json json_obj = {
+        { "output", model.output },
+        { "llm_model", model.llm_model },
+        { "input_tokens", model.input_tokens },
+        { "output_tokens", model.output_tokens }
+    };
+    const std::string json_str = json_obj.dump(4);
+    fmt::print("{}\n", json_str);
+#else
     utils::print_line();
-    fmt::print("\033[1mOutput: \033[32m{}\033[0m\n", model.output);
+    fmt::print(fmt::emphasis::bold, "Output: ");
+    fmt::print(fg(green), "{}\n", model.output);
     utils::print_line();
-    fmt::print("\033[1mUsage:\033[0m\n");
+    fmt::print(fmt::emphasis::bold, "Usage:\n");
     fmt::print("Model: {}\n", model.llm_model);
     fmt::print("Input tokens: {}\n", model.input_tokens);
     fmt::print("Output tokens: {}\n", model.output_tokens);
     utils::print_line();
+#endif
 }
 
 } // namespace
@@ -80,8 +98,12 @@ void command_run(const int argc, char **argv)
         model.prompt = read_prompt_from_stdin_();
     }
 
+    if (model.prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    }
+
     const ModelMessagesResult model_result = create_message_(model);
-    print_results_(model_result);
+    print_results_to_stdout_(model_result);
 }
 
 } // namespace commands
