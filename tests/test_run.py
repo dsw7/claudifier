@@ -31,6 +31,20 @@ def test_run_command_model_arg(arg: str) -> None:
     assert results["llm_model"] == "claude-opus-4-6"
 
 
+@mark.parametrize("arg", ["-l", "--limit="])
+def test_run_command_limit_arg(arg: str) -> None:
+    process = run_claudifier(
+        "run",
+        # "--prompt=What is 3 + 5? Return just the result",
+        "--prompt=Running a test. Please ignore me",
+        f"{arg}2",
+    )
+
+    assert process.exit_code == 0, process.stderr
+    results = loads(process.stdout)
+    assert results["output_tokens"] == 2
+
+
 def test_invalid_model() -> None:
     process = run_claudifier(
         "run",
