@@ -37,7 +37,8 @@ void get_models_list_(const int limit)
         const std::expected<ModelListModelsResult, Err> model_result = handle.query_api(limit, last_id);
 
         if (not model_result) {
-            throw std::runtime_error(model_result.error().errmsg);
+            throw std::runtime_error(
+                fmt::format("An error occurred when getting list of models: '{}'", model_result.error().errmsg));
         }
 
         print_page_(*model_result);

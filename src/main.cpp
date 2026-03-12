@@ -6,6 +6,11 @@
 #include <stdexcept>
 #include <string>
 
+#ifndef TESTING_ENABLED
+#include <fmt/color.h>
+constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
+#endif
+
 void print_help_messages()
 {
     fmt::print("-- Claudifier | v{}\n", PROJECT_VERSION);
@@ -76,7 +81,11 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Received unknown command. Re-run with -h or --help");
         }
     } catch (const std::runtime_error &e) {
+#ifdef TESTING_ENABLED
         fmt::print(stderr, "{}\n", e.what());
+#else
+        fmt::print(stderr, fg(red), "{}\n", e.what());
+#endif
         return EXIT_FAILURE;
     }
 
