@@ -10,7 +10,7 @@ def test_help_messages(flag: str) -> None:
 
 
 @mark.parametrize("arg", ["-p", "--prompt="])
-def test_run_command_prompt_arg(arg: str) -> None:
+def test_prompt_arg(arg: str) -> None:
     process = run_claudifier("run", f"{arg}What is 3 + 5? Return just the result")
 
     assert process.exit_code == 0, process.stderr
@@ -19,11 +19,9 @@ def test_run_command_prompt_arg(arg: str) -> None:
 
 
 @mark.parametrize("arg", ["-m", "--model="])
-def test_run_command_model_arg(arg: str) -> None:
+def test_model_arg(arg: str) -> None:
     process = run_claudifier(
-        "run",
-        "--prompt=Running a test. Please ignore me",
-        f"{arg}claude-opus-4-6",
+        "run", "--prompt=Running a test. Please ignore me", f"{arg}claude-opus-4-6"
     )
 
     assert process.exit_code == 0, process.stderr
@@ -32,12 +30,9 @@ def test_run_command_model_arg(arg: str) -> None:
 
 
 @mark.parametrize("arg", ["-l", "--limit="])
-def test_run_command_limit_arg(arg: str) -> None:
+def test_limit_arg(arg: str) -> None:
     process = run_claudifier(
-        "run",
-        # "--prompt=What is 3 + 5? Return just the result",
-        "--prompt=Running a test. Please ignore me",
-        f"{arg}2",
+        "run", "--prompt=Running a test. Please ignore me", f"{arg}2"
     )
 
     assert process.exit_code == 0, process.stderr
@@ -47,11 +42,16 @@ def test_run_command_limit_arg(arg: str) -> None:
 
 def test_invalid_model() -> None:
     process = run_claudifier(
-        "run",
-        "--prompt=Running a test. Please ignore me",
-        "--model=foobar",
+        "run", "--prompt=Running a test. Please ignore me", "--model=foobar"
     )
     assert process.exit_code == 1
     assert (
         process.stderr == "An error occurred when creating message: 'model: foobar'\n"
     )
+
+
+def test_no_content_handling() -> None:
+    process = run_claudifier(
+        "run", "--prompt=What is 3 + 5? Return just the result", "--limit=1"
+    )
+    assert process.exit_code == 0, process.stderr
