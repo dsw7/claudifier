@@ -36,7 +36,7 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
-  -l, --limit=LIMIT              Limit list to LIMIT number of models
+  -l, --limit=LIMIT              Specify LIMIT number of models per page
 )";
 
     fmt::print("{}\n", messages);
