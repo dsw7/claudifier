@@ -54,4 +54,8 @@ def test_no_content_handling() -> None:
     process = run_claudifier(
         "run", "--prompt=What is 3 + 5? Return just the result", "--limit=1"
     )
-    assert process.exit_code == 0, process.stderr
+    assert process.exit_code == 1
+    assert (
+        process.stderr
+        == "Failed to create message: 'Malformed message response. Content is empty'\n"
+    )

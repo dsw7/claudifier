@@ -30,6 +30,10 @@ ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
         throw std::runtime_error("Malformed message response. Response is not a message");
     }
 
+    if (json["content"].empty()) {
+        throw std::runtime_error("Malformed message response. Content is empty");
+    }
+
     ModelMessagesResult ok;
     ok.input_tokens = json["usage"]["input_tokens"];
     ok.llm_model = json["model"];
