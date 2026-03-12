@@ -16,7 +16,7 @@ void print_help_messages()
 A command line Claude API toolkit.
 
 Usage:
-  cl [OPTIONS] COMMAND [ARGS]...
+  claudifier [OPTIONS] COMMAND [ARGS]...
 
 Options:
   -h, --help     Print help information and exit
@@ -26,7 +26,7 @@ Commands:
   run            Run a query against an appropriate model
   models         Get list of available models
 
-Try 'cl <subcommand> [-h | --help]' for subcommand specific help.
+Try 'claudifier <subcommand> [-h | --help]' for subcommand specific help.
 )";
 
     fmt::print("{}\n", messages);

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.18)
 project(Claudifier VERSION 1.0.0)
 
+# Options
+option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
+
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
@@ -14,6 +17,10 @@ add_compile_definitions(
   CURRENT_YEAR="${CURRENT_YEAR}"
   PROJECT_VERSION="${PROJECT_VERSION}"
 )
+
+if(ENABLE_TESTING)
+  add_compile_definitions(TESTING_ENABLED)
+endif()
 
 set(SRC_FILES
   api/query_messages_api.cpp
