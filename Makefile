@@ -1,7 +1,8 @@
-.PHONY = format compile clean py
+.PHONY = format compile clean compile-test test py
 
 BUILD_DIR = build
 BUILD_DIR_PROD = $(BUILD_DIR)/prod
+BUILD_DIR_TEST = $(BUILD_DIR)/test
 
 .DEFAULT_GOAL = compile
 
@@ -16,6 +17,14 @@ compile: format
 
 clean:
 	@rm -rfv $(BUILD_DIR)
+
+compile-test: format
+	@cmake -S src -B $(BUILD_DIR_TEST) -DENABLE_TESTING=ON
+	@make --jobs=12 --directory=$(BUILD_DIR_TEST)
+
+test: export PATH_BIN = $(CURDIR)/$(BUILD_DIR_TEST)/claudifier
+test: compile-test
+	-@python3 -m pytest -vs tests
 
 py:
 	@black tests/*.py
