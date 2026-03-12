@@ -53,6 +53,17 @@ void print_build_information()
     fmt::print("{}\n", data.dump(2));
 }
 
+void run_command(const int argc, char **argv, const std::string &command)
+{
+    if (command == "run") {
+        commands::command_run(argc, argv);
+    } else if (command == "models") {
+        commands::command_models(argc, argv);
+    } else {
+        throw std::runtime_error("Received unknown command. Re-run with -h or --help");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
@@ -73,13 +84,7 @@ int main(int argc, char *argv[])
     }
 
     try {
-        if (command == "run") {
-            commands::command_run(argc, argv);
-        } else if (command == "models") {
-            commands::command_models(argc, argv);
-        } else {
-            throw std::runtime_error("Received unknown command. Re-run with -h or --help");
-        }
+        run_command(argc, argv, command);
     } catch (const std::runtime_error &e) {
 #ifdef TESTING_ENABLED
         fmt::print(stderr, "{}\n", e.what());

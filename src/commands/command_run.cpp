@@ -71,7 +71,7 @@ void print_results_(const ModelMessagesResult &model)
 
 namespace commands {
 
-void command_run(int argc, char **argv)
+void command_run(const int argc, char **argv)
 {
     ModelMessages model;
     read_cli(argc, argv, model);

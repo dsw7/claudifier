@@ -54,7 +54,7 @@ void get_models_list_(const int limit)
 
 namespace commands {
 
-void command_models(int argc, char **argv)
+void command_models(const int argc, char **argv)
 {
     ModelListModels model;
     read_cli(argc, argv, model);
