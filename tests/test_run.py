@@ -40,6 +40,17 @@ def test_limit_arg(arg: str) -> None:
     assert results["output_tokens"] == 2
 
 
+@mark.parametrize("arg", ["-r", "--raw"])
+def test_raw_response_arg(arg: str) -> None:
+    process = run_claudifier("run", "--prompt=Running a test. Please ignore me", arg)
+
+    assert process.exit_code == 0, process.stderr
+    results = loads(process.stdout)
+
+    assert results["type"] == "message"
+    assert results["stop_reason"] == "end_turn"
+
+
 def test_invalid_model() -> None:
     process = run_claudifier(
         "run", "--prompt=Running a test. Please ignore me", "--model=foobar"

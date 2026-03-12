@@ -57,7 +57,7 @@ void read_cli(const int argc, char **argv, ModelMessages &model)
             { "model", required_argument, 0, 'm' },
             { "prompt", required_argument, 0, 'p' },
             { "limit", required_argument, 0, 'l' },
-            { "raw", required_argument, 0, 'r' },
+            { "raw", no_argument, 0, 'r' },
             { 0, 0, 0, 0 },
         };
 
