@@ -9,10 +9,23 @@ def test_help_messages(flag: str) -> None:
     assert process.exit_code == 0, process.stderr
 
 
-@mark.parametrize("arg", ["-p", "--prompt"])
-def test_run_command(arg: str) -> None:
-    process = run_claudifier("run", f"{arg}=What is 3 + 5? Return just the result")
+@mark.parametrize("arg", ["-p", "--prompt="])
+def test_run_command_prompt_arg(arg: str) -> None:
+    process = run_claudifier("run", f"{arg}What is 3 + 5? Return just the result")
+
     assert process.exit_code == 0, process.stderr
     results = loads(process.stdout)
-
     assert results["output"] == "8"
+
+
+@mark.parametrize("arg", ["-m", "--model="])
+def test_run_command_model_arg(arg: str) -> None:
+    process = run_claudifier(
+        "run",
+        "--prompt=Running a test. Please ignore me",
+        f"{arg}claude-opus-4-6",
+    )
+
+    assert process.exit_code == 0, process.stderr
+    results = loads(process.stdout)
+    assert results["llm_model"] == "claude-opus-4-6"
