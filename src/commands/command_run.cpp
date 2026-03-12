@@ -105,7 +105,12 @@ void command_run(const int argc, char **argv)
     }
 
     const ModelMessagesResult model_result = create_message_(model);
-    print_results_to_stdout_(model_result);
+
+    if (model.print_raw_response) {
+        fmt::print("{}\n", model_result.raw_response);
+    } else {
+        print_results_to_stdout_(model_result);
+    }
 }
 
 } // namespace commands
