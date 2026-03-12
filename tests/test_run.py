@@ -29,3 +29,15 @@ def test_run_command_model_arg(arg: str) -> None:
     assert process.exit_code == 0, process.stderr
     results = loads(process.stdout)
     assert results["llm_model"] == "claude-opus-4-6"
+
+
+def test_invalid_model() -> None:
+    process = run_claudifier(
+        "run",
+        "--prompt=Running a test. Please ignore me",
+        "--model=foobar",
+    )
+    assert process.exit_code == 1
+    assert (
+        process.stderr == "An error occurred when creating message: 'model: foobar'\n"
+    )

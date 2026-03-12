@@ -51,11 +51,13 @@ ModelMessagesResult create_message_(const ModelMessages &model)
     timer.join();
 
     if (query_failed) {
-        throw std::runtime_error(fmt::format("Failed to create message: '{}'", errmsg));
+        throw std::runtime_error(
+            fmt::format("Failed to create message: '{}'", errmsg));
     }
 
     if (not model_result) {
-        throw std::runtime_error(model_result.error().errmsg);
+        throw std::runtime_error(
+            fmt::format("An error occurred when creating message: '{}'", model_result.error().errmsg));
     }
 
     return *model_result;
