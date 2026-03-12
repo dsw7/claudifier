@@ -28,7 +28,7 @@ void print_page_(const ModelListModelsResult &page)
     page_num++;
 }
 
-void get_models_list_(int limit)
+void get_models_list_(const int limit)
 {
     api::GetModels handle;
     std::optional<std::string> last_id;
