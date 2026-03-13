@@ -40,6 +40,15 @@ def test_limit_arg(arg: str) -> None:
     assert results["output_tokens"] == 2
 
 
+def test_invalid_limit() -> None:
+    process = run_claudifier("run", "--prompt=What is 3 + 5?", "--limit=-5")
+    assert process.exit_code == 0, process.stderr
+    results = loads(process.stdout)
+    # clamps to 1 token which is not enough to return any content
+    assert results["output"] == "LLM returned no content.";
+    assert results["output_tokens"] == 1
+
+
 @mark.parametrize("arg", ["-r", "--raw"])
 def test_raw_response_arg(arg: str) -> None:
     process = run_claudifier("run", "--prompt=Running a test. Please ignore me", arg)
@@ -65,11 +74,9 @@ def test_no_content_handling() -> None:
     process = run_claudifier(
         "run", "--prompt=What is 3 + 5? Return just the result", "--limit=1"
     )
-    assert process.exit_code == 1
-    assert (
-        process.stderr
-        == "Failed to create message: 'Malformed message response. Content is empty'\n"
-    )
+    assert process.exit_code == 0, process.stderr
+    results = loads(process.stdout)
+    assert results["output"] == "LLM returned no content.";
 
 
 def test_empty_limit() -> None:
