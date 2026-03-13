@@ -76,6 +76,19 @@ def test_empty_limit() -> None:
     process = run_claudifier(
         "run", "--prompt=Running a test. Please ignore me", "--limit="
     )
-
     assert process.exit_code == 1
     assert process.stderr == "Cannot convert string to int. Input string is empty\n"
+
+
+def test_empty_model() -> None:
+    process = run_claudifier(
+        "run", "--prompt=Running a test. Please ignore me", "--model="
+    )
+    assert process.exit_code == 1
+    assert process.stderr == "The model parameter is empty\n"
+
+
+def test_empty_prompt() -> None:
+    process = run_claudifier("run", "--prompt=")
+    assert process.exit_code == 1
+    assert process.stderr == "The prompt is empty\n"
