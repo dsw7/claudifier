@@ -70,3 +70,12 @@ def test_no_content_handling() -> None:
         process.stderr
         == "Failed to create message: 'Malformed message response. Content is empty'\n"
     )
+
+
+def test_empty_limit() -> None:
+    process = run_claudifier(
+        "run", "--prompt=Running a test. Please ignore me", "--limit="
+    )
+
+    assert process.exit_code == 1
+    assert process.stderr == "Cannot convert string to int. Input string is empty\n"
