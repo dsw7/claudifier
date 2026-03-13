@@ -19,7 +19,7 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
-void preprocess_and_validate_params_(const ModelMessages &model)
+void preprocess_and_validate_params_(ModelMessages &model)
 {
     if (model.prompt.empty()) {
         throw std::runtime_error("The prompt is empty");
@@ -27,6 +27,10 @@ void preprocess_and_validate_params_(const ModelMessages &model)
 
     if (model.llm_model.empty()) {
         throw std::runtime_error("The model parameter is empty");
+    }
+
+    if (model.token_limit < 1) {
+        model.token_limit = 1;
     }
 }
 
