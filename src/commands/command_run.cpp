@@ -19,6 +19,17 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
+void preprocess_and_validate_params_(const ModelMessages &model)
+{
+    if (model.prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    }
+
+    if (model.llm_model.empty()) {
+        throw std::runtime_error("The model parameter is empty");
+    }
+}
+
 std::string read_prompt_from_stdin_()
 {
     utils::print_line();
@@ -100,10 +111,7 @@ void command_run(const int argc, char **argv)
         model.prompt = read_prompt_from_stdin_();
     }
 
-    if (model.prompt.empty()) {
-        throw std::runtime_error("The prompt is empty");
-    }
-
+    preprocess_and_validate_params_(model);
     const ModelMessagesResult model_result = create_message_(model);
 
     if (model.print_raw_response) {
