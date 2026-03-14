@@ -8,13 +8,17 @@
 // models for requests
 // -------------------
 
-struct ModelMessages {
+class ModelMessages {
+public:
     bool print_raw_response = false;
     int token_limit = 1024;
     std::string llm_model = "claude-opus-4-6";
-    nlohmann::json conversation;
 
     void append_user_message(const std::string &content);
+    std::string get_post_fields() const;
+
+private:
+    nlohmann::json conversation_;
 };
 
 struct ModelListModels {

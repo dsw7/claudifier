@@ -7,17 +7,6 @@
 
 namespace {
 
-std::string model_to_post_fields_(const ModelMessages &model)
-{
-    const nlohmann::json post_fields = {
-        { "max_tokens", model.token_limit },
-        { "messages", model.conversation },
-        { "model", model.llm_model }
-    };
-
-    return post_fields.dump();
-}
-
 ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
@@ -60,7 +49,7 @@ std::expected<ModelMessagesResult, Err> CreateMessage::query_api(const ModelMess
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
-    const std::string post_fields = model_to_post_fields_(model);
+    const std::string post_fields = model.get_post_fields();
     curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
