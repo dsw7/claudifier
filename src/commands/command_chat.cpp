@@ -26,13 +26,6 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-void preprocess_and_validate_params_(ModelMessages &model)
-{
-    if (model.token_limit < 1) {
-        model.token_limit = 1;
-    }
-}
-
 ModelMessages read_cli_(const int argc, char **argv)
 {
     ModelMessages model;
@@ -60,14 +53,13 @@ ModelMessages read_cli_(const int argc, char **argv)
                 model.set_llm_model(optarg);
                 break;
             case 'l':
-                model.token_limit = utils::string_to_int(optarg);
+                model.set_max_tokens(utils::string_to_int(optarg));
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
     };
 
-    preprocess_and_validate_params_(model);
     return model;
 }
 

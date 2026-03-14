@@ -11,13 +11,14 @@
 class ModelMessages {
 public:
     bool print_raw_response = false;
-    int token_limit = 1024;
 
+    void set_max_tokens(const int max_tokens);
     void set_llm_model(const std::string &model);
     void append_user_message(const std::string &content);
     std::string get_post_fields() const;
 
 private:
+    int max_tokens_ = 1024;
     nlohmann::json conversation_;
     std::string llm_model_ = "claude-opus-4-6";
 };

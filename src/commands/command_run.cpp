@@ -50,13 +50,6 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-void preprocess_and_validate_params_(ModelMessages &model)
-{
-    if (model.token_limit < 1) {
-        model.token_limit = 1;
-    }
-}
-
 ModelMessages read_cli_(const int argc, char **argv)
 {
     ModelMessages model;
@@ -90,7 +83,7 @@ ModelMessages read_cli_(const int argc, char **argv)
                 prompt = optarg;
                 break;
             case 'l':
-                model.token_limit = utils::string_to_int(optarg);
+                model.set_max_tokens(utils::string_to_int(optarg));
                 break;
             case 'r':
                 model.print_raw_response = true;
@@ -110,7 +103,6 @@ ModelMessages read_cli_(const int argc, char **argv)
         model.append_user_message(prompt);
     }
 
-    preprocess_and_validate_params_(model);
     return model;
 }
 
