@@ -30,7 +30,6 @@ set(SRC_FILES
   commands/command_run.cpp
   commands/command_models.cpp
   commands/command_utils.cpp
-  commands/read_cli.cpp
   main.cpp
 )
 include_directories(api commands external)
