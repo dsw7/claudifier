@@ -31,6 +31,7 @@ set(SRC_FILES
   commands/command_models.cpp
   commands/command_run.cpp
   commands/command_utils.cpp
+  commands/command_chat.cpp
   main.cpp
 )
 include_directories(api commands external)

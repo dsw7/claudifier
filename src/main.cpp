@@ -1,3 +1,4 @@
+#include "command_chat.hpp"
 #include "command_models.hpp"
 #include "command_run.hpp"
 
@@ -28,8 +29,9 @@ Options:
   -v, --version  Print version and exit
 
 Commands:
-  run            Run a query against an appropriate model
+  run            Run a stateless query against an appropriate model
   models         Get list of available models
+  chat           Participate in a stateful conversation with an appropriate model
 
 Try 'claudifier <subcommand> [-h | --help]' for subcommand specific help.
 )";
@@ -59,6 +61,8 @@ void run_command(const int argc, char **argv, const std::string &command)
         commands::command_run(argc, argv);
     } else if (command == "models") {
         commands::command_models(argc, argv);
+    } else if (command == "chat") {
+        commands::command_chat(argc, argv);
     } else {
         throw std::runtime_error("Received unknown command. Re-run with -h or --help");
     }
