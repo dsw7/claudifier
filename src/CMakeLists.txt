@@ -23,12 +23,13 @@ if(ENABLE_TESTING)
 endif()
 
 set(SRC_FILES
-  api/query_messages_api.cpp
   api/curl_base.cpp
+  api/models.cpp
   api/parse_utils.cpp
+  api/query_messages_api.cpp
   api/query_models_api.cpp
-  commands/command_run.cpp
   commands/command_models.cpp
+  commands/command_run.cpp
   commands/command_utils.cpp
   main.cpp
 )

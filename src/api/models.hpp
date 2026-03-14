@@ -1,6 +1,7 @@
 #pragma once
 
 #include <expected>
+#include <json.hpp>
 #include <string>
 #include <vector>
 
@@ -13,6 +14,9 @@ struct ModelMessages {
     int token_limit = 1024;
     std::string llm_model = "claude-opus-4-6";
     std::string prompt;
+    nlohmann::json conversation;
+
+    void append_user_message(const std::string &content);
 };
 
 struct ModelListModels {

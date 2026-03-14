@@ -11,7 +11,7 @@ std::string model_to_post_fields_(const ModelMessages &model)
 {
     const nlohmann::json post_fields = {
         { "max_tokens", model.token_limit },
-        { "messages", { { { "content", model.prompt }, { "role", "user" } } } },
+        { "messages", model.conversation },
         { "model", model.llm_model }
     };
 
