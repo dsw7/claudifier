@@ -23,8 +23,13 @@ private:
     std::string llm_model_ = "claude-opus-4-6";
 };
 
-struct ModelListModels {
-    int limit = 1000;
+class ModelListModels {
+public:
+    void set_max_items_per_page(const int limit);
+    int get_max_items_per_page() const;
+
+private:
+    int items_per_page_ = 1000;
 };
 
 // models for responses

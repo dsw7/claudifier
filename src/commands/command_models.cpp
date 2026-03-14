@@ -3,7 +3,6 @@
 #include "command_utils.hpp"
 #include "query_models_api.hpp"
 
-#include <algorithm>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <optional>
@@ -25,13 +24,6 @@ Options:
 )";
 
     fmt::print("{}\n", messages);
-}
-
-void preprocess_and_validate_params_(ModelListModels &model)
-{
-    static int min_models_per_page = 1;
-    static int max_models_per_page = 1000;
-    model.limit = std::clamp(model.limit, min_models_per_page, max_models_per_page);
 }
 
 ModelListModels read_cli_(const int argc, char **argv)
@@ -57,14 +49,13 @@ ModelListModels read_cli_(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'l':
-                model.limit = utils::string_to_int(optarg);
+                model.set_max_items_per_page(utils::string_to_int(optarg));
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
         }
     };
 
-    preprocess_and_validate_params_(model);
     return model;
 }
 
@@ -118,7 +109,7 @@ namespace commands {
 void command_models(const int argc, char **argv)
 {
     const ModelListModels model = read_cli_(argc, argv);
-    get_models_list_(model.limit);
+    get_models_list_(model.get_max_items_per_page());
 }
 
 } // namespace commands
