@@ -25,6 +25,11 @@ void ModelMessages::append_user_message(const std::string &content)
     this->conversation_.push_back({ { "role", "user" }, { "content", content } });
 }
 
+void ModelMessages::append_assistant_message(const std::string &content)
+{
+    this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
+}
+
 std::string ModelMessages::get_post_fields() const
 {
     const nlohmann::json json = {
