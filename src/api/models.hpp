@@ -18,7 +18,6 @@ struct ModelMessages {
 };
 
 struct ModelListModels {
-    bool print_help_and_exit = false;
     int limit = 1000;
 };
 

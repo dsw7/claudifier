@@ -11,40 +11,7 @@
 
 namespace {
 
-ModelListModels read_cli_(const int argc, char **argv)
-{
-    ModelListModels model;
-
-    while (true) {
-        static struct option long_options[] = {
-            { "help", no_argument, 0, 'h' },
-            { "limit", required_argument, 0, 'l' },
-            { 0, 0, 0, 0 },
-        };
-
-        int option_index = 0;
-        const int c = getopt_long(argc, argv, "hl:", long_options, &option_index);
-
-        if (c == -1) {
-            break;
-        }
-
-        switch (c) {
-            case 'h':
-                model.print_help_and_exit = true;
-                break;
-            case 'l':
-                model.limit = utils::string_to_int(optarg);
-                break;
-            default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
-        }
-    };
-
-    return model;
-}
-
-void help_models_command_()
+void print_help_messages_()
 {
     const std::string messages = R"(Get a list of available models.
 
@@ -66,6 +33,42 @@ void preprocess_and_validate_params_(ModelListModels &model)
     static int max_models_per_page = 1000;
     model.limit = std::clamp(model.limit, min_models_per_page, max_models_per_page);
 }
+
+ModelListModels read_cli_(const int argc, char **argv)
+{
+    ModelListModels model;
+
+    while (true) {
+        static struct option long_options[] = {
+            { "help", no_argument, 0, 'h' },
+            { "limit", required_argument, 0, 'l' },
+            { 0, 0, 0, 0 },
+        };
+
+        int option_index = 0;
+        const int c = getopt_long(argc, argv, "hl:", long_options, &option_index);
+
+        if (c == -1) {
+            break;
+        }
+
+        switch (c) {
+            case 'h':
+                print_help_messages_();
+                exit(EXIT_SUCCESS);
+            case 'l':
+                model.limit = utils::string_to_int(optarg);
+                break;
+            default:
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
+        }
+    };
+
+    preprocess_and_validate_params_(model);
+    return model;
+}
+
+// ----------------------------------------------------------------------------------------------------------
 
 void print_page_(const ModelListModelsResult &page)
 {
@@ -114,14 +117,7 @@ namespace commands {
 
 void command_models(const int argc, char **argv)
 {
-    ModelListModels model = read_cli_(argc, argv);
-
-    if (model.print_help_and_exit) {
-        help_models_command_();
-        return;
-    }
-
-    preprocess_and_validate_params_(model);
+    const ModelListModels model = read_cli_(argc, argv);
     get_models_list_(model.limit);
 }
 
