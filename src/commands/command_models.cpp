@@ -1,14 +1,64 @@
 #include "command_models.hpp"
 
+#include "command_utils.hpp"
 #include "query_models_api.hpp"
-#include "read_cli.hpp"
 
 #include <algorithm>
 #include <fmt/core.h>
+#include <getopt.h>
 #include <optional>
 #include <stdexcept>
 
 namespace {
+
+ModelListModels read_cli_(const int argc, char **argv)
+{
+    ModelListModels model;
+
+    while (true) {
+        static struct option long_options[] = {
+            { "help", no_argument, 0, 'h' },
+            { "limit", required_argument, 0, 'l' },
+            { 0, 0, 0, 0 },
+        };
+
+        int option_index = 0;
+        const int c = getopt_long(argc, argv, "hl:", long_options, &option_index);
+
+        if (c == -1) {
+            break;
+        }
+
+        switch (c) {
+            case 'h':
+                model.print_help_and_exit = true;
+                break;
+            case 'l':
+                model.limit = utils::string_to_int(optarg);
+                break;
+            default:
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
+        }
+    };
+
+    return model;
+}
+
+void help_models_command_()
+{
+    const std::string messages = R"(Get a list of available models.
+
+Usage:
+  claudifier models [OPTIONS]
+
+Options:
+  -h, --help                     Print help information and exit
+  -l, --limit=LIMIT              Specify LIMIT number of models per page. LIMIT
+                                 is clamped between 1 and 1000.
+)";
+
+    fmt::print("{}\n", messages);
+}
 
 void preprocess_and_validate_params_(ModelListModels &model)
 {
@@ -64,10 +114,14 @@ namespace commands {
 
 void command_models(const int argc, char **argv)
 {
-    ModelListModels model;
-    read_cli(argc, argv, model);
-    preprocess_and_validate_params_(model);
+    ModelListModels model = read_cli_(argc, argv);
 
+    if (model.print_help_and_exit) {
+        help_models_command_();
+        return;
+    }
+
+    preprocess_and_validate_params_(model);
     get_models_list_(model.limit);
 }
 
