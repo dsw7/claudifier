@@ -86,7 +86,6 @@ void run_conversational_turn_test_(ModelMessages &model)
     model.append_user_message("What is c + 5? Return just the value");
     const std::string response_2 = run_query_(model);
 
-    fmt::print("{}\n", response);
     fmt::print("{}\n", response_2);
 }
 #endif
