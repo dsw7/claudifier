@@ -28,10 +28,6 @@ Options:
 
 void preprocess_and_validate_params_(ModelMessages &model)
 {
-    if (model.llm_model.empty()) {
-        throw std::runtime_error("The model parameter is empty");
-    }
-
     if (model.token_limit < 1) {
         model.token_limit = 1;
     }
@@ -61,7 +57,7 @@ ModelMessages read_cli_(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'm':
-                model.llm_model = optarg;
+                model.set_llm_model(optarg);
                 break;
             case 'l':
                 model.token_limit = utils::string_to_int(optarg);
