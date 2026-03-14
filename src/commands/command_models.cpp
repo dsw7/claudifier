@@ -3,11 +3,19 @@
 #include "query_models_api.hpp"
 #include "read_cli.hpp"
 
+#include <algorithm>
 #include <fmt/core.h>
 #include <optional>
 #include <stdexcept>
 
 namespace {
+
+void preprocess_and_validate_params_(ModelListModels &model)
+{
+    static int min_models_per_page = 1;
+    static int max_models_per_page = 1000;
+    model.limit = std::clamp(model.limit, min_models_per_page, max_models_per_page);
+}
 
 void print_page_(const ModelListModelsResult &page)
 {
@@ -58,6 +66,7 @@ void command_models(const int argc, char **argv)
 {
     ModelListModels model;
     read_cli(argc, argv, model);
+    preprocess_and_validate_params_(model);
 
     get_models_list_(model.limit);
 }
