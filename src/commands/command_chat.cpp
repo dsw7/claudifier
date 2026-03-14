@@ -63,6 +63,34 @@ ModelMessages read_cli_(const int argc, char **argv)
     return model;
 }
 
+#ifdef TESTING_ENABLED
+std::string run_query_(const ModelMessages &model)
+{
+    static api::CreateMessage handle;
+    std::expected<ModelMessagesResult, Err> result = handle.query_api(model);
+
+    if (not result) {
+        throw std::runtime_error(
+            fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+
+    return result->output;
+}
+
+void run_conversational_turn_test_(ModelMessages &model)
+{
+    model.append_user_message("If a = 2, b = 3, and c = a + b, then what is c?");
+    const std::string response = run_query_(model);
+
+    model.append_assistant_message(response);
+    model.append_user_message("What is c + 5? Return just the value");
+    const std::string response_2 = run_query_(model);
+
+    fmt::print("{}\n", response);
+    fmt::print("{}\n", response_2);
+}
+#endif
+
 // ----------------------------------------------------------------------------------------------------------
 } // namespace
 
@@ -70,7 +98,10 @@ namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    const ModelMessages model = read_cli_(argc, argv);
+    ModelMessages model = read_cli_(argc, argv);
+#ifdef TESTING_ENABLED
+    run_conversational_turn_test_(model);
+#endif
 }
 
 } // namespace commands
