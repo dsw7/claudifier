@@ -1,14 +1,27 @@
+from datetime import date
+from json import loads
+from pytest import mark
 from helpers import run_claudifier
 
 
-def test_root_help_short() -> None:
-    process = run_claudifier("-h")
+@mark.parametrize("flag", ["-h", "--help"])
+def test_root_help_messages(flag: str) -> None:
+    process = run_claudifier(flag)
     assert process.exit_code == 0, process.stderr
 
 
-def test_root_help_long() -> None:
-    process = run_claudifier("--help")
+@mark.parametrize("flag", ["-v", "--version"])
+def test_version(flag: str) -> None:
+    process = run_claudifier(flag)
     assert process.exit_code == 0, process.stderr
+
+    output = loads(process.stdout)
+    assert output["build_type"] == "Testing", "'build_type' is not 'Testing'"
+    assert output["version"] == "1.0.0", "Version is not '1.0.0'"
+
+    today = date.today().isoformat()
+    build_date = output["build_date"].split("T")[0]
+    assert build_date == today, f"Build date {build_date} is not today {today}"
 
 
 def test_unknown_command() -> None:
