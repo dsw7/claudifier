@@ -5,6 +5,7 @@
 
 #include <fmt/core.h>
 #include <getopt.h>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -63,30 +64,48 @@ ModelMessages read_cli_(const int argc, char **argv)
     return model;
 }
 
-#ifdef TESTING_ENABLED
-std::string run_query_(const ModelMessages &model)
+std::string run_query_(const ModelMessages &model, api::CreateMessage &api_handle)
 {
-    static api::CreateMessage handle;
-    std::expected<ModelMessagesResult, Err> result = handle.query_api(model);
+    std::expected<ModelMessagesResult, Err> result = api_handle.query_api(model);
 
-    if (not result) {
-        throw std::runtime_error(
-            fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    if (result) {
+        return result->output;
     }
 
-    return result->output;
+    throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
 }
 
+#ifdef TESTING_ENABLED
 void run_conversational_turn_test_(ModelMessages &model)
 {
     model.append_user_message("If a = 2, b = 3, and c = a + b, then what is c?");
-    const std::string response = run_query_(model);
+    const std::string output = run_query_(model);
 
-    model.append_assistant_message(response);
+    model.append_assistant_message(output);
     model.append_user_message("What is c + 5? Return just the value");
     const std::string response_2 = run_query_(model);
 
     fmt::print("{}\n", response_2);
+}
+#else
+void run_conversation_loop_(ModelMessages &model)
+{
+    api::CreateMessage api_handle;
+    std::string input;
+    std::string output;
+
+    while (true) {
+        fmt::print("Input: ");
+        std::getline(std::cin, input);
+        if (input == "x") {
+            break;
+        }
+
+        model.append_user_message(input);
+        output = run_query_(model, api_handle);
+        fmt::print("Output: {}\n", output);
+        model.append_assistant_message(output);
+    }
 }
 #endif
 
@@ -100,6 +119,8 @@ void command_chat(const int argc, char **argv)
     ModelMessages model = read_cli_(argc, argv);
 #ifdef TESTING_ENABLED
     run_conversational_turn_test_(model);
+#else
+    run_conversation_loop_(model);
 #endif
 }
 
