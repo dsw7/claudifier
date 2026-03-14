@@ -19,6 +19,26 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
+void print_help_messages_()
+{
+    const std::string messages = R"(Create a message according to a prompt.
+Messaging using the run command is stateless.
+The prompt can be read in interactively or via command line argument.
+
+Usage:
+  claudifier run [OPTIONS]
+
+Options:
+  -h, --help                     Print help information and exit
+  -m, --model=MODEL              Specify a valid messages model
+  -p, --prompt=PROMPT            Specify the prompt message
+  -l, --limit=LIMIT              Specify token limit
+  -r, --raw                      Print raw response from server
+)";
+
+    fmt::print("{}\n", messages);
+}
+
 std::string read_prompt_from_stdin_()
 {
     utils::print_line();
@@ -28,6 +48,17 @@ std::string read_prompt_from_stdin_()
     std::getline(std::cin, prompt);
 
     return prompt;
+}
+
+void preprocess_and_validate_params_(ModelMessages &model)
+{
+    if (model.llm_model.empty()) {
+        throw std::runtime_error("The model parameter is empty");
+    }
+
+    if (model.token_limit < 1) {
+        model.token_limit = 1;
+    }
 }
 
 ModelMessages read_cli_(const int argc, char **argv)
@@ -54,8 +85,8 @@ ModelMessages read_cli_(const int argc, char **argv)
 
         switch (c) {
             case 'h':
-                model.print_help_and_exit = true;
-                break;
+                print_help_messages_();
+                exit(EXIT_SUCCESS);
             case 'm':
                 model.llm_model = optarg;
                 break;
@@ -83,40 +114,11 @@ ModelMessages read_cli_(const int argc, char **argv)
         model.append_user_message(prompt);
     }
 
+    preprocess_and_validate_params_(model);
     return model;
 }
 
-void help_run_command_()
-{
-    const std::string messages = R"(Create a message according to a prompt.
-Messaging using the run command is stateless.
-The prompt can be read in interactively or via command line argument.
-
-Usage:
-  claudifier run [OPTIONS]
-
-Options:
-  -h, --help                     Print help information and exit
-  -m, --model=MODEL              Specify a valid messages model
-  -p, --prompt=PROMPT            Specify the prompt message
-  -l, --limit=LIMIT              Specify token limit
-  -r, --raw                      Print raw response from server
-)";
-
-    fmt::print("{}\n", messages);
-}
-
-void preprocess_and_validate_params_(ModelMessages &model)
-{
-
-    if (model.llm_model.empty()) {
-        throw std::runtime_error("The model parameter is empty");
-    }
-
-    if (model.token_limit < 1) {
-        model.token_limit = 1;
-    }
-}
+// ----------------------------------------------------------------------------------------------------------
 
 ModelMessagesResult create_message_(const ModelMessages &model)
 {
@@ -181,14 +183,7 @@ namespace commands {
 
 void command_run(const int argc, char **argv)
 {
-    ModelMessages model = read_cli_(argc, argv);
-
-    if (model.print_help_and_exit) {
-        help_run_command_();
-        return;
-    }
-
-    preprocess_and_validate_params_(model);
+    const ModelMessages model = read_cli_(argc, argv);
     const ModelMessagesResult model_result = create_message_(model);
 
     if (model.print_raw_response) {
