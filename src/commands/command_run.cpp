@@ -19,9 +19,21 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
+std::string read_prompt_from_stdin_()
+{
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Input: ");
+
+    std::string prompt;
+    std::getline(std::cin, prompt);
+
+    return prompt;
+}
+
 ModelMessages read_cli_(const int argc, char **argv)
 {
     ModelMessages model;
+    std::string prompt;
 
     while (true) {
         static struct option long_options[] = {
@@ -48,7 +60,7 @@ ModelMessages read_cli_(const int argc, char **argv)
                 model.llm_model = optarg;
                 break;
             case 'p':
-                model.prompt = optarg;
+                prompt = optarg;
                 break;
             case 'l':
                 model.token_limit = utils::string_to_int(optarg);
@@ -60,6 +72,16 @@ ModelMessages read_cli_(const int argc, char **argv)
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
     };
+
+    if (prompt.empty()) {
+        prompt = read_prompt_from_stdin_();
+    }
+
+    if (prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    } else {
+        model.append_user_message(prompt);
+    }
 
     return model;
 }
@@ -86,9 +108,6 @@ Options:
 
 void preprocess_and_validate_params_(ModelMessages &model)
 {
-    if (model.prompt.empty()) {
-        throw std::runtime_error("The prompt is empty");
-    }
 
     if (model.llm_model.empty()) {
         throw std::runtime_error("The model parameter is empty");
@@ -97,17 +116,6 @@ void preprocess_and_validate_params_(ModelMessages &model)
     if (model.token_limit < 1) {
         model.token_limit = 1;
     }
-}
-
-std::string read_prompt_from_stdin_()
-{
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Input: ");
-
-    std::string prompt;
-    std::getline(std::cin, prompt);
-
-    return prompt;
 }
 
 ModelMessagesResult create_message_(const ModelMessages &model)
@@ -178,10 +186,6 @@ void command_run(const int argc, char **argv)
     if (model.print_help_and_exit) {
         help_run_command_();
         return;
-    }
-
-    if (model.prompt.empty()) {
-        model.prompt = read_prompt_from_stdin_();
     }
 
     preprocess_and_validate_params_(model);
