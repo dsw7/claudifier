@@ -10,7 +10,7 @@ namespace api {
 
 class GetModels: public CurlBase {
 public:
-    std::expected<ModelListModelsResult, Err> query_api(
+    std::expected<ListModelsPage, Err> query_api(
         const int limit,
         const std::optional<std::string> &last_id = std::nullopt);
 };

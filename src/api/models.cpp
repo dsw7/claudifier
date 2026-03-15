@@ -58,7 +58,7 @@ int ModelListModels::get_max_items_per_page() const
 // models for responses
 // -------------------
 
-void ModelListModelsResult::add_data(const std::string &created_at, const std::string &display_name, const std::string &id)
+void ListModelsPage::append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id)
 {
     this->data.push_back(ModelData { created_at, display_name, id });
 }

@@ -61,7 +61,7 @@ ModelListModels read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
-void print_page_(const ModelListModelsResult &page)
+void print_page_(const ListModelsPage &page)
 {
     static bool print_header = true;
 
@@ -86,7 +86,7 @@ void get_models_list_(const int limit)
     std::optional<std::string> last_id;
 
     while (true) {
-        const std::expected<ModelListModelsResult, Err> model_result = handle.query_api(limit, last_id);
+        const std::expected<ListModelsPage, Err> model_result = handle.query_api(limit, last_id);
 
         if (not model_result) {
             throw std::runtime_error(

@@ -57,10 +57,11 @@ struct ModelData {
     std::string id;
 };
 
-struct ModelListModelsResult {
+struct ListModelsPage {
     bool has_more = false;
     std::string last_id;
     std::string raw_response;
     std::vector<ModelData> data;
-    void add_data(const std::string &created_at, const std::string &display_name, const std::string &id);
+
+    void append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id);
 };
