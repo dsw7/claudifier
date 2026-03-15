@@ -19,12 +19,16 @@ clean:
 	@rm -rfv $(BUILD_DIR)
 
 compile-test: format
-	@cmake -S src -B $(BUILD_DIR_TEST) -DENABLE_TESTING=ON
+	@cmake -S src -B $(BUILD_DIR_TEST) -DENABLE_TESTING=ON -DENABLE_COVERAGE=ON
 	@make --jobs=12 --directory=$(BUILD_DIR_TEST)
 
 test: export PATH_BIN = $(CURDIR)/$(BUILD_DIR_TEST)/claudifier
 test: compile-test
 	-@python3 -m pytest -vs tests
+	@lcov --quiet --capture --directory=$(BUILD_DIR) --output-file $(BUILD_DIR)/coverage.info
+	@lcov --quiet --remove $(BUILD_DIR)/coverage.info "/usr/*" "*/external/*" --output-file $(BUILD_DIR)/coverage.info
+	@genhtml --quiet $(BUILD_DIR)/coverage.info --output-directory $(BUILD_DIR)/coverageResults
+	@echo "See coverage report at: $(CURDIR)/$(BUILD_DIR)/coverageResults/index.html"
 
 py:
 	@black tests/*.py
