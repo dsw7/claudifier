@@ -50,9 +50,9 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-ModelMessages read_cli_(const int argc, char **argv)
+Messages read_cli_(const int argc, char **argv)
 {
-    ModelMessages model;
+    Messages model;
     std::string prompt;
 
     while (true) {
@@ -108,13 +108,13 @@ ModelMessages read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
-ModelMessagesResult create_message_(const ModelMessages &model)
+MessagesResult create_message_(const Messages &model)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
 
     bool query_failed = false;
-    std::expected<ModelMessagesResult, Err> model_result;
+    std::expected<MessagesResult, Err> model_result;
     std::string errmsg;
 
     try {
@@ -141,7 +141,7 @@ ModelMessagesResult create_message_(const ModelMessages &model)
     return *model_result;
 }
 
-void print_results_to_stdout_(const ModelMessagesResult &model)
+void print_results_to_stdout_(const MessagesResult &model)
 {
 #ifdef TESTING_ENABLED
     const nlohmann::json json_obj = {
@@ -173,8 +173,8 @@ namespace commands {
 
 void command_run(const int argc, char **argv)
 {
-    const ModelMessages model = read_cli_(argc, argv);
-    const ModelMessagesResult model_result = create_message_(model);
+    const Messages model = read_cli_(argc, argv);
+    const MessagesResult model_result = create_message_(model);
 
     if (model.print_raw_response) {
         fmt::print("{}\n", model_result.raw_response);

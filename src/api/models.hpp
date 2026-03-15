@@ -8,7 +8,7 @@
 // models for requests
 // -------------------
 
-class ModelMessages {
+class Messages {
 public:
     bool print_raw_response = false;
 
@@ -24,7 +24,7 @@ private:
     std::string llm_model_ = "claude-opus-4-6";
 };
 
-class ModelListModels {
+class ListModels {
 public:
     void set_max_items_per_page(const int limit);
     int get_max_items_per_page() const;
@@ -42,7 +42,7 @@ struct Err {
     std::string error_type;
 };
 
-struct ModelMessagesResult {
+struct MessagesResult {
     int input_tokens = 0;
     int output_tokens = 0;
     std::string llm_model;

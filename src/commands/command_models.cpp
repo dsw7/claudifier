@@ -26,9 +26,9 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-ModelListModels read_cli_(const int argc, char **argv)
+ListModels read_cli_(const int argc, char **argv)
 {
-    ModelListModels model;
+    ListModels model;
 
     while (true) {
         static struct option long_options[] = {
@@ -80,7 +80,7 @@ void print_page_(const ListModelsPage &page)
     page_num++;
 }
 
-void get_models_list_(const int limit)
+void print_all_pages_(const int limit)
 {
     api::GetModels handle;
     std::optional<std::string> last_id;
@@ -108,8 +108,8 @@ namespace commands {
 
 void command_models(const int argc, char **argv)
 {
-    const ModelListModels model = read_cli_(argc, argv);
-    get_models_list_(model.get_max_items_per_page());
+    const ListModels model = read_cli_(argc, argv);
+    print_all_pages_(model.get_max_items_per_page());
 }
 
 } // namespace commands

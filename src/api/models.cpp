@@ -5,7 +5,7 @@
 // models for requests
 // -------------------
 
-void ModelMessages::set_max_tokens(const int max_tokens)
+void Messages::set_max_tokens(const int max_tokens)
 {
     this->max_tokens_ = max_tokens;
 
@@ -14,7 +14,7 @@ void ModelMessages::set_max_tokens(const int max_tokens)
     }
 }
 
-void ModelMessages::set_llm_model(const std::string &model)
+void Messages::set_llm_model(const std::string &model)
 {
     if (model.empty()) {
         throw std::runtime_error("The model parameter is empty");
@@ -23,17 +23,17 @@ void ModelMessages::set_llm_model(const std::string &model)
     this->llm_model_ = model;
 }
 
-void ModelMessages::append_user_message(const std::string &content)
+void Messages::append_user_message(const std::string &content)
 {
     this->conversation_.push_back({ { "role", "user" }, { "content", content } });
 }
 
-void ModelMessages::append_assistant_message(const std::string &content)
+void Messages::append_assistant_message(const std::string &content)
 {
     this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
 }
 
-std::string ModelMessages::get_post_fields() const
+std::string Messages::get_post_fields() const
 {
     const nlohmann::json json = {
         { "max_tokens", this->max_tokens_ },
@@ -43,14 +43,14 @@ std::string ModelMessages::get_post_fields() const
     return json.dump();
 }
 
-void ModelListModels::set_max_items_per_page(const int limit)
+void ListModels::set_max_items_per_page(const int limit)
 {
     static int min_models_per_page = 1;
     static int max_models_per_page = 1000;
     this->items_per_page_ = std::clamp(limit, min_models_per_page, max_models_per_page);
 }
 
-int ModelListModels::get_max_items_per_page() const
+int ListModels::get_max_items_per_page() const
 {
     return this->items_per_page_;
 }

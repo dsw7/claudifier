@@ -28,9 +28,9 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-ModelMessages read_cli_(const int argc, char **argv)
+Messages read_cli_(const int argc, char **argv)
 {
-    ModelMessages model;
+    Messages model;
 
     while (true) {
         static struct option long_options[] = {
@@ -65,9 +65,11 @@ ModelMessages read_cli_(const int argc, char **argv)
     return model;
 }
 
-std::string run_query_(const ModelMessages &model, api::CreateMessage &api_handle)
+// ----------------------------------------------------------------------------------------------------------
+
+std::string run_query_(const Messages &model, api::CreateMessage &api_handle)
 {
-    std::expected<ModelMessagesResult, Err> result = api_handle.query_api(model);
+    std::expected<MessagesResult, Err> result = api_handle.query_api(model);
 
     if (result) {
         return result->output;
@@ -76,7 +78,7 @@ std::string run_query_(const ModelMessages &model, api::CreateMessage &api_handl
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
 }
 
-void run_conversation_loop_(ModelMessages &model)
+void run_conversation_loop_(Messages &model)
 {
     api::CreateMessage api_handle;
     std::string output;
@@ -113,14 +115,13 @@ void run_conversation_loop_(ModelMessages &model)
 #endif
 }
 
-// ----------------------------------------------------------------------------------------------------------
 } // namespace
 
 namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    ModelMessages model = read_cli_(argc, argv);
+    Messages model = read_cli_(argc, argv);
     run_conversation_loop_(model);
 }
 

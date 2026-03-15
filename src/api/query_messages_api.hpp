@@ -7,7 +7,7 @@ namespace api {
 
 class CreateMessage: public CurlBase {
 public:
-    std::expected<ModelMessagesResult, Err> query_api(const ModelMessages &model);
+    std::expected<MessagesResult, Err> query_api(const Messages &model);
 };
 
 } // namespace api
