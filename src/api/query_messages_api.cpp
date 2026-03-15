@@ -31,6 +31,7 @@ ModelMessagesResult unpack_200_response_to_model_(const std::string &response)
     ok.llm_model = json["model"];
     ok.output_tokens = json["usage"]["output_tokens"];
     ok.raw_response = json.dump(4);
+    ok.stop_reason = json["stop_reason"];
     return ok;
 }
 

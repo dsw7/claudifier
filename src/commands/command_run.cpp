@@ -145,10 +145,11 @@ void print_results_to_stdout_(const ModelMessagesResult &model)
 {
 #ifdef TESTING_ENABLED
     const nlohmann::json json_obj = {
-        { "output", model.output },
-        { "llm_model", model.llm_model },
         { "input_tokens", model.input_tokens },
-        { "output_tokens", model.output_tokens }
+        { "llm_model", model.llm_model },
+        { "output", model.output },
+        { "output_tokens", model.output_tokens },
+        { "stop_reason", model.stop_reason }
     };
     const std::string json_str = json_obj.dump(4);
     fmt::print("{}\n", json_str);
@@ -161,6 +162,7 @@ void print_results_to_stdout_(const ModelMessagesResult &model)
     fmt::print("Model: {}\n", model.llm_model);
     fmt::print("Input tokens: {}\n", model.input_tokens);
     fmt::print("Output tokens: {}\n", model.output_tokens);
+    fmt::print("Stop reason: {}\n", model.stop_reason);
     utils::print_line();
 #endif
 }

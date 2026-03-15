@@ -48,6 +48,7 @@ struct ModelMessagesResult {
     std::string llm_model;
     std::string output;
     std::string raw_response;
+    std::string stop_reason;
 };
 
 struct ModelData {
