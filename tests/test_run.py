@@ -42,6 +42,12 @@ def test_limit_arg(arg: str) -> None:
 
 
 def test_invalid_limit() -> None:
+    process = run_claudifier("run", "-pHello", "--limit=abc")
+    assert process.exit_code == 1
+    assert process.stderr == "stoi\nFailed to convert 'abc' to int\n"
+
+
+def test_out_of_range_limit() -> None:
     process = run_claudifier("run", "--prompt=What is 3 + 5?", "--limit=-5")
     assert process.exit_code == 0, process.stderr
     results = loads(process.stdout)
