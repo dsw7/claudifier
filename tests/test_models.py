@@ -20,3 +20,15 @@ def test_exit_zero() -> None:
 def test_limit_arg_with_clamping(arg: str, value: int) -> None:
     process = run_claudifier("models", f"{arg}{value}")
     assert process.exit_code == 0, process.stderr
+
+
+def test_invalid_limit() -> None:
+    process = run_claudifier("models", "--limit=abc")
+    assert process.exit_code == 1
+    assert process.stderr == "stoi\nFailed to convert 'abc' to int\n"
+
+
+def test_empty_limit() -> None:
+    process = run_claudifier("models", "--limit=")
+    assert process.exit_code == 1
+    assert process.stderr == "Cannot convert string to int. Input string is empty\n"
