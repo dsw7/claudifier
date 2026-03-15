@@ -38,6 +38,7 @@ def test_limit_arg(arg: str) -> None:
     assert process.exit_code == 0, process.stderr
     results = loads(process.stdout)
     assert results["output_tokens"] == 2
+    assert results["stop_reason"] == "max_tokens"
 
 
 def test_invalid_limit() -> None:
