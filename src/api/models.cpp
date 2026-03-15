@@ -2,6 +2,9 @@
 
 #include <algorithm>
 
+// models for requests
+// -------------------
+
 void ModelMessages::set_max_tokens(const int max_tokens)
 {
     this->max_tokens_ = max_tokens;
@@ -50,4 +53,12 @@ void ModelListModels::set_max_items_per_page(const int limit)
 int ModelListModels::get_max_items_per_page() const
 {
     return this->items_per_page_;
+}
+
+// models for responses
+// -------------------
+
+void ModelListModelsResult::add_data(const std::string &created_at, const std::string &display_name, const std::string &id)
+{
+    this->data.push_back(ModelData { created_at, display_name, id });
 }
