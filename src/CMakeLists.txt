@@ -7,7 +7,6 @@ option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
-set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 
 string(TIMESTAMP BUILD_DATE)
 string(TIMESTAMP CURRENT_YEAR "%Y")
@@ -26,6 +25,8 @@ endif()
 
 if(ENABLE_TESTING)
   add_compile_definitions(TESTING_ENABLED)
+else()
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
 endif()
 
 set(SRC_FILES

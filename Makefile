@@ -13,7 +13,7 @@ format:
 
 compile: format
 	@cmake -S src -B $(BUILD_DIR_PROD)
-	@make --jobs=12 --directory=$(BUILD_DIR_PROD)
+	@make --jobs=12 --directory=$(BUILD_DIR_PROD) install
 
 clean:
 	@rm -rfv $(BUILD_DIR)
