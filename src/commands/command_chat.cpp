@@ -73,6 +73,15 @@ Messages read_cli_(const int argc, char **argv)
 // ----------------------------------------------------------------------------------------------------------
 
 #ifndef TESTING_ENABLED
+void print_special_commands_()
+{
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Commands: \n");
+    fmt::print("[");
+    fmt::print(fg(green), "q");
+    fmt::print("]: Quit the current chat session\n");
+}
+
 void read_input_from_stdin_(std::string &input)
 {
     utils::print_line();
@@ -119,13 +128,15 @@ void run_conversation_loop_(Messages &model)
 
     fmt::print("{}\n", output);
 #else
+    print_special_commands_();
     std::string input;
 
     while (true) {
         read_input_from_stdin_(input);
-        if (input == "x") {
+        if (input == "q") {
             break;
         }
+
         model.append_user_message(input);
         output = run_query_(model, api_handle);
         print_output_to_stdout_(output);
