@@ -13,6 +13,7 @@ already provides numerous CLI tools for interacting with its API.***
 
 ## Table of Contents
 - [Installation](#installation)
+- [Uninstall Claudifier](#uninstall-claudifier)
 - [License](#license)
 
 ## Installation
@@ -64,6 +65,17 @@ some variation of:
 -bash: claudifier: command not found
 ```
 If so, try running `claudifier` in a new terminal window.
+
+## Uninstall Claudifier
+Verify that the `claudifier` command in your `$PATH` is the Claudifier binary
+and not an alias for another application:
+```console
+claudifier -h
+```
+If confirmed, proceed to remove the binary with the following command:
+```console
+rm $(which claudifier)
+```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE)
