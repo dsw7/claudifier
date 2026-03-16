@@ -107,8 +107,6 @@ MessagesResult run_query_(const Messages &model, api::CreateMessage &api_handle)
     std::expected<MessagesResult, Err> result = api_handle.query_api(model);
 
     if (result) {
-        fmt::print("Input tokens: {}\n", result->input_tokens);
-        fmt::print("Output tokens: {}\n", result->output_tokens);
         return result.value();
     }
 
