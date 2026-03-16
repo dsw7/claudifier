@@ -20,6 +20,7 @@ namespace {
 void print_help_messages_()
 {
     const std::string messages = R"(Participate in a multi-turn conversation with LLM.
+This command preserves context between API calls, and therefore will be more token heavy.
 
 Usage:
   claudifier chat [OPTIONS]
@@ -89,20 +90,26 @@ void read_input_from_stdin_(std::string &input)
     std::getline(std::cin, input);
 }
 
-void print_output_to_stdout_(const std::string &output)
+void print_output_to_stdout_(const MessagesResult &results)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", output);
+    fmt::print(fg(green), "{}\n", results.output);
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Usage: \n");
+    fmt::print("Input tokens: {}\n", results.input_tokens);
+    fmt::print("Output tokens: {}\n", results.output_tokens);
 }
 #endif
 
-std::string run_query_(const Messages &model, api::CreateMessage &api_handle)
+MessagesResult run_query_(const Messages &model, api::CreateMessage &api_handle)
 {
     std::expected<MessagesResult, Err> result = api_handle.query_api(model);
 
     if (result) {
-        return result->output;
+        fmt::print("Input tokens: {}\n", result->input_tokens);
+        fmt::print("Output tokens: {}\n", result->output_tokens);
+        return result.value();
     }
 
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
@@ -111,7 +118,7 @@ std::string run_query_(const Messages &model, api::CreateMessage &api_handle)
 void run_conversation_loop_(Messages &model)
 {
     api::CreateMessage api_handle;
-    std::string output;
+    MessagesResult result;
 
 #ifdef TESTING_ENABLED
     // mock conversational turns without interactivity for testing
@@ -122,14 +129,15 @@ void run_conversation_loop_(Messages &model)
 
     for (const auto &input: messages) {
         model.append_user_message(input);
-        output = run_query_(model, api_handle);
-        model.append_assistant_message(output);
+        result = run_query_(model, api_handle);
+        model.append_assistant_message(result.output);
     }
 
-    fmt::print("{}\n", output);
+    fmt::print("{}\n", result.output);
 #else
-    print_special_commands_();
     std::string input;
+
+    print_special_commands_();
 
     while (true) {
         read_input_from_stdin_(input);
@@ -144,9 +152,9 @@ void run_conversation_loop_(Messages &model)
         }
 
         model.append_user_message(input);
-        output = run_query_(model, api_handle);
-        print_output_to_stdout_(output);
-        model.append_assistant_message(output);
+        result = run_query_(model, api_handle);
+        print_output_to_stdout_(result);
+        model.append_assistant_message(result.output);
     }
 #endif
 }
