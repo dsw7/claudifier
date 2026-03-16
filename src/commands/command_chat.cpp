@@ -10,6 +10,11 @@
 #include <stdexcept>
 #include <string>
 
+#ifndef TESTING_ENABLED
+#include <fmt/color.h>
+constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
+#endif
+
 namespace {
 
 void print_help_messages_()
@@ -67,6 +72,22 @@ Messages read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
+#ifndef TESTING_ENABLED
+void read_input_from_stdin_(std::string &input)
+{
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Input: ");
+    std::getline(std::cin, input);
+}
+
+void print_output_to_stdout_(const std::string &output)
+{
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Output: ");
+    fmt::print(fg(green), "{}\n", output);
+}
+#endif
+
 std::string run_query_(const Messages &model, api::CreateMessage &api_handle)
 {
     std::expected<MessagesResult, Err> result = api_handle.query_api(model);
@@ -101,15 +122,13 @@ void run_conversation_loop_(Messages &model)
     std::string input;
 
     while (true) {
-        fmt::print("Input: ");
-        std::getline(std::cin, input);
+        read_input_from_stdin_(input);
         if (input == "x") {
             break;
         }
-
         model.append_user_message(input);
         output = run_query_(model, api_handle);
-        fmt::print("Output: {}\n", output);
+        print_output_to_stdout_(output);
         model.append_assistant_message(output);
     }
 #endif
