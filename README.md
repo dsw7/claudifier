@@ -11,6 +11,60 @@ is tested on Ubuntu/Debian and macOS. **Please note that I built this purely
 because I wanted a program with a very small binary footprint. Anthropic
 already provides numerous CLI tools for interacting with its API.***
 
+## Table of Contents
+- [Installation](#installation)
+- [License](#license)
+
+## Installation
+
+### Prerequisites
+This program requires [CMake](https://cmake.org/), [{fmt}](https://fmt.dev/latest/) and
+[libcurl](https://curl.se/libcurl/). These can be installed as follows:
+
+#### Ubuntu/Debian
+```console
+apt install cmake libfmt-dev libcurl4-openssl-dev
+```
+#### macOS
+```console
+brew install cmake fmt
+# libcurl usually comes bundled with macOS
+```
+#### Other systems
+This program should work on other Unix-like systems (i.e. other Linux
+distributions) however I do not extensively test these.
+
+#### Set up environment variables
+You will need a valid Anthropic API key. Set it as an environment variable:
+```bash
+export ANTHROPIC_API_KEY="<your-api-key>"
+```
+
+### Step 1: Compile the binary
+Compile the binary by executing the `make` target:
+```console
+make
+```
+The binary will be installed into the directory specified by CMake's [install()
+function](https://cmake.org/cmake/help/latest/command/install.html#command:install).
+To clean up generated
+artifacts:
+```console
+make clean
+```
+
+### Step 2: Test setup
+Start the program:
+```console
+claudifier --help
+```
+The program will print a help message if it was set up correctly. You may get
+some variation of:
+```
+-bash: claudifier: command not found
+```
+If so, try running `claudifier` in a new terminal window.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE)
 file for details.
