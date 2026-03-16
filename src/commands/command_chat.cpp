@@ -133,8 +133,14 @@ void run_conversation_loop_(Messages &model)
 
     while (true) {
         read_input_from_stdin_(input);
-        if (input == "q") {
-            break;
+
+        if (input.size() == 1) {
+            if (input == "q") {
+                break;
+            } else {
+                fmt::print("Received invalid command: '{}'\n", input);
+                continue;
+            }
         }
 
         model.append_user_message(input);
