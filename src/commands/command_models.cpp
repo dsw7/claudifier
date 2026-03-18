@@ -5,6 +5,7 @@
 
 #include <fmt/core.h>
 #include <getopt.h>
+#include <json.hpp>
 #include <optional>
 #include <stdexcept>
 
@@ -35,12 +36,12 @@ ListModels read_cli_(const int argc, char **argv)
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
             { "limit", required_argument, 0, 'l' },
-            { "json", required_argument, 0, 'j' },
+            { "json", no_argument, 0, 'j' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hl:j:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hl:j", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -107,6 +108,38 @@ void print_all_pages_(const int limit)
     }
 }
 
+void print_all_pages_as_json_(const int limit)
+{
+    api::GetModels handle;
+    std::optional<std::string> last_id;
+    nlohmann::json json = nlohmann::json::array();
+    int page_num = 1;
+
+    while (true) {
+        const std::expected<ListModelsPage, Err> model_result = handle.query_api(limit, last_id);
+
+        if (not model_result) {
+            throw std::runtime_error(
+                fmt::format("An error occurred when getting list of models: '{}'", model_result.error().errmsg));
+        }
+
+        for (const auto &data: model_result->data) {
+            json.push_back({ { "page", page_num },
+                { "display_name", data.display_name },
+                { "created_at", data.created_at },
+                { "id", data.id } });
+        }
+        page_num++;
+        last_id = model_result->last_id;
+
+        if (not model_result->has_more) {
+            break;
+        }
+    }
+
+    fmt::print("{}\n", json.dump(4));
+}
+
 } // namespace
 
 namespace commands {
@@ -114,7 +147,12 @@ namespace commands {
 void command_models(const int argc, char **argv)
 {
     const ListModels model = read_cli_(argc, argv);
-    print_all_pages_(model.get_max_items_per_page());
+
+    if (model.dump_json) {
+        print_all_pages_as_json_(model.get_max_items_per_page());
+    } else {
+        print_all_pages_(model.get_max_items_per_page());
+    }
 }
 
 } // namespace commands
