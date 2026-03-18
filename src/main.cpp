@@ -71,7 +71,7 @@ void run_command(const int argc, char **argv, const std::string &command)
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        commands::command_run(argc, argv);
+        commands::command_chat(argc, argv);
         return EXIT_SUCCESS;
     }
 
