@@ -21,6 +21,7 @@ Options:
   -h, --help                     Print help information and exit
   -l, --limit=LIMIT              Specify LIMIT number of models per page. LIMIT
                                  is clamped between 1 and 1000.
+  -j, --json                     Export list of models as JSON
 )";
 
     fmt::print("{}\n", messages);
@@ -34,11 +35,12 @@ ListModels read_cli_(const int argc, char **argv)
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
             { "limit", required_argument, 0, 'l' },
+            { "json", required_argument, 0, 'j' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hl:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hl:j:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -50,6 +52,9 @@ ListModels read_cli_(const int argc, char **argv)
                 exit(EXIT_SUCCESS);
             case 'l':
                 model.set_max_items_per_page(utils::string_to_int(optarg));
+                break;
+            case 'j':
+                model.dump_json = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));

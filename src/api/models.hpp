@@ -26,8 +26,9 @@ private:
 
 class ListModels {
 public:
-    void set_max_items_per_page(const int limit);
     int get_max_items_per_page() const;
+    void set_max_items_per_page(const int limit);
+    bool dump_json = false;
 
 private:
     int items_per_page_ = 1000;
