@@ -14,6 +14,7 @@
 #include <fmt/color.h>
 constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 constexpr fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
+constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 #endif
 
 namespace {
@@ -105,12 +106,21 @@ void print_usage_to_stdout_(const MessagesResult &results)
     fmt::print(fmt::emphasis::bold, "Usage: \n");
     fmt::print("Input tokens: {}\n", results.input_tokens);
     fmt::print("Output tokens: {}\n", results.output_tokens);
+}
 
+bool break_conversation_on_condition_(const MessagesResult &results)
+{
     if (results.stop_reason == "end_turn") {
-        fmt::print("Stop reason: {}\n", results.stop_reason);
-    } else {
-        fmt::print(fg(yellow), "Stop reason: {}\n", results.stop_reason);
+        return false;
     }
+
+    fmt::print(fg(yellow), "Stop reason: {}\n", results.stop_reason);
+
+    if (results.stop_reason == "max_tokens") {
+        fmt::print(fg(red), "Cannot continue. The conversation has become fragmented due to token limitations.\n");
+    }
+
+    return true;
 }
 #endif
 
@@ -165,6 +175,9 @@ void run_conversation_loop_(Messages &model)
         result = run_query_(model, api_handle);
         print_output_to_stdout_(result);
         print_usage_to_stdout_(result);
+        if (break_conversation_on_condition_(result)) {
+            break;
+        }
         model.append_assistant_message(result.output);
     }
 #endif
