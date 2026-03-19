@@ -13,6 +13,7 @@
 #ifndef TESTING_ENABLED
 #include <fmt/color.h>
 constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
+constexpr fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
 #endif
 
 namespace {
@@ -96,10 +97,20 @@ void print_output_to_stdout_(const MessagesResult &results)
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
     fmt::print(fg(green), "{}\n", results.output);
+}
+
+void print_usage_to_stdout_(const MessagesResult &results)
+{
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage: \n");
     fmt::print("Input tokens: {}\n", results.input_tokens);
     fmt::print("Output tokens: {}\n", results.output_tokens);
+
+    if (results.stop_reason == "end_turn") {
+        fmt::print("Stop reason: {}\n", results.stop_reason);
+    } else {
+        fmt::print(fg(yellow), "Stop reason: {}\n", results.stop_reason);
+    }
 }
 #endif
 
@@ -153,6 +164,7 @@ void run_conversation_loop_(Messages &model)
         model.append_user_message(input);
         result = run_query_(model, api_handle);
         print_output_to_stdout_(result);
+        print_usage_to_stdout_(result);
         model.append_assistant_message(result.output);
     }
 #endif
