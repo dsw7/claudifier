@@ -19,8 +19,9 @@ namespace {
 
 void print_help_messages_()
 {
-    const std::string messages = R"(Participate in a multi-turn conversation with LLM.
-This command preserves context between API calls, and therefore will be more token heavy.
+    const std::string messages = R"(Participate in a multi-turn conversation with an LLM. Note that this
+command preserves context between API calls and therefore will be more
+token heavy.
 
 Usage:
   claudifier chat [OPTIONS]

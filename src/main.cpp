@@ -36,7 +36,7 @@ Commands:
 Try 'claudifier <subcommand> [-h | --help]' for subcommand specific help.
 )";
 
-    fmt::print("{}\n", messages);
+    fmt::print("{}", messages);
 }
 
 void print_build_information()
