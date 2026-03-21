@@ -55,6 +55,22 @@ void print_build_information()
     fmt::print("{}\n", data.dump(2));
 }
 
+int run_default_command(const int argc, char **argv)
+{
+    try {
+        commands::command_chat(argc, argv);
+    } catch (const std::runtime_error &e) {
+#ifdef TESTING_ENABLED
+        fmt::print(stderr, "{}\n", e.what());
+#else
+        fmt::print(stderr, fg(red), "{}\n", e.what());
+#endif
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 void run_command(const int argc, char **argv, const std::string &command)
 {
     if (command == "run") {
@@ -71,8 +87,7 @@ void run_command(const int argc, char **argv, const std::string &command)
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        commands::command_chat(argc, argv);
-        return EXIT_SUCCESS;
+        return run_default_command(argc, argv);
     }
 
     const std::string command = argv[1];
