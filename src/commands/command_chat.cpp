@@ -93,6 +93,26 @@ void read_input_from_stdin_(std::string &input)
     std::getline(std::cin, input);
 }
 
+enum class LoopControl {
+    BREAK,
+    CONTINUE,
+    PROCEED,
+};
+
+LoopControl parse_special_command_(const std::string &special_command)
+{
+    if (special_command.size() != 1) {
+        return LoopControl::PROCEED;
+    }
+
+    if (special_command == "q") {
+        return LoopControl::BREAK;
+    } else {
+        fmt::print("Received invalid command: '{}'\n", special_command);
+        return LoopControl::CONTINUE;
+    }
+}
+
 void print_output_to_stdout_(const MessagesResult &results)
 {
     utils::print_line();
@@ -135,8 +155,13 @@ MessagesResult run_query_(const Messages &model, api::CreateMessage &api_handle)
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
 }
 
-void run_conversation_loop_(Messages &model)
+} // namespace
+
+namespace commands {
+
+void command_chat(const int argc, char **argv)
 {
+    Messages model = read_cli_(argc, argv);
     api::CreateMessage api_handle;
     MessagesResult result;
 
@@ -156,19 +181,17 @@ void run_conversation_loop_(Messages &model)
     fmt::print("{}\n", result.output);
 #else
     std::string input;
-
     print_special_commands_();
+    LoopControl loop_controller;
 
     while (true) {
         read_input_from_stdin_(input);
+        loop_controller = parse_special_command_(input);
 
-        if (input.size() == 1) {
-            if (input == "q") {
-                break;
-            } else {
-                fmt::print("Received invalid command: '{}'\n", input);
-                continue;
-            }
+        if (loop_controller == LoopControl::BREAK) {
+            break;
+        } else if (loop_controller == LoopControl::CONTINUE) {
+            continue;
         }
 
         model.append_user_message(input);
@@ -181,16 +204,6 @@ void run_conversation_loop_(Messages &model)
         model.append_assistant_message(result.output);
     }
 #endif
-}
-
-} // namespace
-
-namespace commands {
-
-void command_chat(const int argc, char **argv)
-{
-    Messages model = read_cli_(argc, argv);
-    run_conversation_loop_(model);
 }
 
 } // namespace commands
