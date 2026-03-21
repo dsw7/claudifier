@@ -109,13 +109,15 @@ LoopControl parse_special_command_(const std::string &special_command)
 
     if (special_command == "q") {
         return LoopControl::BREAK;
-    } else if (special_command == "?") {
+    } 
+    
+    if (special_command == "?") {
         print_special_commands_();
         return LoopControl::CONTINUE;
-    } else {
+    } 
+
         fmt::print("Received invalid command: '{}'\n", special_command);
         return LoopControl::CONTINUE;
-    }
 }
 
 void print_output_to_stdout_(const MessagesResult &results)
