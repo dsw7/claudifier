@@ -83,7 +83,9 @@ void print_special_commands_()
     fmt::print(fmt::emphasis::bold, "Commands: \n");
     fmt::print("[");
     fmt::print(fg(green), "q");
-    fmt::print("]: Quit the current chat session\n");
+    fmt::print("]: Quit the current chat session\n[");
+    fmt::print(fg(green), "?");
+    fmt::print("]: Print this list of commands\n");
 }
 
 void read_input_from_stdin_(std::string &input)
@@ -107,6 +109,9 @@ LoopControl parse_special_command_(const std::string &special_command)
 
     if (special_command == "q") {
         return LoopControl::BREAK;
+    } else if (special_command == "?") {
+        print_special_commands_();
+        return LoopControl::CONTINUE;
     } else {
         fmt::print("Received invalid command: '{}'\n", special_command);
         return LoopControl::CONTINUE;
