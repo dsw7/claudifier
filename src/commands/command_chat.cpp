@@ -91,8 +91,17 @@ void print_special_commands_()
 void read_input_from_stdin_(std::string &input)
 {
     utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Input: ");
-    std::getline(std::cin, input);
+
+    while (true) {
+        fmt::print(fmt::emphasis::bold, "Input: ");
+        std::getline(std::cin, input);
+
+        if (input.empty()) {
+            fmt::print("Input is empty. Try again.\n");
+        } else {
+            break;
+        }
+    }
 }
 
 enum class LoopControl {
@@ -108,16 +117,17 @@ LoopControl parse_special_command_(const std::string &special_command)
     }
 
     if (special_command == "q") {
+        fmt::print("Aborting conversation.\n");
         return LoopControl::BREAK;
-    } 
-    
+    }
+
     if (special_command == "?") {
         print_special_commands_();
         return LoopControl::CONTINUE;
-    } 
+    }
 
-        fmt::print("Received invalid command: '{}'\n", special_command);
-        return LoopControl::CONTINUE;
+    fmt::print("Received invalid command: '{}'\n", special_command);
+    return LoopControl::CONTINUE;
 }
 
 void print_output_to_stdout_(const MessagesResult &results)
