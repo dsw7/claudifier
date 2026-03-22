@@ -6,7 +6,6 @@ option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
 option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 string(TIMESTAMP BUILD_DATE)
 string(TIMESTAMP CURRENT_YEAR "%Y")
@@ -25,8 +24,10 @@ endif()
 
 if(ENABLE_TESTING)
   add_compile_definitions(TESTING_ENABLED)
+  set(CMAKE_BUILD_TYPE Debug)
 else()
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
 set(SRC_FILES
