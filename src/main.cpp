@@ -44,6 +44,7 @@ void print_build_information()
     nlohmann::json data;
 
     data["build_date"] = BUILD_DATE;
+    data["cmake_build_type"] = CMAKE_BUILD_TYPE;
     data["version"] = PROJECT_VERSION;
 
 #ifdef TESTING_ENABLED

@@ -1,21 +1,14 @@
 cmake_minimum_required(VERSION 3.18)
 project(Claudifier VERSION 1.0.0)
 
-# Options
-option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
-option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
-
 set(CMAKE_CXX_STANDARD 26)
 
 string(TIMESTAMP BUILD_DATE)
 string(TIMESTAMP CURRENT_YEAR "%Y")
 
-add_compile_options(-Wall -Wextra -pedantic -Werror)
-add_compile_definitions(
-  BUILD_DATE="${BUILD_DATE}"
-  CURRENT_YEAR="${CURRENT_YEAR}"
-  PROJECT_VERSION="${PROJECT_VERSION}"
-)
+# Options
+option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
+option(ENABLE_TESTING "Set the TESTING_ENABLED macro" OFF)
 
 if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
@@ -29,6 +22,15 @@ else()
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local/bin")
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
+
+add_compile_definitions(
+  BUILD_DATE="${BUILD_DATE}"
+  CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+  CURRENT_YEAR="${CURRENT_YEAR}"
+  PROJECT_VERSION="${PROJECT_VERSION}"
+)
+
+add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 set(SRC_FILES
   api/curl_base.cpp
