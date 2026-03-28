@@ -21,6 +21,7 @@ Options:
   -z, --zero-shot                Run zero-shot prompting test
   -o, --one-shot                 Run one-shot prompting test
   -f, --few-shot                 Run few-shot prompting test
+  -c, --chain-of-thought         Run chain-of-thought test
 )";
 
     fmt::print("{}\n", messages);
@@ -30,6 +31,7 @@ struct TestCase {
     bool zero_shot = false;
     bool one_shot = false;
     bool few_shot = false;
+    bool chain_of_thought = false;
 };
 
 TestCase read_cli_(const int argc, char **argv)
@@ -41,11 +43,13 @@ TestCase read_cli_(const int argc, char **argv)
             { "help", no_argument, 0, 'h' },
             { "zero-shot", no_argument, 0, 'z' },
             { "one-shot", no_argument, 0, 'o' },
+            { "few-shot", no_argument, 0, 'f' },
+            { "chain-of-thought", no_argument, 0, 'c' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hzof", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hzofc", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -63,6 +67,9 @@ TestCase read_cli_(const int argc, char **argv)
                 break;
             case 'f':
                 test_case.few_shot = true;
+                break;
+            case 'c':
+                test_case.chain_of_thought = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -125,6 +132,22 @@ void test_few_shot_()
     }
 }
 
+void test_chain_of_thought_()
+{
+    Messages model;
+    model.append_user_message(
+        "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
+
+    api::CreateMessage handle;
+    std::expected<MessagesResult, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
 } // namespace
 
 namespace commands {
@@ -143,6 +166,10 @@ void command_test(const int argc, char **argv)
 
     if (test_case.few_shot) {
         test_few_shot_();
+    }
+
+    if (test_case.chain_of_thought) {
+        test_chain_of_thought_();
     }
 }
 
