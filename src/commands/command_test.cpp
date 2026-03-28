@@ -38,6 +38,7 @@ TestCase read_cli_(const int argc, char **argv)
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
             { "zero-shot", no_argument, 0, 'z' },
+            { "one-shot", no_argument, 0, 'o' },
             { 0, 0, 0, 0 },
         };
 
@@ -75,7 +76,7 @@ void test_zero_shot_()
     std::expected<MessagesResult, Err> result = handle.query_api(model);
 
     if (result) {
-        fmt::print("{}\n", result->output);
+        fmt::print("{}\n", result->raw_response);
     } else {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
     }
@@ -92,7 +93,7 @@ void test_one_shot_()
     std::expected<MessagesResult, Err> result = handle.query_api(model);
 
     if (result) {
-        fmt::print("{}\n", result->output);
+        fmt::print("{}\n", result->raw_response);
     } else {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
     }
