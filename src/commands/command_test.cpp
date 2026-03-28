@@ -9,8 +9,17 @@
 
 namespace {
 
+using api::CreateMessage;
 using api::MessagesInput;
 using api::MessagesOutput;
+
+struct TestCase {
+    bool zero_shot = false;
+    bool one_shot = false;
+    bool few_shot = false;
+    bool chain_of_thought = false;
+    bool tree_of_thought = false;
+};
 
 void print_help_messages_()
 {
@@ -31,15 +40,122 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-struct TestCase {
-    bool zero_shot = false;
-    bool one_shot = false;
-    bool few_shot = false;
-    bool chain_of_thought = false;
-    bool tree_of_thought = false;
-};
+void test_zero_shot_()
+{
+    MessagesInput model;
+    model.append_user_message("What is 3 + 5?");
 
-TestCase read_cli_(const int argc, char **argv)
+    CreateMessage handle;
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void test_one_shot_()
+{
+    MessagesInput model;
+    model.append_user_message("This result is great!");
+    model.append_assistant_message("This message sounds POSITIVE");
+    model.append_user_message("This result is bad!");
+
+    CreateMessage handle;
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void test_few_shot_()
+{
+    MessagesInput model;
+    model.append_user_message("The value is a;");
+    model.append_assistant_message("a = 52");
+    model.append_user_message("The value is b;");
+    model.append_assistant_message("b = 54");
+    model.append_user_message("The value is c;");
+    model.append_assistant_message("c = 56");
+    model.append_user_message("The value is d;");
+
+    CreateMessage handle;
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void test_chain_of_thought_()
+{
+    MessagesInput model;
+    model.append_user_message(
+        "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
+
+    CreateMessage handle;
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void test_tree_of_thought_()
+{
+    MessagesInput model;
+    model.append_user_message(R"(Imagine three different experts are answering this question."
+"All experts will write down 1 step of their thinking, then share it with the group."
+"If any expert realizes they're wrong at any point then they leave."
+"Goal: Use the numbers 4, 9, 10, 13 and basic operators (+, -, *, /) to get the number 24."
+"Step 1:)");
+
+    CreateMessage handle;
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void run_test_cases_(const TestCase &test_case)
+{
+    if (test_case.zero_shot) {
+        test_zero_shot_();
+    }
+
+    if (test_case.one_shot) {
+        test_one_shot_();
+    }
+
+    if (test_case.few_shot) {
+        test_few_shot_();
+    }
+
+    if (test_case.chain_of_thought) {
+        test_chain_of_thought_();
+    }
+
+    if (test_case.tree_of_thought) {
+        test_tree_of_thought_();
+    }
+}
+
+} // namespace
+
+namespace commands {
+
+void command_test(const int argc, char **argv)
 {
     TestCase test_case;
 
@@ -85,124 +201,7 @@ TestCase read_cli_(const int argc, char **argv)
         }
     };
 
-    return test_case;
-}
-
-void test_zero_shot_()
-{
-    MessagesInput model;
-    model.append_user_message("What is 3 + 5?");
-
-    api::CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
-
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
-    } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
-    }
-}
-
-void test_one_shot_()
-{
-    MessagesInput model;
-    model.append_user_message("This result is great!");
-    model.append_assistant_message("This message sounds POSITIVE");
-    model.append_user_message("This result is bad!");
-
-    api::CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
-
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
-    } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
-    }
-}
-
-void test_few_shot_()
-{
-    MessagesInput model;
-    model.append_user_message("The value is a;");
-    model.append_assistant_message("a = 52");
-    model.append_user_message("The value is b;");
-    model.append_assistant_message("b = 54");
-    model.append_user_message("The value is c;");
-    model.append_assistant_message("c = 56");
-    model.append_user_message("The value is d;");
-
-    api::CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
-
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
-    } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
-    }
-}
-
-void test_chain_of_thought_()
-{
-    MessagesInput model;
-    model.append_user_message(
-        "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
-
-    api::CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
-
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
-    } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
-    }
-}
-
-void test_tree_of_thought_()
-{
-    MessagesInput model;
-    model.append_user_message(R"(Imagine three different experts are answering this question."
-"All experts will write down 1 step of their thinking, then share it with the group."
-"If any expert realizes they're wrong at any point then they leave."
-"Goal: Use the numbers 4, 9, 10, 13 and basic operators (+, -, *, /) to get the number 24."
-"Step 1:)");
-
-    api::CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
-
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
-    } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
-    }
-}
-
-} // namespace
-
-namespace commands {
-
-void command_test(const int argc, char **argv)
-{
-    const TestCase test_case = read_cli_(argc, argv);
-
-    if (test_case.zero_shot) {
-        test_zero_shot_();
-    }
-
-    if (test_case.one_shot) {
-        test_one_shot_();
-    }
-
-    if (test_case.few_shot) {
-        test_few_shot_();
-    }
-
-    if (test_case.chain_of_thought) {
-        test_chain_of_thought_();
-    }
-
-    if (test_case.tree_of_thought) {
-        test_tree_of_thought_();
-    }
+    run_test_cases_(test_case);
 }
 
 } // namespace commands
