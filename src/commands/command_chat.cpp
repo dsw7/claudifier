@@ -19,6 +19,7 @@ constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 
 namespace {
 
+using api::CreateMessage;
 using api::MessagesInput;
 using api::MessagesOutput;
 
@@ -40,45 +41,6 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-MessagesInput read_cli_(const int argc, char **argv)
-{
-    MessagesInput model;
-
-    while (true) {
-        static struct option long_options[] = {
-            { "help", no_argument, 0, 'h' },
-            { "model", required_argument, 0, 'm' },
-            { "limit", required_argument, 0, 'l' },
-            { 0, 0, 0, 0 },
-        };
-
-        int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:l:", long_options, &option_index);
-
-        if (c == -1) {
-            break;
-        }
-
-        switch (c) {
-            case 'h':
-                print_help_messages_();
-                exit(EXIT_SUCCESS);
-            case 'm':
-                model.set_llm_model(optarg);
-                break;
-            case 'l':
-                model.set_max_tokens(utils::string_to_int(optarg));
-                break;
-            default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
-        }
-    };
-
-    return model;
-}
-
-// ----------------------------------------------------------------------------------------------------------
-
 #ifndef TESTING_ENABLED
 void print_special_commands_()
 {
@@ -91,7 +53,7 @@ void print_special_commands_()
     fmt::print("]: Print this list of commands\n");
 }
 
-void read_input_from_stdin_(std::string &input)
+void read_message_from_stdin_(std::string &input)
 {
     utils::print_line();
 
@@ -164,9 +126,9 @@ bool break_conversation_on_condition_(const MessagesOutput &results)
 }
 #endif
 
-MessagesOutput run_query_(const MessagesInput &model, api::CreateMessage &api_handle)
+MessagesOutput run_query_(const MessagesInput &input, CreateMessage &api_handle)
 {
-    std::expected<MessagesOutput, Err> result = api_handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = api_handle.query_api(input);
 
     if (result) {
         return result.value();
@@ -175,14 +137,9 @@ MessagesOutput run_query_(const MessagesInput &model, api::CreateMessage &api_ha
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
 }
 
-} // namespace
-
-namespace commands {
-
-void command_chat(const int argc, char **argv)
+void run_conversational_loop_(MessagesInput &input)
 {
-    MessagesInput model = read_cli_(argc, argv);
-    api::CreateMessage api_handle;
+    CreateMessage api_handle;
     MessagesOutput result;
 
 #ifdef TESTING_ENABLED
@@ -192,21 +149,21 @@ void command_chat(const int argc, char **argv)
         "What is c + 5? Return just the value",
     };
 
-    for (const auto &input: messages) {
-        model.append_user_message(input);
-        result = run_query_(model, api_handle);
-        model.append_assistant_message(result.output);
+    for (const auto &message: messages) {
+        input.append_user_message(message);
+        result = run_query_(input, api_handle);
+        input.append_assistant_message(result.output);
     }
 
     fmt::print("{}\n", result.output);
 #else
-    std::string input;
+    std::string message;
     print_special_commands_();
     LoopControl loop_controller;
 
     while (true) {
-        read_input_from_stdin_(input);
-        loop_controller = parse_special_command_(input);
+        read_message_from_stdin_(message);
+        loop_controller = parse_special_command_(message);
 
         if (loop_controller == LoopControl::BREAK) {
             break;
@@ -214,16 +171,57 @@ void command_chat(const int argc, char **argv)
             continue;
         }
 
-        model.append_user_message(input);
-        result = run_query_(model, api_handle);
+        input.append_user_message(message);
+        result = run_query_(input, api_handle);
         print_output_to_stdout_(result);
         print_usage_to_stdout_(result);
         if (break_conversation_on_condition_(result)) {
             break;
         }
-        model.append_assistant_message(result.output);
+        input.append_assistant_message(result.output);
     }
+}
 #endif
+
+} // namespace
+
+namespace commands {
+
+void command_chat(const int argc, char **argv)
+{
+    MessagesInput input;
+
+    while (true) {
+        static struct option long_options[] = {
+            { "help", no_argument, 0, 'h' },
+            { "input", required_argument, 0, 'm' },
+            { "limit", required_argument, 0, 'l' },
+            { 0, 0, 0, 0 },
+        };
+
+        int option_index = 0;
+        const int c = getopt_long(argc, argv, "hm:l:", long_options, &option_index);
+
+        if (c == -1) {
+            break;
+        }
+
+        switch (c) {
+            case 'h':
+                print_help_messages_();
+                exit(EXIT_SUCCESS);
+            case 'm':
+                input.set_llm_model(optarg);
+                break;
+            case 'l':
+                input.set_max_tokens(utils::string_to_int(optarg));
+                break;
+            default:
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
+        }
+    };
+
+    run_conversational_loop_(input);
 }
 
 } // namespace commands
