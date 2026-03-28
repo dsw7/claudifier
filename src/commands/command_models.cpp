@@ -11,6 +11,8 @@
 
 namespace {
 
+using api::ModelsOutput;
+
 void print_help_messages_()
 {
     const std::string messages = R"(Get a list of available models.
@@ -67,7 +69,7 @@ ListModels read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
-void print_page_(const ListModelsPage &page)
+void print_page_(const ModelsOutput &page)
 {
     static bool print_header = true;
 
@@ -92,7 +94,7 @@ void print_all_pages_(const int limit)
     std::optional<std::string> last_id;
 
     while (true) {
-        const std::expected<ListModelsPage, Err> model_result = handle.query_api(limit, last_id);
+        const std::expected<ModelsOutput, Err> model_result = handle.query_api(limit, last_id);
 
         if (not model_result) {
             throw std::runtime_error(
@@ -116,7 +118,7 @@ void print_all_pages_as_json_(const int limit)
     int page_num = 1;
 
     while (true) {
-        const std::expected<ListModelsPage, Err> model_result = handle.query_api(limit, last_id);
+        const std::expected<ModelsOutput, Err> model_result = handle.query_api(limit, last_id);
 
         if (not model_result) {
             throw std::runtime_error(

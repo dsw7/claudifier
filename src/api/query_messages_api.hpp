@@ -3,6 +3,8 @@
 #include "curl_base.hpp"
 #include "models.hpp"
 
+#include <expected>
+#include <json.hpp>
 #include <string>
 
 namespace api {

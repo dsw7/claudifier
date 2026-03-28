@@ -8,11 +8,11 @@
 
 namespace {
 
-ListModelsPage unpack_200_response_to_model_(const std::string &response)
+api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
-    ListModelsPage ok;
+    api::ModelsOutput ok;
     ok.raw_response = json.dump(4);
 
     if (json.contains("last_id")) {
@@ -59,7 +59,12 @@ std::string build_url_(const int limit, const std::optional<std::string> &last_i
 
 namespace api {
 
-std::expected<ListModelsPage, Err> GetModels::query_api(const int limit, const std::optional<std::string> &last_id)
+void ModelsOutput::append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id)
+{
+    this->data.push_back(ModelData { created_at, display_name, id });
+}
+
+std::expected<ModelsOutput, Err> GetModels::query_api(const int limit, const std::optional<std::string> &last_id)
 {
     const std::string endpoint = build_url_(limit, last_id);
     curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());

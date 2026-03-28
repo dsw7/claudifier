@@ -1,9 +1,6 @@
 #pragma once
 
-#include <expected>
-#include <json.hpp>
 #include <string>
-#include <vector>
 
 // models for requests
 // -------------------
@@ -25,19 +22,4 @@ struct Err {
     std::string errmsg;
     std::string raw_response;
     std::string error_type;
-};
-
-struct ModelData {
-    std::string created_at;
-    std::string display_name;
-    std::string id;
-};
-
-struct ListModelsPage {
-    bool has_more = false;
-    std::string last_id;
-    std::string raw_response;
-    std::vector<ModelData> data;
-
-    void append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id);
 };

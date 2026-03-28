@@ -16,11 +16,3 @@ int ListModels::get_max_items_per_page() const
 {
     return this->items_per_page_;
 }
-
-// models for responses
-// -------------------
-
-void ListModelsPage::append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id)
-{
-    this->data.push_back(ModelData { created_at, display_name, id });
-}
