@@ -1,6 +1,7 @@
 #include "command_chat.hpp"
 #include "command_models.hpp"
 #include "command_run.hpp"
+#include "command_test.hpp"
 
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -80,6 +81,8 @@ void run_command(const int argc, char **argv, const std::string &command)
         commands::command_models(argc, argv);
     } else if (command == "chat") {
         commands::command_chat(argc, argv);
+    } else if (command == "test") {
+        commands::command_test(argc, argv);
     } else {
         throw std::runtime_error("Received unknown command. Re-run with -h or --help");
     }
