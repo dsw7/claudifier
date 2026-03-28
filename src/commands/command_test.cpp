@@ -20,6 +20,7 @@ Options:
   -h, --help                     Print help information and exit
   -z, --zero-shot                Run zero-shot prompting test
   -o, --one-shot                 Run one-shot prompting test
+  -f, --few-shot                 Run few-shot prompting test
 )";
 
     fmt::print("{}\n", messages);
@@ -28,6 +29,7 @@ Options:
 struct TestCase {
     bool zero_shot = false;
     bool one_shot = false;
+    bool few_shot = false;
 };
 
 TestCase read_cli_(const int argc, char **argv)
@@ -43,7 +45,7 @@ TestCase read_cli_(const int argc, char **argv)
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hzo", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hzof", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -58,6 +60,9 @@ TestCase read_cli_(const int argc, char **argv)
                 break;
             case 'o':
                 test_case.one_shot = true;
+                break;
+            case 'f':
+                test_case.few_shot = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -134,6 +139,10 @@ void command_test(const int argc, char **argv)
 
     if (test_case.one_shot) {
         test_one_shot_();
+    }
+
+    if (test_case.few_shot) {
+        test_few_shot_();
     }
 }
 
