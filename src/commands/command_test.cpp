@@ -197,7 +197,7 @@ void command_test(const int argc, char **argv)
                 test_case.tree_of_thought = true;
                 break;
             default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} test [-h | --help] for more information", argv[0]));
         }
     };
 

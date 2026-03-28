@@ -217,7 +217,7 @@ void command_chat(const int argc, char **argv)
                 input.set_max_tokens(utils::string_to_int(optarg));
                 break;
             default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} chat [-h | --help] for more information", argv[0]));
         }
     };
 

@@ -56,17 +56,17 @@ void print_all_pages_(const int limit)
     std::optional<std::string> last_id;
 
     while (true) {
-        const std::expected<ModelsOutput, Err> model_result = handle.query_api(limit, last_id);
+        const std::expected<ModelsOutput, Err> output = handle.query_api(limit, last_id);
 
-        if (not model_result) {
+        if (not output) {
             throw std::runtime_error(
-                fmt::format("An error occurred when getting list of models: '{}'", model_result.error().errmsg));
+                fmt::format("An error occurred when getting list of models: '{}'", output.error().errmsg));
         }
 
-        print_page_(*model_result);
-        last_id = model_result->last_id;
+        print_page_(*output);
+        last_id = output->last_id;
 
-        if (not model_result->has_more) {
+        if (not output->has_more) {
             break;
         }
     }
@@ -80,23 +80,23 @@ void print_all_pages_as_json_(const int limit)
     int page_num = 1;
 
     while (true) {
-        const std::expected<ModelsOutput, Err> model_result = handle.query_api(limit, last_id);
+        const std::expected<ModelsOutput, Err> output = handle.query_api(limit, last_id);
 
-        if (not model_result) {
+        if (not output) {
             throw std::runtime_error(
-                fmt::format("An error occurred when getting list of models: '{}'", model_result.error().errmsg));
+                fmt::format("An error occurred when getting list of models: '{}'", output.error().errmsg));
         }
 
-        for (const auto &data: model_result->data) {
+        for (const auto &data: output->data) {
             json.push_back({ { "page", page_num },
                 { "display_name", data.display_name },
                 { "created_at", data.created_at },
                 { "id", data.id } });
         }
         page_num++;
-        last_id = model_result->last_id;
+        last_id = output->last_id;
 
-        if (not model_result->has_more) {
+        if (not output->has_more) {
             break;
         }
     }
