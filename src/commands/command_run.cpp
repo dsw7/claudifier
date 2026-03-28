@@ -121,6 +121,7 @@ void command_run(const int argc, char **argv)
 {
     MessagesInput input;
     std::string prompt;
+    bool print_raw_response = false;
 
     while (true) {
         static struct option long_options[] = {
@@ -153,7 +154,7 @@ void command_run(const int argc, char **argv)
                 input.set_max_tokens(utils::string_to_int(optarg));
                 break;
             case 'r':
-                input.print_raw_response = true;
+                print_raw_response = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -172,7 +173,7 @@ void command_run(const int argc, char **argv)
 
     const MessagesOutput output = create_message_(input);
 
-    if (input.print_raw_response) {
+    if (print_raw_response) {
         fmt::print("{}\n", output.raw_response);
     } else {
         print_results_to_stdout_(output);
