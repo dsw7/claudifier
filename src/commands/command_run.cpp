@@ -19,6 +19,7 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
+using api::CreateMessage;
 using api::MessagesInput;
 using api::MessagesOutput;
 
@@ -53,9 +54,72 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-MessagesInput read_cli_(const int argc, char **argv)
+MessagesOutput create_message_(const MessagesInput &input)
 {
-    MessagesInput model;
+    threading::timer_enabled.store(true);
+    std::thread timer(threading::time_api_call);
+
+    bool query_failed = false;
+    std::expected<MessagesOutput, Err> output;
+    std::string errmsg;
+
+    try {
+        CreateMessage handle;
+        output = handle.query_api(input);
+    } catch (const std::runtime_error &e) {
+        query_failed = true;
+        errmsg = e.what();
+    }
+
+    threading::timer_enabled.store(false);
+    timer.join();
+
+    if (query_failed) {
+        throw std::runtime_error(
+            fmt::format("Failed to create message: '{}'", errmsg));
+    }
+
+    if (not output) {
+        throw std::runtime_error(
+            fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
+    }
+
+    return *output;
+}
+
+void print_results_to_stdout_(const MessagesOutput &output)
+{
+#ifdef TESTING_ENABLED
+    const nlohmann::json json_obj = {
+        { "input_tokens", output.input_tokens },
+        { "llm_model", output.llm_model },
+        { "output", output.output },
+        { "output_tokens", output.output_tokens },
+        { "stop_reason", output.stop_reason }
+    };
+    const std::string json_str = json_obj.dump(4);
+    fmt::print("{}\n", json_str);
+#else
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Output: ");
+    fmt::print(fg(green), "{}\n", output.output);
+    utils::print_line();
+    fmt::print(fmt::emphasis::bold, "Usage:\n");
+    fmt::print("Model: {}\n", output.llm_model);
+    fmt::print("Input tokens: {}\n", output.input_tokens);
+    fmt::print("Output tokens: {}\n", output.output_tokens);
+    fmt::print("Stop reason: {}\n", output.stop_reason);
+    utils::print_line();
+#endif
+}
+
+} // namespace
+
+namespace commands {
+
+void command_run(const int argc, char **argv)
+{
+    MessagesInput input;
     std::string prompt;
 
     while (true) {
@@ -80,16 +144,16 @@ MessagesInput read_cli_(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'm':
-                model.set_llm_model(optarg);
+                input.set_llm_model(optarg);
                 break;
             case 'p':
                 prompt = optarg;
                 break;
             case 'l':
-                model.set_max_tokens(utils::string_to_int(optarg));
+                input.set_max_tokens(utils::string_to_int(optarg));
                 break;
             case 'r':
-                model.print_raw_response = true;
+                input.print_raw_response = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -103,86 +167,15 @@ MessagesInput read_cli_(const int argc, char **argv)
     if (prompt.empty()) {
         throw std::runtime_error("The prompt is empty");
     } else {
-        model.append_user_message(prompt);
+        input.append_user_message(prompt);
     }
 
-    return model;
-}
+    const MessagesOutput output = create_message_(input);
 
-// ----------------------------------------------------------------------------------------------------------
-
-MessagesOutput create_message_(const MessagesInput &model)
-{
-    threading::timer_enabled.store(true);
-    std::thread timer(threading::time_api_call);
-
-    bool query_failed = false;
-    std::expected<MessagesOutput, Err> model_result;
-    std::string errmsg;
-
-    try {
-        api::CreateMessage handle;
-        model_result = handle.query_api(model);
-    } catch (const std::runtime_error &e) {
-        query_failed = true;
-        errmsg = e.what();
-    }
-
-    threading::timer_enabled.store(false);
-    timer.join();
-
-    if (query_failed) {
-        throw std::runtime_error(
-            fmt::format("Failed to create message: '{}'", errmsg));
-    }
-
-    if (not model_result) {
-        throw std::runtime_error(
-            fmt::format("An error occurred when creating message: '{}'", model_result.error().errmsg));
-    }
-
-    return *model_result;
-}
-
-void print_results_to_stdout_(const MessagesOutput &model)
-{
-#ifdef TESTING_ENABLED
-    const nlohmann::json json_obj = {
-        { "input_tokens", model.input_tokens },
-        { "llm_model", model.llm_model },
-        { "output", model.output },
-        { "output_tokens", model.output_tokens },
-        { "stop_reason", model.stop_reason }
-    };
-    const std::string json_str = json_obj.dump(4);
-    fmt::print("{}\n", json_str);
-#else
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", model.output);
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Usage:\n");
-    fmt::print("Model: {}\n", model.llm_model);
-    fmt::print("Input tokens: {}\n", model.input_tokens);
-    fmt::print("Output tokens: {}\n", model.output_tokens);
-    fmt::print("Stop reason: {}\n", model.stop_reason);
-    utils::print_line();
-#endif
-}
-
-} // namespace
-
-namespace commands {
-
-void command_run(const int argc, char **argv)
-{
-    const MessagesInput model = read_cli_(argc, argv);
-    const MessagesOutput model_result = create_message_(model);
-
-    if (model.print_raw_response) {
-        fmt::print("{}\n", model_result.raw_response);
+    if (input.print_raw_response) {
+        fmt::print("{}\n", output.raw_response);
     } else {
-        print_results_to_stdout_(model_result);
+        print_results_to_stdout_(output);
     }
 }
 
