@@ -42,89 +42,89 @@ Options:
 
 void test_zero_shot_()
 {
-    MessagesInput model;
-    model.append_user_message("What is 3 + 5?");
+    MessagesInput input;
+    input.append_user_message("What is 3 + 5?");
 
     CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> output = handle.query_api(input);
 
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
+    if (output) {
+        fmt::print("{}\n", output->raw_response);
     } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
     }
 }
 
 void test_one_shot_()
 {
-    MessagesInput model;
-    model.append_user_message("This result is great!");
-    model.append_assistant_message("This message sounds POSITIVE");
-    model.append_user_message("This result is bad!");
+    MessagesInput input;
+    input.append_user_message("This output is great!");
+    input.append_assistant_message("This message sounds POSITIVE");
+    input.append_user_message("This output is bad!");
 
     CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> output = handle.query_api(input);
 
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
+    if (output) {
+        fmt::print("{}\n", output->raw_response);
     } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
     }
 }
 
 void test_few_shot_()
 {
-    MessagesInput model;
-    model.append_user_message("The value is a;");
-    model.append_assistant_message("a = 52");
-    model.append_user_message("The value is b;");
-    model.append_assistant_message("b = 54");
-    model.append_user_message("The value is c;");
-    model.append_assistant_message("c = 56");
-    model.append_user_message("The value is d;");
+    MessagesInput input;
+    input.append_user_message("The value is a;");
+    input.append_assistant_message("a = 52");
+    input.append_user_message("The value is b;");
+    input.append_assistant_message("b = 54");
+    input.append_user_message("The value is c;");
+    input.append_assistant_message("c = 56");
+    input.append_user_message("The value is d;");
 
     CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> output = handle.query_api(input);
 
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
+    if (output) {
+        fmt::print("{}\n", output->raw_response);
     } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
     }
 }
 
 void test_chain_of_thought_()
 {
-    MessagesInput model;
-    model.append_user_message(
+    MessagesInput input;
+    input.append_user_message(
         "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
 
     CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> output = handle.query_api(input);
 
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
+    if (output) {
+        fmt::print("{}\n", output->raw_response);
     } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
     }
 }
 
 void test_tree_of_thought_()
 {
-    MessagesInput model;
-    model.append_user_message(R"(Imagine three different experts are answering this question."
+    MessagesInput input;
+    input.append_user_message(R"(Imagine three different experts are answering this question."
 "All experts will write down 1 step of their thinking, then share it with the group."
 "If any expert realizes they're wrong at any point then they leave."
 "Goal: Use the numbers 4, 9, 10, 13 and basic operators (+, -, *, /) to get the number 24."
 "Step 1:)");
 
     CreateMessage handle;
-    std::expected<MessagesOutput, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> output = handle.query_api(input);
 
-    if (result) {
-        fmt::print("{}\n", result->raw_response);
+    if (output) {
+        fmt::print("{}\n", output->raw_response);
     } else {
-        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
     }
 }
 
