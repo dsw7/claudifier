@@ -181,8 +181,8 @@ void run_conversational_loop_(MessagesInput &input)
         }
         input.append_assistant_message(result.output);
     }
-}
 #endif
+}
 
 } // namespace
 
