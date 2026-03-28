@@ -3,6 +3,7 @@
 #include "command_utils.hpp"
 #include "query_models_api.hpp"
 
+#include <algorithm>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <json.hpp>
@@ -29,45 +30,6 @@ Options:
 
     fmt::print("{}\n", messages);
 }
-
-ListModels read_cli_(const int argc, char **argv)
-{
-    ListModels model;
-
-    while (true) {
-        static struct option long_options[] = {
-            { "help", no_argument, 0, 'h' },
-            { "limit", required_argument, 0, 'l' },
-            { "json", no_argument, 0, 'j' },
-            { 0, 0, 0, 0 },
-        };
-
-        int option_index = 0;
-        const int c = getopt_long(argc, argv, "hl:j", long_options, &option_index);
-
-        if (c == -1) {
-            break;
-        }
-
-        switch (c) {
-            case 'h':
-                print_help_messages_();
-                exit(EXIT_SUCCESS);
-            case 'l':
-                model.set_max_items_per_page(utils::string_to_int(optarg));
-                break;
-            case 'j':
-                model.dump_json = true;
-                break;
-            default:
-                throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
-        }
-    };
-
-    return model;
-}
-
-// ----------------------------------------------------------------------------------------------------------
 
 void print_page_(const ModelsOutput &page)
 {
@@ -148,12 +110,45 @@ namespace commands {
 
 void command_models(const int argc, char **argv)
 {
-    const ListModels model = read_cli_(argc, argv);
+    bool dump_json = false;
+    int items_per_page = 100;
 
-    if (model.dump_json) {
-        print_all_pages_as_json_(model.get_max_items_per_page());
+    while (true) {
+        static struct option long_options[] = {
+            { "help", no_argument, 0, 'h' },
+            { "limit", required_argument, 0, 'l' },
+            { "json", no_argument, 0, 'j' },
+            { 0, 0, 0, 0 },
+        };
+
+        int option_index = 0;
+        const int c = getopt_long(argc, argv, "hl:j", long_options, &option_index);
+
+        if (c == -1) {
+            break;
+        }
+
+        switch (c) {
+            case 'h':
+                print_help_messages_();
+                exit(EXIT_SUCCESS);
+            case 'l':
+                items_per_page = utils::string_to_int(optarg);
+                break;
+            case 'j':
+                dump_json = true;
+                break;
+            default:
+                throw std::runtime_error(fmt::format("Unknown argument. Try running {} models [-h | --help] for more information", argv[0]));
+        }
+    };
+
+    items_per_page = std::clamp(items_per_page, 1, 1000);
+
+    if (dump_json) {
+        print_all_pages_as_json_(items_per_page);
     } else {
-        print_all_pages_(model.get_max_items_per_page());
+        print_all_pages_(items_per_page);
     }
 }
 

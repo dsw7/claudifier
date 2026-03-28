@@ -34,7 +34,6 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 set(SRC_FILES
   api/curl_base.cpp
-  api/models.cpp
   api/parse_utils.cpp
   api/query_messages_api.cpp
   api/query_models_api.cpp
