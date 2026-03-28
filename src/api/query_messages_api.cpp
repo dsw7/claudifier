@@ -7,7 +7,7 @@
 
 namespace {
 
-MessagesResult unpack_200_response_to_model_(const std::string &response)
+MessagesResult unpack_200_response_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
@@ -107,7 +107,7 @@ std::expected<MessagesResult, Err> CreateMessage::query_api(const MessagesInput 
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return unpack_200_response_to_model_(response);
+        return unpack_200_response_(response);
     }
 
     return std::unexpected(unpack_error(response));
