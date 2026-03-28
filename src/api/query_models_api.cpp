@@ -1,6 +1,6 @@
 #include "query_models_api.hpp"
 
-#include "parse_utils.hpp"
+#include "errors.hpp"
 
 #include <fmt/core.h>
 #include <json.hpp>
@@ -23,7 +23,13 @@ std::string build_url_(const int limit, const std::optional<std::string> &last_i
 
 api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 {
-    const nlohmann::json json = api::parse_response(response);
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
 
     api::ModelsOutput ok;
     ok.raw_response = json.dump(4);

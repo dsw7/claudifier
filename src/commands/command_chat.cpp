@@ -20,6 +20,7 @@ constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 namespace {
 
 using api::CreateMessage;
+using api::Err;
 using api::MessagesInput;
 using api::MessagesOutput;
 

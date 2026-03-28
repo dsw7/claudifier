@@ -1,7 +1,7 @@
 #pragma once
 
 #include "curl_base.hpp"
-#include "models.hpp"
+#include "errors.hpp"
 
 #include <expected>
 #include <json.hpp>

@@ -1,7 +1,8 @@
 #include "query_messages_api.hpp"
 
-#include "parse_utils.hpp"
+#include "errors.hpp"
 
+#include <fmt/core.h>
 #include <json.hpp>
 #include <stdexcept>
 
@@ -9,7 +10,13 @@ namespace {
 
 api::MessagesOutput unpack_200_response_(const std::string &response)
 {
-    const nlohmann::json json = api::parse_response(response);
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
 
     if (not json.contains("type")) {
         throw std::runtime_error("Malformed error response. Could not deduce response type.");

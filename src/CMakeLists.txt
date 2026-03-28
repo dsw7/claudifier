@@ -34,14 +34,14 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 set(SRC_FILES
   api/curl_base.cpp
-  api/parse_utils.cpp
+  api/errors.cpp
   api/query_messages_api.cpp
   api/query_models_api.cpp
+  commands/command_chat.cpp
   commands/command_models.cpp
   commands/command_run.cpp
-  commands/command_utils.cpp
-  commands/command_chat.cpp
   commands/command_test.cpp
+  commands/command_utils.cpp
   main.cpp
 )
 include_directories(api commands external)

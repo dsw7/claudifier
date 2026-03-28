@@ -10,6 +10,7 @@
 namespace {
 
 using api::CreateMessage;
+using api::Err;
 using api::MessagesInput;
 using api::MessagesOutput;
 

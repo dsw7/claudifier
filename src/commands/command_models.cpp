@@ -12,6 +12,8 @@
 
 namespace {
 
+using api::Err;
+using api::GetModels;
 using api::ModelsOutput;
 
 void print_help_messages_()
@@ -52,7 +54,7 @@ void print_page_(const ModelsOutput &page)
 
 void print_all_pages_(const int limit)
 {
-    api::GetModels handle;
+    GetModels handle;
     std::optional<std::string> last_id;
 
     while (true) {
@@ -74,7 +76,7 @@ void print_all_pages_(const int limit)
 
 void print_all_pages_as_json_(const int limit)
 {
-    api::GetModels handle;
+    GetModels handle;
     std::optional<std::string> last_id;
     nlohmann::json json = nlohmann::json::array();
     int page_num = 1;
