@@ -25,15 +25,14 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-enum class TestCase {
-    ZERO_SHOT,
-    ONE_SHOT,
-    FEW_SHOT,
+struct TestCase {
+    bool zero_shot = false;
+    bool one_shot = false;
 };
 
 TestCase read_cli_(const int argc, char **argv)
 {
-    TestCase tc;
+    TestCase test_case;
 
     while (true) {
         static struct option long_options[] = {
@@ -54,17 +53,17 @@ TestCase read_cli_(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'z':
-                tc = TestCase::ZERO_SHOT;
+                test_case.zero_shot = true;
                 break;
             case 'o':
-                tc = TestCase::ONE_SHOT;
+                test_case.one_shot = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
     };
 
-    return tc;
+    return test_case;
 }
 
 void test_zero_shot_()
@@ -105,17 +104,14 @@ namespace commands {
 
 void command_test(const int argc, char **argv)
 {
-    TestCase tc = read_cli_(argc, argv);
+    const TestCase test_case = read_cli_(argc, argv);
 
-    switch (tc) {
-        case TestCase::ZERO_SHOT:
-            test_zero_shot_();
-            break;
-        case TestCase::ONE_SHOT:
-            test_one_shot_();
-            break;
-        default:
-            test_zero_shot_();
+    if (test_case.zero_shot) {
+        test_zero_shot_();
+    }
+
+    if (test_case.one_shot) {
+        test_one_shot_();
     }
 }
 
