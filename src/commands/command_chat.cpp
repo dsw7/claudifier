@@ -19,6 +19,8 @@ constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 
 namespace {
 
+using api::MessagesInput;
+
 void print_help_messages_()
 {
     const std::string messages = R"(Participate in a multi-turn conversation with an LLM. Note that this
@@ -37,9 +39,9 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-Messages read_cli_(const int argc, char **argv)
+MessagesInput read_cli_(const int argc, char **argv)
 {
-    Messages model;
+    MessagesInput model;
 
     while (true) {
         static struct option long_options[] = {
@@ -161,7 +163,7 @@ bool break_conversation_on_condition_(const MessagesResult &results)
 }
 #endif
 
-MessagesResult run_query_(const Messages &model, api::CreateMessage &api_handle)
+MessagesResult run_query_(const MessagesInput &model, api::CreateMessage &api_handle)
 {
     std::expected<MessagesResult, Err> result = api_handle.query_api(model);
 
@@ -178,7 +180,7 @@ namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    Messages model = read_cli_(argc, argv);
+    MessagesInput model = read_cli_(argc, argv);
     api::CreateMessage api_handle;
     MessagesResult result;
 

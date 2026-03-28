@@ -5,44 +5,6 @@
 // models for requests
 // -------------------
 
-void Messages::set_max_tokens(const int max_tokens)
-{
-    this->max_tokens_ = max_tokens;
-
-    if (this->max_tokens_ < 1) {
-        this->max_tokens_ = 1;
-    }
-}
-
-void Messages::set_llm_model(const std::string &model)
-{
-    if (model.empty()) {
-        throw std::runtime_error("The model parameter is empty");
-    }
-
-    this->llm_model_ = model;
-}
-
-void Messages::append_user_message(const std::string &content)
-{
-    this->conversation_.push_back({ { "role", "user" }, { "content", content } });
-}
-
-void Messages::append_assistant_message(const std::string &content)
-{
-    this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
-}
-
-std::string Messages::get_post_fields() const
-{
-    const nlohmann::json json = {
-        { "max_tokens", this->max_tokens_ },
-        { "messages", this->conversation_ },
-        { "model", this->llm_model_ }
-    };
-    return json.dump();
-}
-
 void ListModels::set_max_items_per_page(const int limit)
 {
     static int min_models_per_page = 1;

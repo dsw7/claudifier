@@ -19,6 +19,8 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 namespace {
 
+using api::MessagesInput;
+
 void print_help_messages_()
 {
     const std::string messages = R"(Create a message according to a prompt. Messaging using the run
@@ -50,9 +52,9 @@ std::string read_prompt_from_stdin_()
     return prompt;
 }
 
-Messages read_cli_(const int argc, char **argv)
+MessagesInput read_cli_(const int argc, char **argv)
 {
-    Messages model;
+    MessagesInput model;
     std::string prompt;
 
     while (true) {
@@ -108,7 +110,7 @@ Messages read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
-MessagesResult create_message_(const Messages &model)
+MessagesResult create_message_(const MessagesInput &model)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
@@ -173,7 +175,7 @@ namespace commands {
 
 void command_run(const int argc, char **argv)
 {
-    const Messages model = read_cli_(argc, argv);
+    const MessagesInput model = read_cli_(argc, argv);
     const MessagesResult model_result = create_message_(model);
 
     if (model.print_raw_response) {

@@ -9,6 +9,8 @@
 
 namespace {
 
+using api::MessagesInput;
+
 void print_help_messages_()
 {
     const std::string messages = R"(Internal test command.
@@ -87,7 +89,7 @@ TestCase read_cli_(const int argc, char **argv)
 
 void test_zero_shot_()
 {
-    Messages model;
+    MessagesInput model;
     model.append_user_message("What is 3 + 5?");
 
     api::CreateMessage handle;
@@ -102,7 +104,7 @@ void test_zero_shot_()
 
 void test_one_shot_()
 {
-    Messages model;
+    MessagesInput model;
     model.append_user_message("This result is great!");
     model.append_assistant_message("This message sounds POSITIVE");
     model.append_user_message("This result is bad!");
@@ -119,7 +121,7 @@ void test_one_shot_()
 
 void test_few_shot_()
 {
-    Messages model;
+    MessagesInput model;
     model.append_user_message("The value is a;");
     model.append_assistant_message("a = 52");
     model.append_user_message("The value is b;");
@@ -140,7 +142,7 @@ void test_few_shot_()
 
 void test_chain_of_thought_()
 {
-    Messages model;
+    MessagesInput model;
     model.append_user_message(
         "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
 
@@ -156,7 +158,7 @@ void test_chain_of_thought_()
 
 void test_tree_of_thought_()
 {
-    Messages model;
+    MessagesInput model;
     model.append_user_message(R"(Imagine three different experts are answering this question."
 "All experts will write down 1 step of their thinking, then share it with the group."
 "If any expert realizes they're wrong at any point then they leave."
