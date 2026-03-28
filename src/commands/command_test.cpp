@@ -18,8 +18,8 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
-  -z, --zero-shot                Run zero-shot prompting test 
-  -o, --one-shot                 Run one-shot prompting test 
+  -z, --zero-shot                Run zero-shot prompting test
+  -o, --one-shot                 Run one-shot prompting test
 )";
 
     fmt::print("{}\n", messages);
@@ -88,6 +88,27 @@ void test_one_shot_()
     model.append_user_message("This result is great!");
     model.append_assistant_message("This message sounds POSITIVE");
     model.append_user_message("This result is bad!");
+
+    api::CreateMessage handle;
+    std::expected<MessagesResult, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->raw_response);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
+void test_few_shot_()
+{
+    Messages model;
+    model.append_user_message("The value is a;");
+    model.append_assistant_message("a = 52");
+    model.append_user_message("The value is b;");
+    model.append_assistant_message("b = 54");
+    model.append_user_message("The value is c;");
+    model.append_assistant_message("c = 56");
+    model.append_user_message("The value is d;");
 
     api::CreateMessage handle;
     std::expected<MessagesResult, Err> result = handle.query_api(model);
