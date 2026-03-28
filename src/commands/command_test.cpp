@@ -19,6 +19,7 @@ Usage:
 Options:
   -h, --help                     Print help information and exit
   -z, --zero-shot                Run zero-shot prompting test 
+  -o, --one-shot                 Run one-shot prompting test 
 )";
 
     fmt::print("{}\n", messages);
@@ -42,7 +43,7 @@ TestCase read_cli_(const int argc, char **argv)
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hz", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hzo", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -54,6 +55,9 @@ TestCase read_cli_(const int argc, char **argv)
                 exit(EXIT_SUCCESS);
             case 'z':
                 tc = TestCase::ZERO_SHOT;
+                break;
+            case 'o':
+                tc = TestCase::ONE_SHOT;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
@@ -78,6 +82,23 @@ void test_zero_shot_()
     }
 }
 
+void test_one_shot_()
+{
+    Messages model;
+    model.append_user_message("This result is great!");
+    model.append_assistant_message("This message sounds POSITIVE");
+    model.append_user_message("This result is bad!");
+
+    api::CreateMessage handle;
+    std::expected<MessagesResult, Err> result = handle.query_api(model);
+
+    if (result) {
+        fmt::print("{}\n", result->output);
+    } else {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    }
+}
+
 } // namespace
 
 namespace commands {
@@ -89,6 +110,9 @@ void command_test(const int argc, char **argv)
     switch (tc) {
         case TestCase::ZERO_SHOT:
             test_zero_shot_();
+            break;
+        case TestCase::ONE_SHOT:
+            test_one_shot_();
             break;
         default:
             test_zero_shot_();
