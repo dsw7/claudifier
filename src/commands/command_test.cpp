@@ -10,6 +10,7 @@
 namespace {
 
 using api::MessagesInput;
+using api::MessagesOutput;
 
 void print_help_messages_()
 {
@@ -93,7 +94,7 @@ void test_zero_shot_()
     model.append_user_message("What is 3 + 5?");
 
     api::CreateMessage handle;
-    std::expected<MessagesResult, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
 
     if (result) {
         fmt::print("{}\n", result->raw_response);
@@ -110,7 +111,7 @@ void test_one_shot_()
     model.append_user_message("This result is bad!");
 
     api::CreateMessage handle;
-    std::expected<MessagesResult, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
 
     if (result) {
         fmt::print("{}\n", result->raw_response);
@@ -131,7 +132,7 @@ void test_few_shot_()
     model.append_user_message("The value is d;");
 
     api::CreateMessage handle;
-    std::expected<MessagesResult, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
 
     if (result) {
         fmt::print("{}\n", result->raw_response);
@@ -147,7 +148,7 @@ void test_chain_of_thought_()
         "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
 
     api::CreateMessage handle;
-    std::expected<MessagesResult, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
 
     if (result) {
         fmt::print("{}\n", result->raw_response);
@@ -166,7 +167,7 @@ void test_tree_of_thought_()
 "Step 1:)");
 
     api::CreateMessage handle;
-    std::expected<MessagesResult, Err> result = handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = handle.query_api(model);
 
     if (result) {
         fmt::print("{}\n", result->raw_response);

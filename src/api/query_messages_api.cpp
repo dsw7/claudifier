@@ -7,7 +7,7 @@
 
 namespace {
 
-MessagesResult unpack_200_response_(const std::string &response)
+api::MessagesOutput unpack_200_response_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
 
@@ -19,7 +19,7 @@ MessagesResult unpack_200_response_(const std::string &response)
         throw std::runtime_error("Malformed message response. Response is not a message");
     }
 
-    MessagesResult ok;
+    api::MessagesOutput ok;
 
     if (json["content"].empty()) {
         ok.output = "LLM returned no content.";
@@ -77,7 +77,7 @@ std::string MessagesInput::get_post_fields() const
     return json.dump();
 }
 
-std::expected<MessagesResult, Err> CreateMessage::query_api(const MessagesInput &input)
+std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput &input)
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);

@@ -27,15 +27,6 @@ struct Err {
     std::string error_type;
 };
 
-struct MessagesResult {
-    int input_tokens = 0;
-    int output_tokens = 0;
-    std::string llm_model;
-    std::string output;
-    std::string raw_response;
-    std::string stop_reason;
-};
-
 struct ModelData {
     std::string created_at;
     std::string display_name;

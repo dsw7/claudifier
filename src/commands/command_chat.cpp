@@ -20,6 +20,7 @@ constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 namespace {
 
 using api::MessagesInput;
+using api::MessagesOutput;
 
 void print_help_messages_()
 {
@@ -132,14 +133,14 @@ LoopControl parse_special_command_(const std::string &special_command)
     return LoopControl::CONTINUE;
 }
 
-void print_output_to_stdout_(const MessagesResult &results)
+void print_output_to_stdout_(const MessagesOutput &results)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
     fmt::print(fg(green), "{}\n", results.output);
 }
 
-void print_usage_to_stdout_(const MessagesResult &results)
+void print_usage_to_stdout_(const MessagesOutput &results)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage: \n");
@@ -147,7 +148,7 @@ void print_usage_to_stdout_(const MessagesResult &results)
     fmt::print("Output tokens: {}\n", results.output_tokens);
 }
 
-bool break_conversation_on_condition_(const MessagesResult &results)
+bool break_conversation_on_condition_(const MessagesOutput &results)
 {
     if (results.stop_reason == "end_turn") {
         return false;
@@ -163,9 +164,9 @@ bool break_conversation_on_condition_(const MessagesResult &results)
 }
 #endif
 
-MessagesResult run_query_(const MessagesInput &model, api::CreateMessage &api_handle)
+MessagesOutput run_query_(const MessagesInput &model, api::CreateMessage &api_handle)
 {
-    std::expected<MessagesResult, Err> result = api_handle.query_api(model);
+    std::expected<MessagesOutput, Err> result = api_handle.query_api(model);
 
     if (result) {
         return result.value();
@@ -182,7 +183,7 @@ void command_chat(const int argc, char **argv)
 {
     MessagesInput model = read_cli_(argc, argv);
     api::CreateMessage api_handle;
-    MessagesResult result;
+    MessagesOutput result;
 
 #ifdef TESTING_ENABLED
     // mock conversational turns without interactivity for testing

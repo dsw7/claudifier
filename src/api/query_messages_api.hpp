@@ -23,9 +23,18 @@ private:
     std::string llm_model_ = "claude-opus-4-6";
 };
 
+struct MessagesOutput {
+    int input_tokens = 0;
+    int output_tokens = 0;
+    std::string llm_model;
+    std::string output;
+    std::string raw_response;
+    std::string stop_reason;
+};
+
 class CreateMessage: public CurlBase {
 public:
-    std::expected<MessagesResult, Err> query_api(const MessagesInput &input);
+    std::expected<MessagesOutput, Err> query_api(const MessagesInput &input);
 };
 
 } // namespace api

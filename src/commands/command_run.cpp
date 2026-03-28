@@ -20,6 +20,7 @@ constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 namespace {
 
 using api::MessagesInput;
+using api::MessagesOutput;
 
 void print_help_messages_()
 {
@@ -110,13 +111,13 @@ MessagesInput read_cli_(const int argc, char **argv)
 
 // ----------------------------------------------------------------------------------------------------------
 
-MessagesResult create_message_(const MessagesInput &model)
+MessagesOutput create_message_(const MessagesInput &model)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
 
     bool query_failed = false;
-    std::expected<MessagesResult, Err> model_result;
+    std::expected<MessagesOutput, Err> model_result;
     std::string errmsg;
 
     try {
@@ -143,7 +144,7 @@ MessagesResult create_message_(const MessagesInput &model)
     return *model_result;
 }
 
-void print_results_to_stdout_(const MessagesResult &model)
+void print_results_to_stdout_(const MessagesOutput &model)
 {
 #ifdef TESTING_ENABLED
     const nlohmann::json json_obj = {
@@ -176,7 +177,7 @@ namespace commands {
 void command_run(const int argc, char **argv)
 {
     const MessagesInput model = read_cli_(argc, argv);
-    const MessagesResult model_result = create_message_(model);
+    const MessagesOutput model_result = create_message_(model);
 
     if (model.print_raw_response) {
         fmt::print("{}\n", model_result.raw_response);
