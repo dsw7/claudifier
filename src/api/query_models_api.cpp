@@ -8,6 +8,19 @@
 
 namespace {
 
+std::string build_url_(const int limit, const std::optional<std::string> &last_id)
+{
+    std::string url;
+
+    if (last_id) {
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&after_id={}", limit, *last_id);
+    } else {
+        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
+    }
+
+    return url;
+}
+
 api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 {
     const nlohmann::json json = api::parse_response(response);
@@ -40,19 +53,6 @@ api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
     }
 
     return ok;
-}
-
-std::string build_url_(const int limit, const std::optional<std::string> &last_id)
-{
-    std::string url;
-
-    if (last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&after_id={}", limit, *last_id);
-    } else {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
-    }
-
-    return url;
 }
 
 } // namespace
