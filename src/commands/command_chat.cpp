@@ -96,30 +96,30 @@ LoopControl parse_special_command_(const std::string &special_command)
     return LoopControl::CONTINUE;
 }
 
-void print_output_to_stdout_(const MessagesOutput &results)
+void print_output_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", results.output);
+    fmt::print(fg(green), "{}\n", output.output);
 }
 
-void print_usage_to_stdout_(const MessagesOutput &results)
+void print_usage_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage: \n");
-    fmt::print("Input tokens: {}\n", results.input_tokens);
-    fmt::print("Output tokens: {}\n", results.output_tokens);
+    fmt::print("Input tokens: {}\n", output.input_tokens);
+    fmt::print("Output tokens: {}\n", output.output_tokens);
 }
 
-bool break_conversation_on_condition_(const MessagesOutput &results)
+bool break_conversation_on_condition_(const MessagesOutput &output)
 {
-    if (results.stop_reason == "end_turn") {
+    if (output.stop_reason == "end_turn") {
         return false;
     }
 
-    fmt::print(fg(yellow), "Stop reason: {}\n", results.stop_reason);
+    fmt::print(fg(yellow), "Stop reason: {}\n", output.stop_reason);
 
-    if (results.stop_reason == "max_tokens") {
+    if (output.stop_reason == "max_tokens") {
         fmt::print(fg(red), "Cannot continue. The conversation has become fragmented due to token limitations.\n");
     }
 
@@ -129,19 +129,19 @@ bool break_conversation_on_condition_(const MessagesOutput &results)
 
 MessagesOutput run_query_(const MessagesInput &input, CreateMessage &api_handle)
 {
-    std::expected<MessagesOutput, Err> result = api_handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = api_handle.query_api(input);
 
-    if (result) {
-        return result.value();
+    if (output) {
+        return output.value();
     }
 
-    throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", result.error().errmsg));
+    throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
 }
 
 void run_conversational_loop_(MessagesInput &input)
 {
     CreateMessage api_handle;
-    MessagesOutput result;
+    MessagesOutput output;
 
 #ifdef TESTING_ENABLED
     // mock conversational turns without interactivity for testing
@@ -152,11 +152,11 @@ void run_conversational_loop_(MessagesInput &input)
 
     for (const auto &message: messages) {
         input.append_user_message(message);
-        result = run_query_(input, api_handle);
-        input.append_assistant_message(result.output);
+        output = run_query_(input, api_handle);
+        input.append_assistant_message(output.output);
     }
 
-    fmt::print("{}\n", result.output);
+    fmt::print("{}\n", output.output);
 #else
     std::string message;
     print_special_commands_();
@@ -173,13 +173,13 @@ void run_conversational_loop_(MessagesInput &input)
         }
 
         input.append_user_message(message);
-        result = run_query_(input, api_handle);
-        print_output_to_stdout_(result);
-        print_usage_to_stdout_(result);
-        if (break_conversation_on_condition_(result)) {
+        output = run_query_(input, api_handle);
+        print_output_to_stdout_(output);
+        print_usage_to_stdout_(output);
+        if (break_conversation_on_condition_(output)) {
             break;
         }
-        input.append_assistant_message(result.output);
+        input.append_assistant_message(output.output);
     }
 #endif
 }
