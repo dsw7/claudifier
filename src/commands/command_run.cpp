@@ -88,7 +88,7 @@ MessagesOutput create_message_(const MessagesInput &input)
     return *output;
 }
 
-void print_results_to_stdout_(const MessagesOutput &output)
+void print_output_to_stdout_(const MessagesOutput &output)
 {
 #ifdef TESTING_ENABLED
     const nlohmann::json json_obj = {
@@ -177,7 +177,7 @@ void command_run(const int argc, char **argv)
     if (print_raw_response) {
         fmt::print("{}\n", output.raw_response);
     } else {
-        print_results_to_stdout_(output);
+        print_output_to_stdout_(output);
     }
 }
 
