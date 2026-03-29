@@ -107,3 +107,27 @@ def test_empty_prompt() -> None:
     process = run_claudifier("run", "--prompt=")
     assert process.exit_code == 1
     assert process.stderr == "The prompt is empty\n"
+
+
+@mark.parametrize(
+    "prompt, diverted", [("What is 2 + 2?", False), ("Is Arizona in the USA?", True)]
+)
+def test_system_prompt(prompt: str, diverted: bool) -> None:
+    process = run_claudifier(
+        "run",
+        "--raw",
+        f"--prompt={prompt}",
+        "--system=You are a math teacher. Ensure the student only asks questions related to "
+        'math. Return the response in valid JSON of form {"result": <string>, "diverted": <bool>}. '
+        'Set the "diverted" to true in the JSON if you have to divert the conversation.',
+    )
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    text = loads(stdout["content"][0]["text"])
+    assert text["diverted"] == diverted
+
+
+def test_system_prompt_empty() -> None:
+    process = run_claudifier("run", "--prompt=What is 3 + 2?", "--system=")
+    assert process.exit_code == 1
+    assert process.stderr == "The provided system prompt is empty\n"
