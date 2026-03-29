@@ -64,6 +64,15 @@ void MessagesInput::set_llm_model(const std::string &model)
     this->llm_model_ = model;
 }
 
+void MessagesInput::set_system_prompt(const std::string &prompt)
+{
+    if (prompt.empty()) {
+        throw std::runtime_error("The provided system prompt is empty");
+    }
+
+    this->system_prompt_ = prompt;
+}
+
 void MessagesInput::append_user_message(const std::string &content)
 {
     this->conversation_.push_back({ { "role", "user" }, { "content", content } });
@@ -76,11 +85,16 @@ void MessagesInput::append_assistant_message(const std::string &content)
 
 std::string MessagesInput::get_post_fields() const
 {
-    const nlohmann::json json = {
+    nlohmann::json json = {
         { "max_tokens", this->max_tokens_ },
         { "messages", this->conversation_ },
         { "model", this->llm_model_ }
     };
+
+    if (this->system_prompt_) {
+        json["system"] = this->system_prompt_;
+    }
+
     return json.dump();
 }
 
