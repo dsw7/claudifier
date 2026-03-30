@@ -154,3 +154,9 @@ def test_temperature_missing_opt() -> None:
     process = run_claudifier("run", "--temperature=", "--prompt=What is 3 + 5?")
     assert process.exit_code == 1
     assert process.stderr == "Cannot convert string to float. Input string is empty\n"
+
+
+def test_temperature_bad_opt() -> None:
+    process = run_claudifier("run", "--temperature=abc", "--prompt=What is 3 + 5?")
+    assert process.exit_code == 1
+    assert process.stderr == "stof\nFailed to convert 'abc' to float\n"
