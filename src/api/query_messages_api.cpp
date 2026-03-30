@@ -2,6 +2,7 @@
 
 #include "errors.hpp"
 
+#include <algorithm>
 #include <fmt/core.h>
 #include <json.hpp>
 #include <stdexcept>
@@ -53,6 +54,13 @@ void MessagesInput::set_max_tokens(const int max_tokens)
     if (this->max_tokens_ < 1) {
         this->max_tokens_ = 1;
     }
+}
+
+void MessagesInput::set_temperature(const float temperature)
+{
+    static float min_temp = 0.0;
+    static float max_temp = 1.0;
+    this->temperature_ = std::clamp(temperature, min_temp, max_temp);
 }
 
 void MessagesInput::set_llm_model(const std::string &model)
