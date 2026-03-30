@@ -96,7 +96,8 @@ std::string MessagesInput::get_post_fields() const
     nlohmann::json json = {
         { "max_tokens", this->max_tokens_ },
         { "messages", this->conversation_ },
-        { "model", this->llm_model_ }
+        { "model", this->llm_model_ },
+        { "temperature", this->temperature_ }
     };
 
     if (this->system_prompt_) {
