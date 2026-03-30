@@ -3,7 +3,6 @@
 #include "command_utils.hpp"
 #include "query_messages_api.hpp"
 
-#include <array>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
@@ -138,25 +137,10 @@ void run_conversational_loop_(MessagesInput &input)
 {
     CreateMessage api_handle;
     MessagesOutput output;
-
-#ifdef TESTING_ENABLED
-    // mock conversational turns without interactivity for testing
-    const std::array<std::string, 2> messages = {
-        "If a = 2, b = 3, and c = a + b, then what is c?",
-        "What is c + 5? Return just the value",
-    };
-
-    for (const auto &message: messages) {
-        input.append_user_message(message);
-        output = run_query_(input, api_handle);
-        input.append_assistant_message(output.output);
-    }
-
-    fmt::print("{}\n", output.output);
-#else
-    std::string message;
-    print_special_commands_();
     LoopControl loop_controller;
+    std::string message;
+
+    print_special_commands_();
 
     while (true) {
         read_message_from_stdin_(message);
@@ -177,7 +161,6 @@ void run_conversational_loop_(MessagesInput &input)
         }
         input.append_assistant_message(output.output);
     }
-#endif
 }
 
 } // namespace
