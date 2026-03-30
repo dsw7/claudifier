@@ -141,3 +141,10 @@ def test_temperature(input_temp: float, clamped_temp: float) -> None:
     assert process.exit_code == 0
     stdout = loads(process.stdout)
     assert float(stdout["temperature"]) == clamped_temp
+
+
+def test_temperature_short_opt() -> None:
+    process = run_claudifier("run", "-t0.5", "--prompt=What is 3 + 5?")
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    assert float(stdout["temperature"]) == 0.5
