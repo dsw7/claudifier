@@ -27,6 +27,7 @@ private:
 };
 
 struct MessagesOutput {
+    double rtt_time = 0;
     int input_tokens = 0;
     int output_tokens = 0;
     std::string llm_model;

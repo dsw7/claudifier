@@ -128,7 +128,12 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return unpack_200_response_(response);
+        MessagesOutput output = unpack_200_response_(response);
+
+        if (curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time) != CURLE_OK) {
+            throw std::runtime_error(curl_easy_strerror(code));
+        }
+        return output;
     }
 
     return std::unexpected(unpack_error(response));
