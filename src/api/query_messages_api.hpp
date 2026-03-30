@@ -22,7 +22,7 @@ public:
 private:
     int max_tokens_ = 1024;
     nlohmann::json conversation_;
-    std::string llm_model_ = "claude-opus-4-6";
+    std::string llm_model_ = "claude-3-haiku-20240307";
     std::optional<std::string> system_prompt_;
 };
 
