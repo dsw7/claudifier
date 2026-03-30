@@ -22,11 +22,12 @@ public:
 private:
     int max_tokens_ = 1024;
     nlohmann::json conversation_;
-    std::string llm_model_ = "claude-opus-4-6";
+    std::string llm_model_ = "claude-3-haiku-20240307";
     std::optional<std::string> system_prompt_;
 };
 
 struct MessagesOutput {
+    double rtt_time = 0;
     int input_tokens = 0;
     int output_tokens = 0;
     std::string llm_model;
