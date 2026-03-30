@@ -131,3 +131,32 @@ def test_system_prompt_empty() -> None:
     process = run_claudifier("run", "--prompt=What is 3 + 2?", "--system=")
     assert process.exit_code == 1
     assert process.stderr == "The provided system prompt is empty\n"
+
+
+@mark.parametrize("input_temp, clamped_temp", [(-0.4, 0), (0.5, 0.5), (100, 1)])
+def test_temperature(input_temp: float, clamped_temp: float) -> None:
+    process = run_claudifier(
+        "run", f"--temperature={input_temp}", "--prompt=What is 3 + 5?"
+    )
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    assert float(stdout["temperature"]) == clamped_temp
+
+
+def test_temperature_short_opt() -> None:
+    process = run_claudifier("run", "-t0.5", "--prompt=What is 3 + 5?")
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    assert float(stdout["temperature"]) == 0.5
+
+
+def test_temperature_missing_opt() -> None:
+    process = run_claudifier("run", "--temperature=", "--prompt=What is 3 + 5?")
+    assert process.exit_code == 1
+    assert process.stderr == "Cannot convert string to float. Input string is empty\n"
+
+
+def test_temperature_bad_opt() -> None:
+    process = run_claudifier("run", "--temperature=abc", "--prompt=What is 3 + 5?")
+    assert process.exit_code == 1
+    assert process.stderr == "stof\nFailed to convert 'abc' to float\n"

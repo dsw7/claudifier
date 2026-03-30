@@ -40,6 +40,8 @@ Options:
   -l, --limit=LIMIT              Specify token limit
   -r, --raw                      Print raw response from server
   -s, --system                   Provide a system prompt
+  -t, --temperature              Specify how random the response will be.
+                                 The temperature is clamped between 0.0 and 1.0
 )";
 
     fmt::print("{}\n", messages);
@@ -97,7 +99,8 @@ void print_output_to_stdout_(const MessagesOutput &output)
         { "llm_model", output.llm_model },
         { "output", output.output },
         { "output_tokens", output.output_tokens },
-        { "stop_reason", output.stop_reason }
+        { "stop_reason", output.stop_reason },
+        { "temperature", output.temperature }
     };
     const std::string json_str = json_obj.dump(4);
     fmt::print("{}\n", json_str);
@@ -108,6 +111,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage:\n");
     fmt::print("Model: {}\n", output.llm_model);
+    fmt::print("Temperature: {}\n", output.temperature);
     fmt::print("Input tokens: {}\n", output.input_tokens);
     fmt::print("Output tokens: {}\n", output.output_tokens);
     fmt::print("Stop reason: {}\n", output.stop_reason);
@@ -134,11 +138,12 @@ void command_run(const int argc, char **argv)
             { "limit", required_argument, 0, 'l' },
             { "raw", no_argument, 0, 'r' },
             { "system", required_argument, 0, 's' },
+            { "temperature", required_argument, 0, 't' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:p:l:rs:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hm:p:l:rs:t:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -162,6 +167,9 @@ void command_run(const int argc, char **argv)
                 break;
             case 's':
                 input.set_system_prompt(optarg);
+                break;
+            case 't':
+                input.set_temperature(utils::string_to_float(optarg));
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));

@@ -2,6 +2,7 @@
 
 #include "errors.hpp"
 
+#include <algorithm>
 #include <fmt/core.h>
 #include <json.hpp>
 #include <stdexcept>
@@ -55,6 +56,13 @@ void MessagesInput::set_max_tokens(const int max_tokens)
     }
 }
 
+void MessagesInput::set_temperature(const float temperature)
+{
+    static float min_temp = 0.0;
+    static float max_temp = 1.0;
+    this->temperature_ = std::clamp(temperature, min_temp, max_temp);
+}
+
 void MessagesInput::set_llm_model(const std::string &model)
 {
     if (model.empty()) {
@@ -83,12 +91,18 @@ void MessagesInput::append_assistant_message(const std::string &content)
     this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
 }
 
+float MessagesInput::get_temperature() const
+{
+    return this->temperature_;
+}
+
 std::string MessagesInput::get_post_fields() const
 {
     nlohmann::json json = {
         { "max_tokens", this->max_tokens_ },
         { "messages", this->conversation_ },
-        { "model", this->llm_model_ }
+        { "model", this->llm_model_ },
+        { "temperature", this->temperature_ }
     };
 
     if (this->system_prompt_) {
@@ -132,6 +146,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
 
     if (http_status_code == 200) {
         MessagesOutput output = unpack_200_response_(response);
+        output.temperature = input.get_temperature();
 
         const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);
         if (code_info_time != CURLE_OK) {

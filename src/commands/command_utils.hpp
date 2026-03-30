@@ -6,6 +6,7 @@
 namespace utils {
 void print_line();
 int string_to_int(const std::string &str);
+float string_to_float(const std::string &str);
 } // namespace utils
 
 namespace threading {
