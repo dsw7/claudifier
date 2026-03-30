@@ -99,7 +99,8 @@ void print_output_to_stdout_(const MessagesOutput &output)
         { "llm_model", output.llm_model },
         { "output", output.output },
         { "output_tokens", output.output_tokens },
-        { "stop_reason", output.stop_reason }
+        { "stop_reason", output.stop_reason },
+        { "temperature", output.temperature }
     };
     const std::string json_str = json_obj.dump(4);
     fmt::print("{}\n", json_str);
@@ -110,6 +111,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage:\n");
     fmt::print("Model: {}\n", output.llm_model);
+    fmt::print("Temperature: {}\n", output.temperature);
     fmt::print("Input tokens: {}\n", output.input_tokens);
     fmt::print("Output tokens: {}\n", output.output_tokens);
     fmt::print("Stop reason: {}\n", output.stop_reason);
