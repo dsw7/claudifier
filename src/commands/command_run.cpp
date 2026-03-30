@@ -111,6 +111,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
     fmt::print("Input tokens: {}\n", output.input_tokens);
     fmt::print("Output tokens: {}\n", output.output_tokens);
     fmt::print("Stop reason: {}\n", output.stop_reason);
+    fmt::print("Round trip time: {} s\n", output.rtt_time);
     utils::print_line();
 #endif
 }
