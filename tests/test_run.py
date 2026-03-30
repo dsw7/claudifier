@@ -131,3 +131,13 @@ def test_system_prompt_empty() -> None:
     process = run_claudifier("run", "--prompt=What is 3 + 2?", "--system=")
     assert process.exit_code == 1
     assert process.stderr == "The provided system prompt is empty\n"
+
+
+@mark.parametrize("input_temp, clamped_temp", [(-0.4, 0), (0.5, 0.5), (100, 1)])
+def test_temperature(input_temp: float, clamped_temp: float) -> None:
+    process = run_claudifier(
+        "run", f"--temperature={input_temp}", "--prompt=What is 3 + 5?"
+    )
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    assert float(stdout["temperature"]) == clamped_temp
