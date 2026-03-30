@@ -2,6 +2,8 @@
 
 #include "query_messages_api.hpp"
 
+#include <array>
+#include <expected>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <stdexcept>
@@ -15,6 +17,7 @@ using api::MessagesInput;
 using api::MessagesOutput;
 
 struct TestCase {
+    bool conversational_turns = false;
     bool zero_shot = false;
     bool one_shot = false;
     bool few_shot = false;
@@ -31,6 +34,7 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
+  -u, --conversational-turns     Run conversational turns test
   -z, --zero-shot                Run zero-shot prompting test
   -o, --one-shot                 Run one-shot prompting test
   -f, --few-shot                 Run few-shot prompting test
@@ -39,6 +43,29 @@ Options:
 )";
 
     fmt::print("{}\n", messages);
+}
+
+void test_conversational_turns_()
+{
+    // mock conversational turns like in chat command but without interactivity for testing
+    CreateMessage handle;
+    MessagesInput input;
+
+    input.append_user_message("If a = 2, b = 3, and c = a + b, then what is c?");
+    std::expected<MessagesOutput, Err> output_1 = handle.query_api(input);
+    if (not output_1) {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_1.error().errmsg));
+    }
+    input.append_assistant_message(output_1->output);
+
+    input.append_user_message("What is c + 5? Return just the value");
+    std::expected<MessagesOutput, Err> output_2 = handle.query_api(input);
+    if (not output_2) {
+        throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_2.error().errmsg));
+    }
+    input.append_assistant_message(output_2->output);
+
+    fmt::print("{}\n", output_2->output);
 }
 
 void test_zero_shot_()
@@ -131,6 +158,10 @@ void test_tree_of_thought_()
 
 void run_test_cases_(const TestCase &test_case)
 {
+    if (test_case.conversational_turns) {
+        test_conversational_turns_();
+    }
+
     if (test_case.zero_shot) {
         test_zero_shot_();
     }
@@ -163,6 +194,7 @@ void command_test(const int argc, char **argv)
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
+            { "conversational-turns", no_argument, 0, 'u' },
             { "zero-shot", no_argument, 0, 'z' },
             { "one-shot", no_argument, 0, 'o' },
             { "few-shot", no_argument, 0, 'f' },
@@ -172,7 +204,7 @@ void command_test(const int argc, char **argv)
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hzofct", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "huzofct", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -182,6 +214,9 @@ void command_test(const int argc, char **argv)
             case 'h':
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
+            case 'u':
+                test_case.conversational_turns = true;
+                break;
             case 'z':
                 test_case.zero_shot = true;
                 break;
