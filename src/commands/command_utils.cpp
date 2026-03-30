@@ -57,6 +57,24 @@ int string_to_int(const std::string &str)
     return i;
 }
 
+float string_to_float(const std::string &str)
+{
+    if (str.empty()) {
+        throw std::runtime_error("Cannot convert string to float. Input string is empty");
+    }
+
+    float f = 0.00;
+
+    try {
+        f = std::stof(str);
+    } catch (const std::invalid_argument &e) {
+        const std::string errmsg = fmt::format("{}\nFailed to convert '{}' to float", e.what(), str);
+        throw std::runtime_error(errmsg);
+    }
+
+    return f;
+}
+
 } // namespace utils
 
 namespace threading {
