@@ -17,7 +17,7 @@ using api::MessagesInput;
 using api::MessagesOutput;
 
 struct TestCase {
-    bool conversational_turns = false;
+    bool chat = false;
     bool zero_shot = false;
     bool one_shot = false;
     bool few_shot = false;
@@ -34,7 +34,7 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
-  -u, --conversational-turns     Run conversational turns test
+  -u, --chat                     Run chat test
   -z, --zero-shot                Run zero-shot prompting test
   -o, --one-shot                 Run one-shot prompting test
   -f, --few-shot                 Run few-shot prompting test
@@ -45,7 +45,7 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-void test_conversational_turns_()
+void test_chat_()
 {
     // mock conversational turns like in chat command but without interactivity for testing
     CreateMessage handle;
@@ -158,8 +158,8 @@ void test_tree_of_thought_()
 
 void run_test_cases_(const TestCase &test_case)
 {
-    if (test_case.conversational_turns) {
-        test_conversational_turns_();
+    if (test_case.chat) {
+        test_chat_();
     }
 
     if (test_case.zero_shot) {
@@ -194,7 +194,7 @@ void command_test(const int argc, char **argv)
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
-            { "conversational-turns", no_argument, 0, 'u' },
+            { "chat", no_argument, 0, 'u' },
             { "zero-shot", no_argument, 0, 'z' },
             { "one-shot", no_argument, 0, 'o' },
             { "few-shot", no_argument, 0, 'f' },
@@ -215,7 +215,7 @@ void command_test(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'u':
-                test_case.conversational_turns = true;
+                test_case.chat = true;
                 break;
             case 'z':
                 test_case.zero_shot = true;
