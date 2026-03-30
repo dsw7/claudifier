@@ -96,6 +96,11 @@ float MessagesInput::get_temperature() const
     return this->temperature_;
 }
 
+nlohmann::json MessagesInput::get_conversation() const
+{
+    return this->conversation_;
+}
+
 std::string MessagesInput::get_post_fields() const
 {
     nlohmann::json json = {

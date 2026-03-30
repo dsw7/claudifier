@@ -19,6 +19,7 @@ public:
     void append_user_message(const std::string &content);
     void append_assistant_message(const std::string &content);
     float get_temperature() const;
+    nlohmann::json get_conversation() const;
     std::string get_post_fields() const;
 
 private:
