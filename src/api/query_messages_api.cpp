@@ -91,6 +91,11 @@ void MessagesInput::append_assistant_message(const std::string &content)
     this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
 }
 
+float MessagesInput::get_temperature() const
+{
+    return this->temperature_;
+}
+
 std::string MessagesInput::get_post_fields() const
 {
     nlohmann::json json = {
@@ -141,6 +146,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
 
     if (http_status_code == 200) {
         MessagesOutput output = unpack_200_response_(response);
+        output.temperature = input.get_temperature();
 
         const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);
         if (code_info_time != CURLE_OK) {

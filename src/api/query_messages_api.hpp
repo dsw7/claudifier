@@ -18,10 +18,11 @@ public:
     void set_system_prompt(const std::string &prompt);
     void append_user_message(const std::string &content);
     void append_assistant_message(const std::string &content);
+    float get_temperature() const;
     std::string get_post_fields() const;
 
 private:
-    float temperature_ = 1.0;
+    float temperature_ = 1.0f;
     int max_tokens_ = 1024;
     nlohmann::json conversation_;
     std::optional<std::string> system_prompt_;
@@ -30,6 +31,7 @@ private:
 
 struct MessagesOutput {
     double rtt_time = 0;
+    float temperature = 1.0f;
     int input_tokens = 0;
     int output_tokens = 0;
     std::string llm_model;
