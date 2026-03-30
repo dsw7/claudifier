@@ -115,24 +115,29 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
     std::string response;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
 
-    const CURLcode code = curl_easy_perform(this->curl_);
+    const CURLcode code_easy_perform = curl_easy_perform(this->curl_);
 
     curl_slist_free_all(headers);
     headers = nullptr;
 
-    if (code != CURLE_OK) {
-        throw std::runtime_error(curl_easy_strerror(code));
+    if (code_easy_perform != CURLE_OK) {
+        throw std::runtime_error(curl_easy_strerror(code_easy_perform));
     }
 
     long http_status_code = -1;
-    curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
+    const CURLcode code_info_resp = curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
+    if (code_info_resp != CURLE_OK) {
+        throw std::runtime_error(curl_easy_strerror(code_info_resp));
+    }
 
     if (http_status_code == 200) {
         MessagesOutput output = unpack_200_response_(response);
 
-        if (curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time) != CURLE_OK) {
-            throw std::runtime_error(curl_easy_strerror(code));
+        const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);
+        if (code_info_time != CURLE_OK) {
+            throw std::runtime_error(curl_easy_strerror(code_info_time));
         }
+
         return output;
     }
 
