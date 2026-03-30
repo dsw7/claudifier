@@ -65,7 +65,7 @@ void test_chat_()
     }
     input.append_assistant_message(output_2->output);
 
-    fmt::print("{}\n", output_2->output);
+    fmt::print("{}\n", input.get_conversation().dump(4));
 }
 
 void test_zero_shot_()
