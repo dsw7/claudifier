@@ -1,5 +1,24 @@
+from json import loads
 from pytest import mark
 from helpers import run_claudifier
+
+
+def test_chat() -> None:
+    process = run_claudifier("test", "--chat")
+    assert process.exit_code == 0, process.stderr
+    conversation = loads(process.stdout)
+
+    assert len(conversation) == 4
+    assert conversation[0]["role"] == "user"
+    assert conversation[1]["role"] == "assistant"
+    assert conversation[2]["role"] == "user"
+    assert conversation[3]["role"] == "assistant"
+
+    assert (
+        conversation[0]["content"] == "If a = 2, b = 3, and c = a + b, then what is c?"
+    )
+    assert conversation[2]["content"] == "What is c + 5? Return just the value"
+    assert conversation[3]["content"] == "10"
 
 
 @mark.skip(reason="Need Valgrind infrastructure")
