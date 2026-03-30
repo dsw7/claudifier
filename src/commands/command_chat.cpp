@@ -4,18 +4,12 @@
 #include "query_messages_api.hpp"
 
 #include <array>
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-#ifndef TESTING_ENABLED
-#include <fmt/color.h>
-constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
-constexpr fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
-constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
-#endif
 
 namespace {
 
@@ -23,6 +17,10 @@ using api::CreateMessage;
 using api::Err;
 using api::MessagesInput;
 using api::MessagesOutput;
+
+constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
+constexpr fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
+constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 
 void print_help_messages_()
 {
@@ -42,7 +40,6 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-#ifndef TESTING_ENABLED
 void print_special_commands_()
 {
     utils::print_line();
@@ -125,7 +122,6 @@ bool break_conversation_on_condition_(const MessagesOutput &output)
 
     return true;
 }
-#endif
 
 MessagesOutput run_query_(const MessagesInput &input, CreateMessage &api_handle)
 {
