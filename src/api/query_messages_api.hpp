@@ -34,6 +34,7 @@ class MessagesOutput {
 public:
     MessagesOutput() = default;
     MessagesOutput(const std::string &response);
+    std::string get_latest_text();
 
     double rtt_time = 0;
     float temperature = 1.0f;

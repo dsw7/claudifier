@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <fmt/core.h>
 #include <stdexcept>
+#include <vector>
 
 namespace api {
 
@@ -109,6 +110,24 @@ MessagesOutput::MessagesOutput(const std::string &response)
     this->output_tokens = this->response_["usage"]["output_tokens"];
     this->raw_response = this->response_.dump(4);
     this->stop_reason = this->response_["stop_reason"];
+}
+
+std::string MessagesOutput::get_latest_text()
+{
+    // helper function for getting the last message in a chain of TextBlocks
+    std::vector<std::string> text_blocks;
+
+    for (const auto &block: this->response_["content"]) {
+        if (block["type"] == "text") {
+            text_blocks.emplace_back(block["text"]);
+        }
+    }
+
+    if (text_blocks.empty()) {
+        throw std::runtime_error("No TextBlocks could be found");
+    }
+
+    return text_blocks.back();
 }
 
 std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput &input)
