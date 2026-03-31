@@ -4,46 +4,7 @@
 
 #include <algorithm>
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
-
-namespace {
-
-api::MessagesOutput unpack_200_response_(const std::string &response)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    if (not json.contains("type")) {
-        throw std::runtime_error("Malformed error response. Could not deduce response type.");
-    }
-
-    if (json["type"] != "message") {
-        throw std::runtime_error("Malformed message response. Response is not a message");
-    }
-
-    api::MessagesOutput ok;
-
-    if (json["content"].empty()) {
-        ok.output = "LLM returned no content.";
-    } else {
-        ok.output = json["content"][0]["text"];
-    }
-
-    ok.input_tokens = json["usage"]["input_tokens"];
-    ok.llm_model = json["model"];
-    ok.output_tokens = json["usage"]["output_tokens"];
-    ok.raw_response = json.dump(4);
-    ok.stop_reason = json["stop_reason"];
-    return ok;
-}
-
-} // namespace
 
 namespace api {
 
@@ -117,6 +78,37 @@ std::string MessagesInput::get_post_fields() const
     return json.dump();
 }
 
+void MessagesOutput::unpack_200_response(const std::string &response)
+{
+    nlohmann::json json;
+
+    try {
+        json = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
+
+    if (not json.contains("type")) {
+        throw std::runtime_error("Malformed error response. Could not deduce response type.");
+    }
+
+    if (json["type"] != "message") {
+        throw std::runtime_error("Malformed message response. Response is not a message");
+    }
+
+    if (json["content"].empty()) {
+        this->output = "LLM returned no content.";
+    } else {
+        this->output = json["content"][0]["text"];
+    }
+
+    this->input_tokens = json["usage"]["input_tokens"];
+    this->llm_model = json["model"];
+    this->output_tokens = json["usage"]["output_tokens"];
+    this->raw_response = json.dump(4);
+    this->stop_reason = json["stop_reason"];
+}
+
 std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput &input)
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
@@ -150,7 +142,8 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
     }
 
     if (http_status_code == 200) {
-        MessagesOutput output = unpack_200_response_(response);
+        MessagesOutput output;
+        output.unpack_200_response(response);
         output.temperature = input.get_temperature();
 
         const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);

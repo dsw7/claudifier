@@ -31,6 +31,8 @@ private:
 };
 
 struct MessagesOutput {
+    void unpack_200_response(const std::string &response);
+
     double rtt_time = 0;
     float temperature = 1.0f;
     int input_tokens = 0;
