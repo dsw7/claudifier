@@ -96,7 +96,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", output.output);
+    fmt::print(fg(green), "{}\n", output.get_latest_text());
 }
 
 void print_usage_to_stdout_(const MessagesOutput &output)
@@ -159,7 +159,7 @@ void run_conversational_loop_(MessagesInput &input)
         if (break_conversation_on_condition_(output)) {
             break;
         }
-        input.append_assistant_message(output.output);
+        input.append_assistant_message(output.get_latest_text());
     }
 }
 

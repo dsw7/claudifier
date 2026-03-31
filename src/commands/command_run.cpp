@@ -97,7 +97,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
     const nlohmann::json json_obj = {
         { "input_tokens", output.input_tokens },
         { "llm_model", output.llm_model },
-        { "output", output.output },
+        { "output", output.get_latest_text() },
         { "output_tokens", output.output_tokens },
         { "stop_reason", output.stop_reason },
         { "temperature", output.temperature }
@@ -107,7 +107,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
 #else
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", output.output);
+    fmt::print(fg(green), "{}\n", output.get_latest_text());
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage:\n");
     fmt::print("Model: {}\n", output.llm_model);

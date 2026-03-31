@@ -34,14 +34,13 @@ class MessagesOutput {
 public:
     MessagesOutput() = default;
     MessagesOutput(const std::string &response);
-    std::string get_latest_text();
+    std::string get_latest_text() const;
 
     double rtt_time = 0;
     float temperature = 1.0f;
     int input_tokens = 0;
     int output_tokens = 0;
     std::string llm_model;
-    std::string output;
     std::string raw_response;
     std::string stop_reason;
 

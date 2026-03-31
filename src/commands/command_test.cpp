@@ -56,14 +56,14 @@ void test_chat_()
     if (not output_1) {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_1.error().errmsg));
     }
-    input.append_assistant_message(output_1->output);
+    input.append_assistant_message(output_1->get_latest_text());
 
     input.append_user_message("What is c + 5? Return just the value");
     std::expected<MessagesOutput, Err> output_2 = handle.query_api(input);
     if (not output_2) {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_2.error().errmsg));
     }
-    input.append_assistant_message(output_2->output);
+    input.append_assistant_message(output_2->get_latest_text());
 
     fmt::print("{}\n", input.get_conversation().dump(4));
 }

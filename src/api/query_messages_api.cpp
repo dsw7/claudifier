@@ -104,7 +104,6 @@ MessagesOutput::MessagesOutput(const std::string &response)
 
     this->validate_schema_();
 
-    this->output = this->response_["content"][0]["text"];
     this->input_tokens = this->response_["usage"]["input_tokens"];
     this->llm_model = this->response_["model"];
     this->output_tokens = this->response_["usage"]["output_tokens"];
@@ -112,7 +111,7 @@ MessagesOutput::MessagesOutput(const std::string &response)
     this->stop_reason = this->response_["stop_reason"];
 }
 
-std::string MessagesOutput::get_latest_text()
+std::string MessagesOutput::get_latest_text() const
 {
     // helper function for getting the last message in a chain of TextBlocks
     std::vector<std::string> text_blocks;
