@@ -49,11 +49,9 @@ def test_invalid_limit() -> None:
 
 def test_out_of_range_limit() -> None:
     process = run_claudifier("run", "--prompt=What is 3 + 5?", "--limit=-5")
-    assert process.exit_code == 0, process.stderr
-    results = loads(process.stdout)
     # clamps to 1 token which is not enough to return any content
-    assert results["output"] == "LLM returned no content."
-    assert results["output_tokens"] == 1
+    assert process.exit_code == 1
+    assert process.stderr == "Failed to create message: 'LLM returned no content.'\n"
 
 
 @mark.parametrize("arg", ["-r", "--raw"])
@@ -81,9 +79,8 @@ def test_no_content_handling() -> None:
     process = run_claudifier(
         "run", "--prompt=What is 3 + 5? Return just the result", "--limit=1"
     )
-    assert process.exit_code == 0, process.stderr
-    results = loads(process.stdout)
-    assert results["output"] == "LLM returned no content."
+    assert process.exit_code == 1
+    assert process.stderr == "Failed to create message: 'LLM returned no content.'\n"
 
 
 def test_empty_limit() -> None:
