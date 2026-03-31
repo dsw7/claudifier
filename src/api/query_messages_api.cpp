@@ -78,7 +78,7 @@ std::string MessagesInput::get_post_fields() const
     return json.dump();
 }
 
-void MessagesOutput::unpack_200_response(const std::string &response)
+MessagesOutput::MessagesOutput(const std::string &response)
 {
     nlohmann::json json;
 
@@ -142,8 +142,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput 
     }
 
     if (http_status_code == 200) {
-        MessagesOutput output;
-        output.unpack_200_response(response);
+        MessagesOutput output(response);
         output.temperature = input.get_temperature();
 
         const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);
