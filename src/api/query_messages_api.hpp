@@ -30,7 +30,8 @@ private:
     std::string llm_model_ = "claude-3-haiku-20240307";
 };
 
-struct MessagesOutput {
+class MessagesOutput {
+public:
     MessagesOutput() = default;
     MessagesOutput(const std::string &response);
 
@@ -42,6 +43,10 @@ struct MessagesOutput {
     std::string output;
     std::string raw_response;
     std::string stop_reason;
+
+private:
+    nlohmann::json response_;
+    void validate_schema_();
 };
 
 class CreateMessage: public CurlBase {

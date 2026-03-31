@@ -78,35 +78,37 @@ std::string MessagesInput::get_post_fields() const
     return json.dump();
 }
 
+void MessagesOutput::validate_schema_()
+{
+    if (this->response_.contains("type")) {
+        if (this->response_["type"] != "message") {
+            throw std::runtime_error("Malformed message response. Response is not a message");
+        }
+    } else {
+        throw std::runtime_error("Malformed error response. Could not deduce response type.");
+    }
+
+    if (this->response_["content"].empty()) {
+        throw std::runtime_error("LLM returned no content.");
+    }
+}
+
 MessagesOutput::MessagesOutput(const std::string &response)
 {
-    nlohmann::json json;
-
     try {
-        json = nlohmann::json::parse(response);
+        this->response_ = nlohmann::json::parse(response);
     } catch (const nlohmann::json::parse_error &e) {
         throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
     }
 
-    if (not json.contains("type")) {
-        throw std::runtime_error("Malformed error response. Could not deduce response type.");
-    }
+    this->validate_schema_();
 
-    if (json["type"] != "message") {
-        throw std::runtime_error("Malformed message response. Response is not a message");
-    }
-
-    if (json["content"].empty()) {
-        this->output = "LLM returned no content.";
-    } else {
-        this->output = json["content"][0]["text"];
-    }
-
-    this->input_tokens = json["usage"]["input_tokens"];
-    this->llm_model = json["model"];
-    this->output_tokens = json["usage"]["output_tokens"];
-    this->raw_response = json.dump(4);
-    this->stop_reason = json["stop_reason"];
+    this->output = this->response_["content"][0]["text"];
+    this->input_tokens = this->response_["usage"]["input_tokens"];
+    this->llm_model = this->response_["model"];
+    this->output_tokens = this->response_["usage"]["output_tokens"];
+    this->raw_response = this->response_.dump(4);
+    this->stop_reason = this->response_["stop_reason"];
 }
 
 std::expected<MessagesOutput, Err> CreateMessage::query_api(const MessagesInput &input)
