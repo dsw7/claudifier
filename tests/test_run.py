@@ -1,5 +1,7 @@
 from json import loads
-from pytest import mark
+from os import remove
+from typing import Generator
+from pytest import mark, fixture
 from helpers import run_claudifier
 
 
@@ -162,3 +164,19 @@ def test_temperature_bad_opt() -> None:
     process = run_claudifier("run", "--temperature=abc", "--prompt=What is 3 + 5?")
     assert process.exit_code == 1
     assert process.stderr == "stof\nFailed to convert 'abc' to float\n"
+
+
+@fixture
+def setup_inputfile() -> Generator[None, None, None]:
+    with open("Inputfile", "w") as f:
+        f.write("What is 2 + 2? Return just the sum.")
+
+    yield
+    remove("Inputfile")
+
+
+def test_read_from_inputfile(setup_inputfile: Generator[None, None, None]) -> None:
+    process = run_claudifier("run", "--json", "-t0.05")
+    assert process.exit_code == 0
+    stdout = loads(process.stdout)
+    assert stdout["output"] in ("4.", "4")
