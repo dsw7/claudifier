@@ -42,6 +42,21 @@ Options:
     fmt::print("{}\n", messages);
 }
 
+std::string select_prompt_()
+{
+    std::string prompt;
+
+    // otherwise attempt to load prompt from stdin
+    utils::print_line();
+    prompt = utils::read_input_from_stdin();
+
+    if (prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    }
+
+    return prompt;
+}
+
 MessagesOutput create_message_(const MessagesInput &input)
 {
     threading::timer_enabled.store(true);
@@ -168,12 +183,7 @@ void command_run(const int argc, char **argv)
     };
 
     if (prompt.empty()) {
-        utils::print_line();
-        prompt = utils::read_input_from_stdin();
-    }
-
-    if (prompt.empty()) {
-        throw std::runtime_error("The prompt is empty");
+        input.append_user_message(select_prompt_());
     } else {
         input.append_user_message(prompt);
     }
