@@ -49,8 +49,10 @@ std::string select_prompt_()
 
     static std::filesystem::path inputfile = "Inputfile";
     if (std::filesystem::exists(inputfile)) {
+#ifndef TESTING_ENABLED
         utils::print_line();
         fmt::print("Found Inputfile in current directory.\nLoading prompt from file.\n");
+#endif
         return utils::read_from_file(inputfile);
     }
 
