@@ -3,6 +3,7 @@
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
+#include <filesystem>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
@@ -46,7 +47,14 @@ std::string select_prompt_()
 {
     std::string prompt;
 
-    // otherwise attempt to load prompt from stdin
+    static std::filesystem::path inputfile = "Inputfile";
+    if (std::filesystem::exists(inputfile)) {
+        utils::print_line();
+        fmt::print("Found Inputfile in current directory.\nLoading prompt from file.\n");
+        return utils::read_from_file(inputfile);
+    }
+
+    // attempt to load prompt from stdin if Inputfile does not exist
     utils::print_line();
     prompt = utils::read_input_from_stdin();
 
