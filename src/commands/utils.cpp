@@ -97,13 +97,13 @@ std::string read_from_file(const std::filesystem::path &filepath)
 {
     std::ifstream infile(filepath);
 
-    if (infile) {
+    if (infile.is_open()) {
         std::ostringstream oss;
         oss << infile.rdbuf();
         return oss.str();
     }
 
-    throw std::runtime_error(fmt::format("Failed to open '{}'", (std::string)filepath));
+    throw std::runtime_error(fmt::format("Failed to open file '{}'", (std::string)filepath));
 }
 
 } // namespace utils
