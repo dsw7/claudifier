@@ -3,6 +3,7 @@
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
+#include <filesystem>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
@@ -40,6 +41,29 @@ Options:
 )";
 
     fmt::print("{}\n", messages);
+}
+
+std::string select_prompt_()
+{
+    std::string prompt;
+
+    static std::filesystem::path inputfile = "Inputfile";
+    if (std::filesystem::exists(inputfile)) {
+#ifndef TESTING_ENABLED
+        utils::print_line();
+        fmt::print("Found Inputfile in current directory.\nLoading prompt from file.\n");
+#endif
+        prompt = utils::read_from_file(inputfile);
+    } else {
+        utils::print_line();
+        prompt = utils::read_input_from_stdin();
+    }
+
+    if (prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    }
+
+    return prompt;
 }
 
 MessagesOutput create_message_(const MessagesInput &input)
@@ -168,12 +192,7 @@ void command_run(const int argc, char **argv)
     };
 
     if (prompt.empty()) {
-        utils::print_line();
-        prompt = utils::read_input_from_stdin();
-    }
-
-    if (prompt.empty()) {
-        throw std::runtime_error("The prompt is empty");
+        input.append_user_message(select_prompt_());
     } else {
         input.append_user_message(prompt);
     }

@@ -3,6 +3,7 @@
 #include <array>
 #include <chrono>
 #include <fmt/core.h>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <sys/ioctl.h>
@@ -90,6 +91,19 @@ float string_to_float(const std::string &str)
     }
 
     return f;
+}
+
+std::string read_from_file(const std::filesystem::path &filepath)
+{
+    std::ifstream infile(filepath);
+
+    if (infile.is_open()) {
+        std::ostringstream oss;
+        oss << infile.rdbuf();
+        return oss.str();
+    }
+
+    throw std::runtime_error(fmt::format("Failed to open file '{}'", (std::string)filepath));
 }
 
 } // namespace utils
