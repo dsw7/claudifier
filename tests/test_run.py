@@ -11,7 +11,9 @@ def test_help_messages(flag: str) -> None:
 
 @mark.parametrize("arg", ["-p", "--prompt="])
 def test_prompt_arg(arg: str) -> None:
-    process = run_claudifier("run", f"{arg}What is 3 + 5? Return just the result")
+    process = run_claudifier(
+        "run", f"{arg}What is 3 + 5? Return just the result", "--json"
+    )
 
     assert process.exit_code == 0, process.stderr
     results = loads(process.stdout)
@@ -21,7 +23,10 @@ def test_prompt_arg(arg: str) -> None:
 @mark.parametrize("arg", ["-m", "--model="])
 def test_model_arg(arg: str) -> None:
     process = run_claudifier(
-        "run", "--prompt=Running a test. Please ignore me", f"{arg}claude-opus-4-6"
+        "run",
+        "--prompt=Running a test. Please ignore me",
+        f"{arg}claude-opus-4-6",
+        "--json",
     )
 
     assert process.exit_code == 0, process.stderr
@@ -32,7 +37,7 @@ def test_model_arg(arg: str) -> None:
 @mark.parametrize("arg", ["-l", "--limit="])
 def test_limit_arg(arg: str) -> None:
     process = run_claudifier(
-        "run", "--prompt=Running a test. Please ignore me", f"{arg}2"
+        "run", "--prompt=Running a test. Please ignore me", f"{arg}2", "--json"
     )
 
     assert process.exit_code == 0, process.stderr
@@ -133,7 +138,7 @@ def test_system_prompt_empty() -> None:
 @mark.parametrize("input_temp, clamped_temp", [(-0.4, 0), (0.5, 0.5), (100, 1)])
 def test_temperature(input_temp: float, clamped_temp: float) -> None:
     process = run_claudifier(
-        "run", f"--temperature={input_temp}", "--prompt=What is 3 + 5?"
+        "run", f"--temperature={input_temp}", "--prompt=What is 3 + 5?", "-j"
     )
     assert process.exit_code == 0
     stdout = loads(process.stdout)
@@ -141,7 +146,7 @@ def test_temperature(input_temp: float, clamped_temp: float) -> None:
 
 
 def test_temperature_short_opt() -> None:
-    process = run_claudifier("run", "-t0.5", "--prompt=What is 3 + 5?")
+    process = run_claudifier("run", "-t0.5", "--prompt=What is 3 + 5?", "-j")
     assert process.exit_code == 0
     stdout = loads(process.stdout)
     assert float(stdout["temperature"]) == 0.5
