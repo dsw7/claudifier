@@ -1,5 +1,5 @@
 from json import loads
-from os import remove
+from os import remove, path
 from typing import Generator
 from pytest import mark, fixture
 from helpers import run_claudifier
@@ -167,16 +167,26 @@ def test_temperature_bad_opt() -> None:
 
 
 @fixture
-def setup_inputfile() -> Generator[None, None, None]:
+def clean_up_inputfile() -> Generator[None, None, None]:
+    yield
+    if path.exists("Inputfile"):
+        remove("Inputfile")
+
+
+def test_read_from_inputfile(clean_up_inputfile: Generator[None, None, None]) -> None:
     with open("Inputfile", "w") as f:
         f.write("What is 2 + 2? Return just the sum.")
 
-    yield
-    remove("Inputfile")
-
-
-def test_read_from_inputfile(setup_inputfile: Generator[None, None, None]) -> None:
     process = run_claudifier("run", "--json", "-t0.05")
-    assert process.exit_code == 0
+    assert process.exit_code == 0, process.stderr
     stdout = loads(process.stdout)
     assert stdout["output"] in ("4.", "4")
+
+
+def test_empty_inputfile(clean_up_inputfile: Generator[None, None, None]) -> None:
+    with open("Inputfile", "w"):
+        pass
+
+    process = run_claudifier("run")
+    assert process.exit_code == 1
+    assert process.stderr == "The prompt is empty\n"
