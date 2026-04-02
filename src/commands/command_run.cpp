@@ -3,7 +3,6 @@
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
-#include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
@@ -13,8 +12,6 @@
 #include <thread>
 
 namespace {
-
-constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 using api::CreateMessage;
 using api::Err;
@@ -82,7 +79,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", output.get_latest_text());
+    fmt::print(fg(colors::green), "{}\n", output.get_latest_text());
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage:\n");
     fmt::print("Model: {}\n", output.llm_model);

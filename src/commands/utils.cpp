@@ -2,7 +2,6 @@
 
 #include <array>
 #include <chrono>
-#include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <stdexcept>

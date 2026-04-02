@@ -3,7 +3,6 @@
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
-#include <fmt/color.h>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
@@ -16,10 +15,6 @@ using api::CreateMessage;
 using api::Err;
 using api::MessagesInput;
 using api::MessagesOutput;
-
-constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
-constexpr fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
-constexpr fmt::terminal_color red = fmt::terminal_color::bright_red;
 
 void print_help_messages_()
 {
@@ -44,9 +39,9 @@ void print_special_commands_()
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Commands: \n");
     fmt::print("[");
-    fmt::print(fg(green), "q");
+    fmt::print(fg(colors::green), "q");
     fmt::print("]: Quit the current chat session\n[");
-    fmt::print(fg(green), "?");
+    fmt::print(fg(colors::green), "?");
     fmt::print("]: Print this list of commands\n");
 }
 
@@ -80,7 +75,7 @@ void print_output_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(green), "{}\n", output.get_latest_text());
+    fmt::print(fg(colors::green), "{}\n", output.get_latest_text());
 }
 
 void print_usage_to_stdout_(const MessagesOutput &output)
@@ -97,10 +92,10 @@ bool break_conversation_on_condition_(const MessagesOutput &output)
         return false;
     }
 
-    fmt::print(fg(yellow), "Stop reason: {}\n", output.stop_reason);
+    fmt::print(fg(colors::yellow), "Stop reason: {}\n", output.stop_reason);
 
     if (output.stop_reason == "max_tokens") {
-        fmt::print(fg(red), "Cannot continue. The conversation has become fragmented due to token limitations.\n");
+        fmt::print(fg(colors::red), "Cannot continue. The conversation has become fragmented due to token limitations.\n");
     }
 
     return true;

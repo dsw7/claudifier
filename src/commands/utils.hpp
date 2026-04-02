@@ -1,7 +1,14 @@
 #pragma once
 
 #include <atomic>
+#include <fmt/color.h>
 #include <string>
+
+namespace colors {
+constexpr inline fmt::terminal_color green = fmt::terminal_color::bright_green;
+constexpr inline fmt::terminal_color yellow = fmt::terminal_color::bright_yellow;
+constexpr inline fmt::terminal_color red = fmt::terminal_color::bright_red;
+} // namespace colors
 
 namespace utils {
 void print_line();
