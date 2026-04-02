@@ -7,17 +7,14 @@
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
+#include <json.hpp>
 #include <stdexcept>
 #include <string>
 #include <thread>
 
-#ifdef TESTING_ENABLED
-#include <json.hpp>
-#else
-constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
-#endif
-
 namespace {
+
+constexpr fmt::terminal_color green = fmt::terminal_color::bright_green;
 
 using api::CreateMessage;
 using api::Err;
@@ -42,6 +39,7 @@ Options:
   -s, --system                   Provide a system prompt
   -t, --temperature              Specify how random the response will be.
                                  The temperature is clamped between 0.0 and 1.0
+  -j, --json                     Dump results to JSON (as opposed to tabular format)
 )";
 
     fmt::print("{}\n", messages);
@@ -93,18 +91,6 @@ MessagesOutput create_message_(const MessagesInput &input)
 
 void print_output_to_stdout_(const MessagesOutput &output)
 {
-#ifdef TESTING_ENABLED
-    const nlohmann::json json_obj = {
-        { "input_tokens", output.input_tokens },
-        { "llm_model", output.llm_model },
-        { "output", output.get_latest_text() },
-        { "output_tokens", output.output_tokens },
-        { "stop_reason", output.stop_reason },
-        { "temperature", output.temperature }
-    };
-    const std::string json_str = json_obj.dump(4);
-    fmt::print("{}\n", json_str);
-#else
     utils::print_line();
     fmt::print(fmt::emphasis::bold, "Output: ");
     fmt::print(fg(green), "{}\n", output.get_latest_text());
@@ -117,7 +103,20 @@ void print_output_to_stdout_(const MessagesOutput &output)
     fmt::print("Stop reason: {}\n", output.stop_reason);
     fmt::print("Round trip time: {} s\n", output.rtt_time);
     utils::print_line();
-#endif
+}
+
+void print_output_to_stdout_json_(const MessagesOutput &output)
+{
+    const nlohmann::json json_obj = {
+        { "input_tokens", output.input_tokens },
+        { "llm_model", output.llm_model },
+        { "output", output.get_latest_text() },
+        { "output_tokens", output.output_tokens },
+        { "stop_reason", output.stop_reason },
+        { "temperature", output.temperature }
+    };
+    const std::string json_str = json_obj.dump(4);
+    fmt::print("{}\n", json_str);
 }
 
 } // namespace
@@ -128,7 +127,9 @@ void command_run(const int argc, char **argv)
 {
     MessagesInput input;
     std::string prompt;
+
     bool print_raw_response = false;
+    bool print_json = false;
 
     while (true) {
         static struct option long_options[] = {
@@ -139,11 +140,12 @@ void command_run(const int argc, char **argv)
             { "raw", no_argument, 0, 'r' },
             { "system", required_argument, 0, 's' },
             { "temperature", required_argument, 0, 't' },
+            { "json", no_argument, 0, 'j' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:p:l:rs:t:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hm:p:l:rs:t:j", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -171,6 +173,9 @@ void command_run(const int argc, char **argv)
             case 't':
                 input.set_temperature(utils::string_to_float(optarg));
                 break;
+            case 'j':
+                print_json = true;
+                break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
@@ -190,6 +195,8 @@ void command_run(const int argc, char **argv)
 
     if (print_raw_response) {
         fmt::print("{}\n", output.raw_response);
+    } else if (print_json) {
+        print_output_to_stdout_json_(output);
     } else {
         print_output_to_stdout_(output);
     }
