@@ -41,7 +41,7 @@ set(SRC_FILES
   commands/command_models.cpp
   commands/command_run.cpp
   commands/command_test.cpp
-  commands/command_utils.cpp
+  commands/utils.cpp
   main.cpp
 )
 include_directories(api commands external)

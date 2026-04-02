@@ -1,7 +1,7 @@
 #include "command_models.hpp"
 
-#include "command_utils.hpp"
 #include "query_models_api.hpp"
+#include "utils.hpp"
 
 #include <algorithm>
 #include <fmt/core.h>

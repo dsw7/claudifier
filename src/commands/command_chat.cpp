@@ -1,7 +1,7 @@
 #include "command_chat.hpp"
 
-#include "command_utils.hpp"
 #include "query_messages_api.hpp"
+#include "utils.hpp"
 
 #include <fmt/color.h>
 #include <fmt/core.h>
