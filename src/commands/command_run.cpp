@@ -53,12 +53,11 @@ std::string select_prompt_()
         utils::print_line();
         fmt::print("Found Inputfile in current directory.\nLoading prompt from file.\n");
 #endif
-        return utils::read_from_file(inputfile);
+        prompt = utils::read_from_file(inputfile);
+    } else {
+        utils::print_line();
+        prompt = utils::read_input_from_stdin();
     }
-
-    // attempt to load prompt from stdin if Inputfile does not exist
-    utils::print_line();
-    prompt = utils::read_input_from_stdin();
 
     if (prompt.empty()) {
         throw std::runtime_error("The prompt is empty");
