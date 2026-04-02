@@ -50,22 +50,6 @@ void print_special_commands_()
     fmt::print("]: Print this list of commands\n");
 }
 
-void read_message_from_stdin_(std::string &input)
-{
-    utils::print_line();
-
-    while (true) {
-        fmt::print(fmt::emphasis::bold, "Input: ");
-        std::getline(std::cin, input);
-
-        if (input.empty()) {
-            fmt::print("Input is empty. Try again.\n");
-        } else {
-            break;
-        }
-    }
-}
-
 enum class LoopControl {
     BREAK,
     CONTINUE,
@@ -138,12 +122,13 @@ void run_conversational_loop_(MessagesInput &input)
     CreateMessage api_handle;
     MessagesOutput output;
     LoopControl loop_controller;
-    std::string message;
 
     print_special_commands_();
 
     while (true) {
-        read_message_from_stdin_(message);
+        utils::print_line();
+        const std::string message = utils::read_input_from_stdin();
+
         loop_controller = parse_special_command_(message);
 
         if (loop_controller == LoopControl::BREAK) {

@@ -45,17 +45,6 @@ Options:
     fmt::print("{}\n", messages);
 }
 
-std::string read_prompt_from_stdin_()
-{
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Input: ");
-
-    std::string prompt;
-    std::getline(std::cin, prompt);
-
-    return prompt;
-}
-
 MessagesOutput create_message_(const MessagesInput &input)
 {
     threading::timer_enabled.store(true);
@@ -182,7 +171,8 @@ void command_run(const int argc, char **argv)
     };
 
     if (prompt.empty()) {
-        prompt = read_prompt_from_stdin_();
+        utils::print_line();
+        prompt = utils::read_input_from_stdin();
     }
 
     if (prompt.empty()) {
