@@ -5,6 +5,7 @@
 
 namespace utils {
 void print_line();
+std::string read_input_from_stdin();
 int string_to_int(const std::string &str);
 float string_to_float(const std::string &str);
 } // namespace utils

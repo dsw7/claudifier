@@ -2,6 +2,7 @@
 
 #include <array>
 #include <chrono>
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <stdexcept>
@@ -37,6 +38,23 @@ void print_line()
 {
     static std::string line = get_line_();
     fmt::print("{}\n", line);
+}
+
+std::string read_input_from_stdin()
+{
+    std::string input;
+    while (true) {
+        fmt::print(fmt::emphasis::bold, "Input: ");
+        std::getline(std::cin, input);
+
+        if (input.empty()) {
+            fmt::print("Input is empty. Try again.\n");
+        } else {
+            break;
+        }
+    }
+
+    return input;
 }
 
 int string_to_int(const std::string &str)
