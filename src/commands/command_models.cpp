@@ -43,7 +43,7 @@ ModelsOutput get_models_()
     return *output;
 }
 
-void print_all_pages_()
+void print_all_models_to_stdout()
 {
     const ModelsOutput models = get_models_();
 
@@ -55,18 +55,23 @@ void print_all_pages_()
     }
 }
 
-void print_all_pages_as_json_()
+void print_all_models_to_stdout_json_()
 {
     const ModelsOutput models = get_models_();
 
-    nlohmann::json json = nlohmann::json::array();
+    nlohmann::json list_models = nlohmann::json::array();
     for (const auto &data: models.models) {
-        json.push_back({ { "display_name", data.display_name },
+        list_models.push_back({ { "display_name", data.display_name },
             { "created_at", data.created_at },
             { "id", data.id } });
     }
 
-    fmt::print("{}\n", json.dump(4));
+    nlohmann::json output = {
+        { "models", list_models },
+        { "has_more", models.has_more }
+    };
+
+    fmt::print("{}\n", output.dump(4));
 }
 
 } // namespace
@@ -104,9 +109,9 @@ void command_models(const int argc, char **argv)
     };
 
     if (dump_json) {
-        print_all_pages_as_json_();
+        print_all_models_to_stdout_json_();
     } else {
-        print_all_pages_();
+        print_all_models_to_stdout();
     }
 }
 

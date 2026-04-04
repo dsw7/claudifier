@@ -14,11 +14,10 @@ def test_exit_zero() -> None:
     assert process.exit_code == 0, process.stderr
 
 
-def test_json_dump_and_correct_page_numbers() -> None:
-    process = run_claudifier("models", "--json", "--limit=4")
-    assert process.exit_code == 0
-    pages = [i["page"] for i in loads(process.stdout)]
+def test_json_dump() -> None:
+    process = run_claudifier("models", "--json")
+    assert process.exit_code == 0, process.stderr
 
-    assert len(pages) > 8, "Test cannot proceed - too few models"
-    assert pages.count(1) == 4
-    assert pages.count(2) == 4
+    stdout = loads(process.stdout)
+    assert "models" in stdout
+    assert not stdout["has_more"]
