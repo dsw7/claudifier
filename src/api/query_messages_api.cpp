@@ -92,13 +92,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api()
         throw std::runtime_error(curl_easy_strerror(code_easy_perform));
     }
 
-    long http_status_code = -1;
-    const CURLcode code_info_resp = curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
-    if (code_info_resp != CURLE_OK) {
-        throw std::runtime_error(curl_easy_strerror(code_info_resp));
-    }
-
-    if (http_status_code == 200) {
+    if (this->is_200_response_()) {
         MessagesOutput output(response);
         output.temperature = this->temperature_;
 

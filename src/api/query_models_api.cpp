@@ -23,6 +23,7 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
     std::string response;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
 
+    this->is_200_response_();
     const CURLcode code = curl_easy_perform(this->curl_);
 
     curl_slist_free_all(headers);
@@ -32,10 +33,7 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
         throw std::runtime_error(curl_easy_strerror(code));
     }
 
-    long http_status_code = -1;
-    curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
-
-    if (http_status_code == 200) {
+    if (this->is_200_response_()) {
         ModelsOutput output(response);
         return output;
     }

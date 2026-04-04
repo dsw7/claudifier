@@ -14,6 +14,7 @@ public:
     CurlBase &operator=(const CurlBase &) = delete;
 
 protected:
+    bool is_200_response_();
     CURL *curl_ = nullptr;
     std::string user_api_key_;
 };

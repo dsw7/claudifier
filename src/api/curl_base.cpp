@@ -59,4 +59,16 @@ CurlBase::~CurlBase()
     curl_global_cleanup();
 }
 
+bool CurlBase::is_200_response_()
+{
+    long http_status_code = -1;
+
+    const CURLcode return_code = curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
+    if (return_code != CURLE_OK) {
+        throw std::runtime_error(curl_easy_strerror(return_code));
+    }
+
+    return http_status_code == 200;
+}
+
 } // namespace api
