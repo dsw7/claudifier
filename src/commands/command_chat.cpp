@@ -29,6 +29,8 @@ Options:
   -h, --help                     Print help information and exit
   -m, --model=MODEL              Specify a valid messages model
   -l, --limit=LIMIT              Specify token limit
+  -t, --temperature              Specify how random the response will be.
+                                 The temperature is clamped between 0.0 and 1.0
 )";
 
     fmt::print("{}\n", messages);
@@ -148,19 +150,21 @@ namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    std::string model;
+    float temperature = 1.0f;
     int max_tokens = 1024;
+    std::string model = "claude-3-haiku-20240307";
 
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
-            { "input", required_argument, 0, 'm' },
+            { "model", required_argument, 0, 'm' },
             { "limit", required_argument, 0, 'l' },
+            { "temperature", required_argument, 0, 't' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:l:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hm:l:t:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -176,12 +180,15 @@ void command_chat(const int argc, char **argv)
             case 'l':
                 max_tokens = utils::string_to_int(optarg);
                 break;
+            case 't':
+                temperature = utils::string_to_float(optarg);
+                break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} chat [-h | --help] for more information", argv[0]));
         }
     };
 
-    CreateMessage input(max_tokens, 1.00f, model);
+    CreateMessage input(max_tokens, temperature, model);
     run_conversational_loop_(input);
 }
 
