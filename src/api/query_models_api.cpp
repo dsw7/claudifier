@@ -72,7 +72,7 @@ ModelsOutput::ModelsOutput(const std::string &response)
             throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
         }
 
-        this->data.push_back(api::ModelData { model["created_at"], model["display_name"], model["id"] });
+        this->models.push_back(Model { model["created_at"], model["display_name"], model["id"] });
     }
 }
 

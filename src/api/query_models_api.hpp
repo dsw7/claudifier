@@ -10,7 +10,7 @@
 
 namespace api {
 
-struct ModelData {
+struct Model {
     std::string created_at;
     std::string display_name;
     std::string id;
@@ -22,7 +22,7 @@ public:
 
     bool has_more = false;
     std::string raw_response;
-    std::vector<ModelData> data;
+    std::vector<Model> models;
 
 private:
     nlohmann::json response_;

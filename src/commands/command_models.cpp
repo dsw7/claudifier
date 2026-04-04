@@ -50,7 +50,7 @@ void print_all_pages_()
     fmt::print("{:<25}{:<25}{}\n", "Display name", "Created at", "Model ID");
     fmt::print("{:<25}{:<25}{}\n", "------------", "----------", "--------");
 
-    for (const auto &data: models.data) {
+    for (const auto &data: models.models) {
         fmt::print("{:<25}{:<25}{}\n", data.display_name, data.created_at, data.id);
     }
 }
@@ -60,7 +60,7 @@ void print_all_pages_as_json_()
     const ModelsOutput models = get_models_();
 
     nlohmann::json json = nlohmann::json::array();
-    for (const auto &data: models.data) {
+    for (const auto &data: models.models) {
         json.push_back({ { "display_name", data.display_name },
             { "created_at", data.created_at },
             { "id", data.id } });
