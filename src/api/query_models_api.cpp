@@ -8,19 +8,6 @@
 
 namespace {
 
-std::string build_url_(const int limit, const std::optional<std::string> &last_id)
-{
-    std::string url;
-
-    if (last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&after_id={}", limit, *last_id);
-    } else {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
-    }
-
-    return url;
-}
-
 api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 {
     nlohmann::json json;
@@ -33,12 +20,6 @@ api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 
     api::ModelsOutput ok;
     ok.raw_response = json.dump(4);
-
-    if (json.contains("last_id")) {
-        ok.last_id = json["last_id"];
-    } else {
-        throw std::runtime_error("Malformed models response. Missing 'last_id' key.");
-    }
 
     if (json.contains("has_more")) {
         ok.has_more = json["has_more"];
@@ -55,7 +36,7 @@ api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
             throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
         }
 
-        ok.append_llm_model_to_page(item["created_at"], item["display_name"], item["id"]);
+        ok.data.push_back(api::ModelData { item["created_at"], item["display_name"], item["id"] });
     }
 
     return ok;
@@ -65,14 +46,11 @@ api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
 
 namespace api {
 
-void ModelsOutput::append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id)
+std::expected<ModelsOutput, Err> GetModels::query_api()
 {
-    this->data.push_back(ModelData { created_at, display_name, id });
-}
+    static int limit = 1000;
+    const std::string endpoint = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
 
-std::expected<ModelsOutput, Err> GetModels::query_api(const int limit, const std::optional<std::string> &last_id)
-{
-    const std::string endpoint = build_url_(limit, last_id);
     curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());
     curl_easy_setopt(this->curl_, CURLOPT_HTTPGET, 1L);
 
