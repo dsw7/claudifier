@@ -8,6 +8,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <json.hpp>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -24,7 +25,7 @@ struct Parameters {
     float temperature = 1.0f;
     int max_tokens = 1024;
     std::string model;
-    std::string system_prompt;
+    std::optional<std::string> system_prompt;
     std::string user_prompt;
 };
 
@@ -139,12 +140,16 @@ void print_output_to_stdout_json_(const MessagesOutput &output)
 
 void create_message_(const Parameters &params)
 {
-    CreateMessage input(params.max_tokens, params.temperature, params.model, params.system_prompt);
+    CreateMessage input(params.max_tokens, params.temperature, params.model);
 
     if (params.user_prompt.empty()) {
         input.append_user_message(select_prompt_());
     } else {
         input.append_user_message(params.user_prompt);
+    }
+
+    if (params.system_prompt) {
+        input.set_system_prompt(*params.system_prompt);
     }
 
     const MessagesOutput output = query_api_(input);

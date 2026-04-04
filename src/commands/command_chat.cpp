@@ -150,6 +150,7 @@ void command_chat(const int argc, char **argv)
 {
     std::string model;
     int max_tokens = 1024;
+
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
@@ -180,7 +181,7 @@ void command_chat(const int argc, char **argv)
         }
     };
 
-    CreateMessage input(max_tokens, 1.00f, model, std::nullopt);
+    CreateMessage input(max_tokens, 1.00f, model);
     run_conversational_loop_(input);
 }
 

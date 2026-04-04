@@ -12,12 +12,10 @@ namespace api {
 CreateMessage::CreateMessage(
     const int max_tokens,
     const float temperature,
-    const std::string &model,
-    const std::optional<std::string> &system_prompt) :
+    const std::string &model) :
     max_tokens_(max_tokens),
     temperature_(temperature),
-    model_(model),
-    system_prompt_(system_prompt)
+    model_(model)
 {
     if (this->max_tokens_ < 1) {
         this->max_tokens_ = 1;
@@ -28,12 +26,15 @@ CreateMessage::CreateMessage(
     if (this->model_.empty()) {
         throw std::runtime_error("The model parameter is empty");
     }
+}
 
-    if (this->system_prompt_) {
-        if (this->system_prompt_->empty()) {
-            throw std::runtime_error("The provided system prompt is empty");
-        }
+void CreateMessage::set_system_prompt(const std::string &prompt)
+{
+    if (prompt.empty()) {
+        throw std::runtime_error("The provided system prompt is empty");
     }
+
+    this->system_prompt_ = prompt;
 }
 
 void CreateMessage::append_user_message(const std::string &content)
