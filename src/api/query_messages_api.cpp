@@ -36,40 +36,6 @@ CreateMessage::CreateMessage(
     }
 }
 
-void CreateMessage::set_max_tokens(const int max_tokens)
-{
-    this->max_tokens_ = max_tokens;
-
-    if (this->max_tokens_ < 1) {
-        this->max_tokens_ = 1;
-    }
-}
-
-void CreateMessage::set_temperature(const float temperature)
-{
-    static float min_temp = 0.0;
-    static float max_temp = 1.0;
-    this->temperature_ = std::clamp(temperature, min_temp, max_temp);
-}
-
-void CreateMessage::set_llm_model(const std::string &model)
-{
-    if (model.empty()) {
-        throw std::runtime_error("The model parameter is empty");
-    }
-
-    this->model_ = model;
-}
-
-void CreateMessage::set_system_prompt(const std::string &prompt)
-{
-    if (prompt.empty()) {
-        throw std::runtime_error("The provided system prompt is empty");
-    }
-
-    this->system_prompt_ = prompt;
-}
-
 void CreateMessage::append_user_message(const std::string &content)
 {
     this->conversation_.push_back({ { "role", "user" }, { "content", content } });
