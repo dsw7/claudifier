@@ -9,6 +9,11 @@
 
 namespace api {
 
+CreateMessage::CreateMessage() :
+    max_tokens_(1024),
+    temperature_(1.0f),
+    model_("claude-3-haiku-20240307") {}
+
 CreateMessage::CreateMessage(
     const int max_tokens,
     const float temperature,
@@ -21,7 +26,7 @@ CreateMessage::CreateMessage(
         this->max_tokens_ = 1;
     }
 
-    this->temperature_ = std::clamp(temperature, 0.0f, 1.0f);
+    this->temperature_ = std::clamp(this->temperature_, 0.0f, 1.0f);
 
     if (this->model_.empty()) {
         throw std::runtime_error("The model parameter is empty");
