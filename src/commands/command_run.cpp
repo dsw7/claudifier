@@ -24,9 +24,9 @@ struct Parameters {
     bool print_raw_response = false;
     float temperature = 1.0f;
     int max_tokens = 1024;
-    std::string model;
     std::optional<std::string> system_prompt;
-    std::string user_prompt;
+    std::optional<std::string> user_prompt;
+    std::string model = "claude-3-haiku-20240307";
 };
 
 void print_help_messages_()
@@ -142,10 +142,10 @@ void create_message_(const Parameters &params)
 {
     CreateMessage input(params.max_tokens, params.temperature, params.model);
 
-    if (params.user_prompt.empty()) {
-        input.append_user_message(select_prompt_());
+    if (params.user_prompt) {
+        input.append_user_message(*params.user_prompt);
     } else {
-        input.append_user_message(params.user_prompt);
+        input.append_user_message(select_prompt_());
     }
 
     if (params.system_prompt) {
