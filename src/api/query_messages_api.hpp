@@ -16,7 +16,7 @@ public:
     MessagesOutput(const std::string &response);
     std::string get_latest_text() const;
 
-    double rtt_time = 0;
+    double rtt_time = 0.0;
     float temperature = 1.0f;
     int input_tokens = 0;
     int output_tokens = 0;

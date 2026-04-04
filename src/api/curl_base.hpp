@@ -15,6 +15,8 @@ public:
 
 protected:
     bool is_200_response_();
+    double get_rtt_time_();
+
     CURL *curl_ = nullptr;
     std::string user_api_key_;
 };

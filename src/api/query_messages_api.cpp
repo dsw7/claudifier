@@ -95,12 +95,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api()
     if (this->is_200_response_()) {
         MessagesOutput output(response);
         output.temperature = this->temperature_;
-
-        const CURLcode code_info_time = curl_easy_getinfo(this->curl_, CURLINFO_TOTAL_TIME, &output.rtt_time);
-        if (code_info_time != CURLE_OK) {
-            throw std::runtime_error(curl_easy_strerror(code_info_time));
-        }
-
+        output.rtt_time = this->get_rtt_time_();
         return output;
     }
 
