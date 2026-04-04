@@ -31,6 +31,12 @@ private:
 
 class CreateMessage: public CurlBase {
 public:
+    CreateMessage(
+        const int max_tokens = 1024,
+        const float temperature = 1.0f,
+        const std::string &model = "claude-3-haiku-20240307",
+        const std::optional<std::string> &system_prompt = std::nullopt);
+
     void set_max_tokens(const int max_tokens);
     void set_temperature(const float temperature);
     void set_llm_model(const std::string &model);
@@ -41,11 +47,11 @@ public:
     std::expected<MessagesOutput, Err> query_api();
 
 private:
-    float temperature_ = 1.0f;
-    int max_tokens_ = 1024;
+    int max_tokens_;
+    float temperature_;
+    std::string model_;
     nlohmann::json conversation_;
     std::optional<std::string> system_prompt_;
-    std::string llm_model_ = "claude-3-haiku-20240307";
 };
 
 } // namespace api

@@ -9,6 +9,33 @@
 
 namespace api {
 
+CreateMessage::CreateMessage(
+    const int max_tokens,
+    const float temperature,
+    const std::string &model,
+    const std::optional<std::string> &system_prompt) :
+    max_tokens_(max_tokens),
+    temperature_(temperature),
+    model_(model),
+    system_prompt_(system_prompt)
+{
+    if (this->max_tokens_ < 1) {
+        this->max_tokens_ = 1;
+    }
+
+    this->temperature_ = std::clamp(temperature, 0.0f, 1.0f);
+
+    if (this->model_.empty()) {
+        throw std::runtime_error("The model parameter is empty");
+    }
+
+    if (this->system_prompt_) {
+        if (this->system_prompt_->empty()) {
+            throw std::runtime_error("The provided system prompt is empty");
+        }
+    }
+}
+
 void CreateMessage::set_max_tokens(const int max_tokens)
 {
     this->max_tokens_ = max_tokens;
@@ -31,7 +58,7 @@ void CreateMessage::set_llm_model(const std::string &model)
         throw std::runtime_error("The model parameter is empty");
     }
 
-    this->llm_model_ = model;
+    this->model_ = model;
 }
 
 void CreateMessage::set_system_prompt(const std::string &prompt)
@@ -72,13 +99,14 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api()
     nlohmann::json json = {
         { "max_tokens", this->max_tokens_ },
         { "messages", this->conversation_ },
-        { "model", this->llm_model_ },
+        { "model", this->model_ },
         { "temperature", this->temperature_ }
     };
     if (this->system_prompt_) {
         json["system"] = this->system_prompt_;
     }
-    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, json.dump().c_str());
+    const std::string post_fields = json.dump();
+    curl_easy_setopt(this->curl_, CURLOPT_POSTFIELDS, post_fields.c_str());
 
     std::string response;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
