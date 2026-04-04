@@ -106,8 +106,7 @@ def test_empty_model() -> None:
     assert process.stderr == "The model parameter is empty\n"
 
 
-@mark.skip(reason="Test will always hang as empty prompt forces read from stdin")
-def test_empty_prompt() -> None:
+def test_user_prompt_empty() -> None:
     process = run_claudifier("run", "--prompt=")
     assert process.exit_code == 1
     assert process.stderr == "The prompt is empty\n"

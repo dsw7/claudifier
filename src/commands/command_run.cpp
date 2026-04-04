@@ -69,10 +69,6 @@ std::string select_prompt_()
         prompt = utils::read_input_from_stdin();
     }
 
-    if (prompt.empty()) {
-        throw std::runtime_error("The prompt is empty");
-    }
-
     return prompt;
 }
 
@@ -142,11 +138,19 @@ void create_message_(const Parameters &params)
 {
     CreateMessage input(params.max_tokens, params.temperature, params.model);
 
+    std::string user_prompt;
+
     if (params.user_prompt) {
-        input.append_user_message(*params.user_prompt);
+        user_prompt = *params.user_prompt;
     } else {
-        input.append_user_message(select_prompt_());
+        user_prompt = select_prompt_();
     }
+
+    if (user_prompt.empty()) {
+        throw std::runtime_error("The prompt is empty");
+    }
+
+    input.append_user_message(user_prompt);
 
     if (params.system_prompt) {
         input.set_system_prompt(*params.system_prompt);
