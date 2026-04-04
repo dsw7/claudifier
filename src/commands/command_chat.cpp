@@ -13,7 +13,6 @@ namespace {
 
 using api::CreateMessage;
 using api::Err;
-using api::MessagesInput;
 using api::MessagesOutput;
 
 void print_help_messages_()
@@ -101,9 +100,9 @@ bool break_conversation_on_condition_(const MessagesOutput &output)
     return true;
 }
 
-MessagesOutput run_query_(const MessagesInput &input, CreateMessage &api_handle)
+MessagesOutput run_query_(CreateMessage &input)
 {
-    std::expected<MessagesOutput, Err> output = api_handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         return output.value();
@@ -112,9 +111,8 @@ MessagesOutput run_query_(const MessagesInput &input, CreateMessage &api_handle)
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
 }
 
-void run_conversational_loop_(MessagesInput &input)
+void run_conversational_loop_(CreateMessage &input)
 {
-    CreateMessage api_handle;
     MessagesOutput output;
     LoopControl loop_controller;
 
@@ -133,7 +131,7 @@ void run_conversational_loop_(MessagesInput &input)
         }
 
         input.append_user_message(message);
-        output = run_query_(input, api_handle);
+        output = run_query_(input);
         print_output_to_stdout_(output);
         print_usage_to_stdout_(output);
         if (break_conversation_on_condition_(output)) {
@@ -149,7 +147,7 @@ namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    MessagesInput input;
+    CreateMessage input;
 
     while (true) {
         static struct option long_options[] = {

@@ -13,7 +13,6 @@ namespace {
 
 using api::CreateMessage;
 using api::Err;
-using api::MessagesInput;
 using api::MessagesOutput;
 
 struct TestCase {
@@ -48,18 +47,17 @@ Options:
 void test_chat_()
 {
     // mock conversational turns like in chat command but without interactivity for testing
-    CreateMessage handle;
-    MessagesInput input;
+    CreateMessage input;
 
     input.append_user_message("If a = 2, b = 3, and c = a + b, then what is c?");
-    std::expected<MessagesOutput, Err> output_1 = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output_1 = input.query_api();
     if (not output_1) {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_1.error().errmsg));
     }
     input.append_assistant_message(output_1->get_latest_text());
 
     input.append_user_message("What is c + 5? Return just the value");
-    std::expected<MessagesOutput, Err> output_2 = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output_2 = input.query_api();
     if (not output_2) {
         throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output_2.error().errmsg));
     }
@@ -70,11 +68,10 @@ void test_chat_()
 
 void test_zero_shot_()
 {
-    MessagesInput input;
+    CreateMessage input;
     input.append_user_message("What is 3 + 5?");
 
-    CreateMessage handle;
-    std::expected<MessagesOutput, Err> output = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         fmt::print("{}\n", output->raw_response);
@@ -85,13 +82,12 @@ void test_zero_shot_()
 
 void test_one_shot_()
 {
-    MessagesInput input;
+    CreateMessage input;
     input.append_user_message("This output is great!");
     input.append_assistant_message("This message sounds POSITIVE");
     input.append_user_message("This output is bad!");
 
-    CreateMessage handle;
-    std::expected<MessagesOutput, Err> output = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         fmt::print("{}\n", output->raw_response);
@@ -102,7 +98,7 @@ void test_one_shot_()
 
 void test_few_shot_()
 {
-    MessagesInput input;
+    CreateMessage input;
     input.append_user_message("The value is a;");
     input.append_assistant_message("a = 52");
     input.append_user_message("The value is b;");
@@ -111,8 +107,7 @@ void test_few_shot_()
     input.append_assistant_message("c = 56");
     input.append_user_message("The value is d;");
 
-    CreateMessage handle;
-    std::expected<MessagesOutput, Err> output = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         fmt::print("{}\n", output->raw_response);
@@ -123,12 +118,11 @@ void test_few_shot_()
 
 void test_chain_of_thought_()
 {
-    MessagesInput input;
+    CreateMessage input;
     input.append_user_message(
         "x = 16. x is then doubled. Finally, x is divided by 4. What is the value of x? Show each step in your calculation.");
 
-    CreateMessage handle;
-    std::expected<MessagesOutput, Err> output = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         fmt::print("{}\n", output->raw_response);
@@ -139,15 +133,14 @@ void test_chain_of_thought_()
 
 void test_tree_of_thought_()
 {
-    MessagesInput input;
+    CreateMessage input;
     input.append_user_message(R"(Imagine three different experts are answering this question."
 "All experts will write down 1 step of their thinking, then share it with the group."
 "If any expert realizes they're wrong at any point then they leave."
 "Goal: Use the numbers 4, 9, 10, 13 and basic operators (+, -, *, /) to get the number 24."
 "Step 1:)");
 
-    CreateMessage handle;
-    std::expected<MessagesOutput, Err> output = handle.query_api(input);
+    std::expected<MessagesOutput, Err> output = input.query_api();
 
     if (output) {
         fmt::print("{}\n", output->raw_response);

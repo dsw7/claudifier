@@ -10,26 +10,6 @@
 
 namespace api {
 
-class MessagesInput {
-public:
-    void set_max_tokens(const int max_tokens);
-    void set_temperature(const float temperature);
-    void set_llm_model(const std::string &model);
-    void set_system_prompt(const std::string &prompt);
-    void append_user_message(const std::string &content);
-    void append_assistant_message(const std::string &content);
-    float get_temperature() const;
-    nlohmann::json get_conversation() const;
-    std::string get_post_fields() const;
-
-private:
-    float temperature_ = 1.0f;
-    int max_tokens_ = 1024;
-    nlohmann::json conversation_;
-    std::optional<std::string> system_prompt_;
-    std::string llm_model_ = "claude-3-haiku-20240307";
-};
-
 class MessagesOutput {
 public:
     MessagesOutput() = default;
@@ -51,7 +31,21 @@ private:
 
 class CreateMessage: public CurlBase {
 public:
-    std::expected<MessagesOutput, Err> query_api(const MessagesInput &input);
+    void set_max_tokens(const int max_tokens);
+    void set_temperature(const float temperature);
+    void set_llm_model(const std::string &model);
+    void set_system_prompt(const std::string &prompt);
+    void append_user_message(const std::string &content);
+    void append_assistant_message(const std::string &content);
+    nlohmann::json get_conversation() const;
+    std::expected<MessagesOutput, Err> query_api();
+
+private:
+    float temperature_ = 1.0f;
+    int max_tokens_ = 1024;
+    nlohmann::json conversation_;
+    std::optional<std::string> system_prompt_;
+    std::string llm_model_ = "claude-3-haiku-20240307";
 };
 
 } // namespace api

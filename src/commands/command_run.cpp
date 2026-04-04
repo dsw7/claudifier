@@ -16,7 +16,6 @@ namespace {
 
 using api::CreateMessage;
 using api::Err;
-using api::MessagesInput;
 using api::MessagesOutput;
 
 void print_help_messages_()
@@ -66,7 +65,7 @@ std::string select_prompt_()
     return prompt;
 }
 
-MessagesOutput create_message_(const MessagesInput &input)
+MessagesOutput create_message_(CreateMessage &input)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
@@ -76,8 +75,7 @@ MessagesOutput create_message_(const MessagesInput &input)
     std::string errmsg;
 
     try {
-        CreateMessage handle;
-        output = handle.query_api(input);
+        output = input.query_api();
     } catch (const std::runtime_error &e) {
         query_failed = true;
         errmsg = e.what();
@@ -135,7 +133,7 @@ namespace commands {
 
 void command_run(const int argc, char **argv)
 {
-    MessagesInput input;
+    CreateMessage input;
     std::string prompt;
 
     bool print_raw_response = false;
