@@ -3,76 +3,15 @@
 #include "errors.hpp"
 
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
-
-namespace {
-
-std::string build_url_(const int limit, const std::optional<std::string> &last_id)
-{
-    std::string url;
-
-    if (last_id) {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}&after_id={}", limit, *last_id);
-    } else {
-        url = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
-    }
-
-    return url;
-}
-
-api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    api::ModelsOutput ok;
-    ok.raw_response = json.dump(4);
-
-    if (json.contains("last_id")) {
-        ok.last_id = json["last_id"];
-    } else {
-        throw std::runtime_error("Malformed models response. Missing 'last_id' key.");
-    }
-
-    if (json.contains("has_more")) {
-        ok.has_more = json["has_more"];
-    } else {
-        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
-    }
-
-    if (not json.contains("data")) {
-        throw std::runtime_error("Malformed models response. Missing 'data' key.");
-    }
-
-    for (const auto &item: json["data"]) {
-        if (item["type"] != "model") {
-            throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
-        }
-
-        ok.append_llm_model_to_page(item["created_at"], item["display_name"], item["id"]);
-    }
-
-    return ok;
-}
-
-} // namespace
 
 namespace api {
 
-void ModelsOutput::append_llm_model_to_page(const std::string &created_at, const std::string &display_name, const std::string &id)
+std::expected<ModelsOutput, Err> GetModels::query_api()
 {
-    this->data.push_back(ModelData { created_at, display_name, id });
-}
+    static int limit = 1000;
+    const std::string endpoint = fmt::format("https://api.anthropic.com/v1/models?limit={}", limit);
 
-std::expected<ModelsOutput, Err> GetModels::query_api(const int limit, const std::optional<std::string> &last_id)
-{
-    const std::string endpoint = build_url_(limit, last_id);
     curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());
     curl_easy_setopt(this->curl_, CURLOPT_HTTPGET, 1L);
 
@@ -97,10 +36,44 @@ std::expected<ModelsOutput, Err> GetModels::query_api(const int limit, const std
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return unpack_200_response_to_model_(response);
+        ModelsOutput output(response);
+        return output;
     }
 
     return std::unexpected(unpack_error(response));
+}
+
+void ModelsOutput::validate_schema_()
+{
+    if (not this->response_.contains("has_more")) {
+        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
+    }
+
+    if (not this->response_.contains("data")) {
+        throw std::runtime_error("Malformed models response. Missing 'data' key.");
+    }
+}
+
+ModelsOutput::ModelsOutput(const std::string &response)
+{
+    try {
+        this->response_ = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
+
+    this->validate_schema_();
+
+    this->raw_response = this->response_.dump(4);
+    this->has_more = this->response_["has_more"];
+
+    for (const auto &model: this->response_["data"]) {
+        if (model["type"] != "model") {
+            throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
+        }
+
+        this->models.push_back(Model { model["created_at"], model["display_name"], model["id"] });
+    }
 }
 
 } // namespace api
