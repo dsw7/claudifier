@@ -6,6 +6,7 @@
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -147,8 +148,8 @@ namespace commands {
 
 void command_chat(const int argc, char **argv)
 {
-    CreateMessage input;
-
+    std::string model;
+    int max_tokens = 1024;
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
@@ -169,16 +170,17 @@ void command_chat(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'm':
-                input.set_llm_model(optarg);
+                model = optarg;
                 break;
             case 'l':
-                input.set_max_tokens(utils::string_to_int(optarg));
+                max_tokens = utils::string_to_int(optarg);
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} chat [-h | --help] for more information", argv[0]));
         }
     };
 
+    CreateMessage input(max_tokens, 1.00f, model, std::nullopt);
     run_conversational_loop_(input);
 }
 

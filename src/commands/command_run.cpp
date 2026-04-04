@@ -18,6 +18,16 @@ using api::CreateMessage;
 using api::Err;
 using api::MessagesOutput;
 
+struct Parameters {
+    bool print_json = false;
+    bool print_raw_response = false;
+    float temperature = 1.0f;
+    int max_tokens = 1024;
+    std::string model;
+    std::string system_prompt;
+    std::string user_prompt;
+};
+
 void print_help_messages_()
 {
     const std::string messages = R"(Create a message according to a prompt. Messaging using the run
@@ -65,7 +75,7 @@ std::string select_prompt_()
     return prompt;
 }
 
-MessagesOutput create_message_(CreateMessage &input)
+MessagesOutput query_api_(CreateMessage &input)
 {
     threading::timer_enabled.store(true);
     std::thread timer(threading::time_api_call);
@@ -127,17 +137,34 @@ void print_output_to_stdout_json_(const MessagesOutput &output)
     fmt::print("{}\n", json_str);
 }
 
+void create_message_(const Parameters &params)
+{
+    CreateMessage input(params.max_tokens, params.temperature, params.model, params.system_prompt);
+
+    if (params.user_prompt.empty()) {
+        input.append_user_message(select_prompt_());
+    } else {
+        input.append_user_message(params.user_prompt);
+    }
+
+    const MessagesOutput output = query_api_(input);
+
+    if (params.print_raw_response) {
+        fmt::print("{}\n", output.raw_response);
+    } else if (params.print_json) {
+        print_output_to_stdout_json_(output);
+    } else {
+        print_output_to_stdout_(output);
+    }
+}
+
 } // namespace
 
 namespace commands {
 
 void command_run(const int argc, char **argv)
 {
-    CreateMessage input;
-    std::string prompt;
-
-    bool print_raw_response = false;
-    bool print_json = false;
+    Parameters params;
 
     while (true) {
         static struct option long_options[] = {
@@ -164,46 +191,32 @@ void command_run(const int argc, char **argv)
                 print_help_messages_();
                 exit(EXIT_SUCCESS);
             case 'm':
-                input.set_llm_model(optarg);
+                params.model = optarg;
                 break;
             case 'p':
-                prompt = optarg;
+                params.user_prompt = optarg;
                 break;
             case 'l':
-                input.set_max_tokens(utils::string_to_int(optarg));
+                params.max_tokens = utils::string_to_int(optarg);
                 break;
             case 'r':
-                print_raw_response = true;
+                params.print_raw_response = true;
                 break;
             case 's':
-                input.set_system_prompt(optarg);
+                params.system_prompt = optarg;
                 break;
             case 't':
-                input.set_temperature(utils::string_to_float(optarg));
+                params.temperature = utils::string_to_float(optarg);
                 break;
             case 'j':
-                print_json = true;
+                params.print_json = true;
                 break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
     };
 
-    if (prompt.empty()) {
-        input.append_user_message(select_prompt_());
-    } else {
-        input.append_user_message(prompt);
-    }
-
-    const MessagesOutput output = create_message_(input);
-
-    if (print_raw_response) {
-        fmt::print("{}\n", output.raw_response);
-    } else if (print_json) {
-        print_output_to_stdout_json_(output);
-    } else {
-        print_output_to_stdout_(output);
-    }
+    create_message_(params);
 }
 
 } // namespace commands
