@@ -3,46 +3,7 @@
 #include "errors.hpp"
 
 #include <fmt/core.h>
-#include <json.hpp>
 #include <stdexcept>
-
-namespace {
-
-api::ModelsOutput unpack_200_response_to_model_(const std::string &response)
-{
-    nlohmann::json json;
-
-    try {
-        json = nlohmann::json::parse(response);
-    } catch (const nlohmann::json::parse_error &e) {
-        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
-    }
-
-    api::ModelsOutput ok;
-    ok.raw_response = json.dump(4);
-
-    if (json.contains("has_more")) {
-        ok.has_more = json["has_more"];
-    } else {
-        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
-    }
-
-    if (not json.contains("data")) {
-        throw std::runtime_error("Malformed models response. Missing 'data' key.");
-    }
-
-    for (const auto &item: json["data"]) {
-        if (item["type"] != "model") {
-            throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
-        }
-
-        ok.data.push_back(api::ModelData { item["created_at"], item["display_name"], item["id"] });
-    }
-
-    return ok;
-}
-
-} // namespace
 
 namespace api {
 
@@ -75,10 +36,44 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_status_code);
 
     if (http_status_code == 200) {
-        return unpack_200_response_to_model_(response);
+        ModelsOutput output(response);
+        return output;
     }
 
     return std::unexpected(unpack_error(response));
+}
+
+void ModelsOutput::validate_schema_()
+{
+    if (not this->response_.contains("has_more")) {
+        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
+    }
+
+    if (not this->response_.contains("data")) {
+        throw std::runtime_error("Malformed models response. Missing 'data' key.");
+    }
+}
+
+ModelsOutput::ModelsOutput(const std::string &response)
+{
+    try {
+        this->response_ = nlohmann::json::parse(response);
+    } catch (const nlohmann::json::parse_error &e) {
+        throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
+    }
+
+    this->validate_schema_();
+
+    this->raw_response = this->response_.dump(4);
+    this->has_more = this->response_["has_more"];
+
+    for (const auto &model: this->response_["data"]) {
+        if (model["type"] != "model") {
+            throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
+        }
+
+        this->data.push_back(api::ModelData { model["created_at"], model["display_name"], model["id"] });
+    }
 }
 
 } // namespace api

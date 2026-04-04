@@ -4,6 +4,7 @@
 #include "errors.hpp"
 
 #include <expected>
+#include <json.hpp>
 #include <string>
 #include <vector>
 
@@ -15,10 +16,17 @@ struct ModelData {
     std::string id;
 };
 
-struct ModelsOutput {
+class ModelsOutput {
+public:
+    ModelsOutput(const std::string &response);
+
     bool has_more = false;
     std::string raw_response;
     std::vector<ModelData> data;
+
+private:
+    nlohmann::json response_;
+    void validate_schema_();
 };
 
 class GetModels: public CurlBase {
