@@ -99,7 +99,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api()
         return output;
     }
 
-    return std::unexpected(unpack_error(response));
+    return std::unexpected(Err(response));
 }
 
 void MessagesOutput::validate_schema_()

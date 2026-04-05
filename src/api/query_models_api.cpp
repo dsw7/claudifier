@@ -38,7 +38,7 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
         return output;
     }
 
-    return std::unexpected(unpack_error(response));
+    return std::unexpected(Err(response));
 }
 
 void ModelsOutput::validate_schema_()

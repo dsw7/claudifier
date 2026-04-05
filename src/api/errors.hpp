@@ -17,5 +17,4 @@ private:
     void validate_schema_();
 };
 
-Err unpack_error(const std::string &response);
 } // namespace api
