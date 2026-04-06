@@ -1,6 +1,7 @@
 #include "command_costs.hpp"
 
 #include "query_costs_api.hpp"
+#include "utils.hpp"
 
 #include <expected>
 #include <fmt/core.h>
@@ -23,6 +24,7 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
+  -d, --days=DAYS                Show usages DAYS numbers of days back
   -j, --json                     Export cost report as JSON
 )";
 
@@ -36,16 +38,18 @@ namespace commands {
 void command_costs(const int argc, char **argv)
 {
     bool dump_json = false;
+    int days = 30;
 
     while (true) {
         static struct option long_options[] = {
             { "help", no_argument, 0, 'h' },
             { "json", no_argument, 0, 'j' },
+            { "days", required_argument, 0, 'd' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hj", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hjd:", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -58,13 +62,16 @@ void command_costs(const int argc, char **argv)
             case 'j':
                 dump_json = true;
                 break;
+            case 'd':
+                days = utils::string_to_int(optarg);
+                break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} costs [-h | --help] for more information", argv[0]));
         }
     };
 
     GetCosts api_handle;
-    const std::expected<CostReport, Err> output = api_handle.query_api();
+    const std::expected<CostReport, Err> output = api_handle.query_api(days);
 
     if (not output) {
         throw std::runtime_error(
