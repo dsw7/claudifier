@@ -24,7 +24,6 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
     std::string response;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
 
-    this->is_200_response_();
     const CURLcode code = curl_easy_perform(this->curl_);
 
     curl_slist_free_all(headers);
