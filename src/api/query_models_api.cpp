@@ -1,7 +1,6 @@
 #include "query_models_api.hpp"
 
 #include "api_keys.hpp"
-#include "errors.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
