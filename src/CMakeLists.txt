@@ -36,6 +36,7 @@ set(SRC_FILES
   api/api_keys.cpp
   api/curl_base.cpp
   api/errors.cpp
+  api/query_costs_api.cpp
   api/query_messages_api.cpp
   api/query_models_api.cpp
   commands/command_chat.cpp
