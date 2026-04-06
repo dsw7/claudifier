@@ -38,6 +38,7 @@ set(SRC_FILES
   api/query_messages_api.cpp
   api/query_models_api.cpp
   commands/command_chat.cpp
+  commands/command_costs.cpp
   commands/command_models.cpp
   commands/command_run.cpp
   commands/command_test.cpp
