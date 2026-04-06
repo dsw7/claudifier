@@ -20,7 +20,7 @@ std::string get_rfc_3339_timestamp_(const int days)
 
     // format to RFC 3339
     std::ostringstream oss;
-    oss << std::put_time(gmt_time, "%Y-%m-%dT%H:%M:%SZ");
+    oss << std::put_time(gmt_time, "%Y-%m-%dT00:00:00Z");
     return oss.str();
 }
 
