@@ -1,0 +1,29 @@
+#include "api_keys.hpp"
+
+#include <cstdlib>
+#include <stdexcept>
+
+namespace {
+
+std::string load_user_api_key_()
+{
+    const char *api_key = std::getenv("ANTHROPIC_API_KEY");
+
+    if (api_key == nullptr) {
+        throw std::runtime_error("Environment variable ANTHROPIC_API_KEY not found.");
+    }
+
+    return std::string(api_key);
+}
+
+} // namespace
+
+namespace api {
+
+std::string get_user_api_key()
+{
+    static std::string api_key = load_user_api_key_();
+    return api_key;
+}
+
+} // namespace api
