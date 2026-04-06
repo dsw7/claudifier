@@ -1,10 +1,17 @@
 #include "command_costs.hpp"
 
+#include "query_costs_api.hpp"
+
+#include <expected>
 #include <fmt/core.h>
 #include <getopt.h>
 #include <stdexcept>
 
 namespace {
+
+using api::CostReport;
+using api::Err;
+using api::GetCosts;
 
 void print_help_messages_()
 {
@@ -56,8 +63,16 @@ void command_costs(const int argc, char **argv)
         }
     };
 
+    GetCosts api_handle;
+    const std::expected<CostReport, Err> output = api_handle.query_api();
+
+    if (not output) {
+        throw std::runtime_error(
+            fmt::format("An error occurred when getting cost report: '{}'", output.error().errmsg));
+    }
+
     if (dump_json) {
-    } else {
+        fmt::print("{}\n", output->raw_response);
     }
 }
 
