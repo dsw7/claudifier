@@ -27,4 +27,10 @@ std::string get_user_api_key()
     return api_key;
 }
 
+std::string get_admin_api_key()
+{
+    static std::string api_key = load_api_key_("ANTHROPIC_ADMIN_API_KEY");
+    return api_key;
+}
+
 } // namespace api
