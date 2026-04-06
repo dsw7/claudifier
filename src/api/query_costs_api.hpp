@@ -23,7 +23,7 @@ private:
 
 class GetCosts: public CurlBase {
 public:
-    std::expected<CostReport, Err> query_api();
+    std::expected<CostReport, Err> query_api(const int days);
 };
 
 } // namespace api
