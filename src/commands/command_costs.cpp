@@ -3,6 +3,7 @@
 #include "query_costs_api.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
 #include <expected>
 #include <fmt/core.h>
 #include <getopt.h>
@@ -69,6 +70,8 @@ void command_costs(const int argc, char **argv)
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} costs [-h | --help] for more information", argv[0]));
         }
     };
+
+    days = std::clamp(days, 1, 60);
 
     GetCosts api_handle;
     const std::expected<CostReport, Err> output = api_handle.query_api(days);
