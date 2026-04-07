@@ -32,6 +32,13 @@ Options:
     fmt::print("{}\n", messages);
 }
 
+void print_costs_(const CostReport &report)
+{
+    for (const auto &bucket: report.get_cost_buckets()) {
+        fmt::print("{} {} {}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
+    }
+}
+
 } // namespace
 
 namespace commands {
@@ -83,6 +90,8 @@ void command_costs(const int argc, char **argv)
 
     if (dump_json) {
         fmt::print("{}\n", output->raw_response);
+    } else {
+        print_costs_(*output);
     }
 }
 
