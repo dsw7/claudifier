@@ -38,8 +38,21 @@ void print_costs_(const CostReport &report)
     fmt::print("{:<25}{:<25}{}\n", "Starting at", "Ending at", "Cost (cents)");
     fmt::print("{:<25}{:<25}{}\n", "--------------------", "--------------------", "------------");
 
+    float total_cost_cents = 0.0f;
+    int num_days = 0;
+
     for (const auto &bucket: report.get_cost_buckets()) {
         fmt::print("{:<25}{:<25}{}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
+
+        if (bucket.amount != "-") {
+            total_cost_cents += utils::string_to_float(bucket.amount);
+        }
+        num_days++;
+    }
+
+    const float total_cost_dollars = total_cost_cents / 100.0f;
+    if (num_days > 1) {
+        fmt::print("\nOverall usage (USD): ${} over {} days\n", total_cost_dollars, num_days);
     }
 }
 
