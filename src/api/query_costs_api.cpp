@@ -36,7 +36,24 @@ CostReport::CostReport(const std::string &response)
         throw std::runtime_error(fmt::format("Failed to parse response: {}", e.what()));
     }
 
+    this->validate_schema_();
+
     this->raw_response = this->response_.dump(4);
+}
+
+void CostReport::validate_schema_()
+{
+    if (not this->response_.contains("data")) {
+        throw std::runtime_error("Malformed models response. Missing 'data' key.");
+    }
+
+    if (not this->response_.contains("has_more")) {
+        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
+    }
+
+    if (not this->response_.contains("next_page")) {
+        throw std::runtime_error("Malformed models response. Missing 'next_page' key.");
+    }
 }
 
 std::expected<CostReport, Err> GetCosts::query_api(const int days)
