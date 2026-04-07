@@ -1,4 +1,5 @@
 #include "command_chat.hpp"
+#include "command_costs.hpp"
 #include "command_models.hpp"
 #include "command_run.hpp"
 #include "command_test.hpp"
@@ -33,6 +34,9 @@ Commands:
   run            Run a stateless query against an appropriate model
   models         Get list of available models
   chat           Participate in a stateful conversation with an appropriate model
+
+Administrative commands:
+  costs          Get cost report
 
 Try 'claudifier <subcommand> [-h | --help]' for subcommand specific help.
 )";
@@ -81,6 +85,8 @@ void run_command(const int argc, char **argv, const std::string &command)
         commands::command_models(argc, argv);
     } else if (command == "chat") {
         commands::command_chat(argc, argv);
+    } else if (command == "costs") {
+        commands::command_costs(argc, argv);
     } else if (command == "test") {
         commands::command_test(argc, argv);
     } else {

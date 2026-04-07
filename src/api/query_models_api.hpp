@@ -21,7 +21,6 @@ public:
     ModelsOutput(const std::string &response);
 
     bool has_more = false;
-    std::string raw_response;
     std::vector<Model> models;
 
 private:

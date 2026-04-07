@@ -33,11 +33,14 @@ add_compile_definitions(
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 set(SRC_FILES
+  api/api_keys.cpp
   api/curl_base.cpp
   api/errors.cpp
+  api/query_costs_api.cpp
   api/query_messages_api.cpp
   api/query_models_api.cpp
   commands/command_chat.cpp
+  commands/command_costs.cpp
   commands/command_models.cpp
   commands/command_run.cpp
   commands/command_test.cpp

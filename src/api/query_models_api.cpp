@@ -1,6 +1,6 @@
 #include "query_models_api.hpp"
 
-#include "errors.hpp"
+#include "api_keys.hpp"
 
 #include <fmt/core.h>
 #include <stdexcept>
@@ -16,14 +16,13 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
     curl_easy_setopt(this->curl_, CURLOPT_HTTPGET, 1L);
 
     curl_slist *headers = nullptr;
-    headers = curl_slist_append(headers, ("X-Api-Key: " + this->user_api_key_).c_str());
+    headers = curl_slist_append(headers, ("X-Api-Key: " + get_user_api_key()).c_str());
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
 
     std::string response;
     curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &response);
 
-    this->is_200_response_();
     const CURLcode code = curl_easy_perform(this->curl_);
 
     curl_slist_free_all(headers);
@@ -43,12 +42,12 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
 
 void ModelsOutput::validate_schema_()
 {
-    if (not this->response_.contains("has_more")) {
-        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
-    }
-
     if (not this->response_.contains("data")) {
         throw std::runtime_error("Malformed models response. Missing 'data' key.");
+    }
+
+    if (not this->response_.contains("has_more")) {
+        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
     }
 }
 
@@ -62,7 +61,6 @@ ModelsOutput::ModelsOutput(const std::string &response)
 
     this->validate_schema_();
 
-    this->raw_response = this->response_.dump(4);
     this->has_more = this->response_["has_more"];
 
     for (const auto &model: this->response_["data"]) {
@@ -70,7 +68,7 @@ ModelsOutput::ModelsOutput(const std::string &response)
             throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
         }
 
-        this->models.push_back(Model { model["created_at"], model["display_name"], model["id"] });
+        this->models.emplace_back(model["created_at"], model["display_name"], model["id"]);
     }
 }
 

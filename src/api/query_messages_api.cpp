@@ -1,5 +1,6 @@
 #include "query_messages_api.hpp"
 
+#include "api_keys.hpp"
 #include "errors.hpp"
 
 #include <algorithm>
@@ -63,7 +64,7 @@ std::expected<MessagesOutput, Err> CreateMessage::query_api()
     curl_easy_setopt(this->curl_, CURLOPT_POST, 1L);
 
     curl_slist *headers = nullptr;
-    headers = curl_slist_append(headers, ("X-Api-Key: " + this->user_api_key_).c_str());
+    headers = curl_slist_append(headers, ("X-Api-Key: " + get_user_api_key()).c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "anthropic-version: 2023-06-01");
     curl_easy_setopt(this->curl_, CURLOPT_HTTPHEADER, headers);
