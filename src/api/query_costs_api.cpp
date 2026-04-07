@@ -68,8 +68,9 @@ std::vector<CostBucket> CostReport::get_cost_buckets() const
 
 std::expected<CostReport, Err> GetCosts::query_api(const int days)
 {
+    static int limit = 31;
     const std::string starting_at = get_rfc_3339_timestamp_(days);
-    const std::string endpoint = fmt::format("https://api.anthropic.com/v1/organizations/cost_report?starting_at={}", starting_at);
+    const std::string endpoint = fmt::format("https://api.anthropic.com/v1/organizations/cost_report?starting_at={}&limit={}", starting_at, limit);
     curl_easy_setopt(this->curl_, CURLOPT_URL, endpoint.c_str());
     curl_easy_setopt(this->curl_, CURLOPT_HTTPGET, 1L);
 

@@ -25,7 +25,8 @@ Usage:
 
 Options:
   -h, --help                     Print help information and exit
-  -d, --days=DAYS                Show usages DAYS numbers of days back
+  -d, --days=DAYS                Show usages DAYS numbers of days back. Value
+                                 is clamped between 1 and 30 days
   -j, --json                     Export cost report as JSON
 )";
 
@@ -78,7 +79,7 @@ void command_costs(const int argc, char **argv)
         }
     };
 
-    days = std::clamp(days, 1, 60);
+    days = std::clamp(days, 1, 30);
 
     GetCosts api_handle;
     const std::expected<CostReport, Err> output = api_handle.query_api(days);
