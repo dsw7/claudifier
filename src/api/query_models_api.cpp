@@ -68,7 +68,7 @@ ModelsOutput::ModelsOutput(const std::string &response)
             throw std::runtime_error("Malformed models response. Object in 'data' array is not a model.");
         }
 
-        this->models.push_back(Model { model["created_at"], model["display_name"], model["id"] });
+        this->models.emplace_back(model["created_at"], model["display_name"], model["id"]);
     }
 }
 
