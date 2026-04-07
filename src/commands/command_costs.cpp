@@ -35,8 +35,11 @@ Options:
 
 void print_costs_(const CostReport &report)
 {
+    fmt::print("{:<25}{:<25}{}\n", "Starting at", "Ending at", "Cost (cents)");
+    fmt::print("{:<25}{:<25}{}\n", "--------------------", "--------------------", "------------");
+
     for (const auto &bucket: report.get_cost_buckets()) {
-        fmt::print("{} {} {}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
+        fmt::print("{:<25}{:<25}{}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
     }
 }
 
