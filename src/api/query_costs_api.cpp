@@ -60,7 +60,11 @@ std::vector<CostBucket> CostReport::get_cost_buckets() const
     std::vector<CostBucket> buckets;
 
     for (const auto &d: this->response_["data"]) {
-        buckets.emplace_back(d["results"][0]["amount"], d["starting_at"], d["ending_at"]);
+        if (d["results"].empty()) {
+            buckets.emplace_back(d["starting_at"], d["ending_at"], "-");
+        } else {
+            buckets.emplace_back(d["starting_at"], d["ending_at"], d["results"][0]["amount"]);
+        }
     }
 
     return buckets;
