@@ -42,12 +42,12 @@ std::expected<ModelsOutput, Err> GetModels::query_api()
 
 void ModelsOutput::validate_schema_()
 {
-    if (not this->response_.contains("has_more")) {
-        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
-    }
-
     if (not this->response_.contains("data")) {
         throw std::runtime_error("Malformed models response. Missing 'data' key.");
+    }
+
+    if (not this->response_.contains("has_more")) {
+        throw std::runtime_error("Malformed models response. Missing 'has_more' key.");
     }
 }
 
@@ -61,7 +61,6 @@ ModelsOutput::ModelsOutput(const std::string &response)
 
     this->validate_schema_();
 
-    this->raw_response = this->response_.dump(4);
     this->has_more = this->response_["has_more"];
 
     for (const auto &model: this->response_["data"]) {
