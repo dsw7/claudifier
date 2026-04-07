@@ -37,7 +37,6 @@ CostReport::CostReport(const std::string &response)
     }
 
     this->validate_schema_();
-
     this->raw_response = this->response_.dump(4);
 }
 
@@ -54,6 +53,17 @@ void CostReport::validate_schema_()
     if (not this->response_.contains("next_page")) {
         throw std::runtime_error("Malformed models response. Missing 'next_page' key.");
     }
+}
+
+std::vector<CostBucket> CostReport::get_cost_buckets() const
+{
+    std::vector<CostBucket> buckets;
+
+    for (const auto &d: this->response_["data"]) {
+        buckets.emplace_back(d["results"][0]["amount"], d["starting_at"], d["ending_at"]);
+    }
+
+    return buckets;
 }
 
 std::expected<CostReport, Err> GetCosts::query_api(const int days)
