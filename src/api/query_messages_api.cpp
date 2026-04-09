@@ -53,9 +53,19 @@ void CreateMessage::append_assistant_message(const std::string &content)
     this->conversation_.push_back({ { "role", "assistant" }, { "content", content } });
 }
 
+void CreateMessage::clear_conversation()
+{
+    this->conversation_.clear();
+}
+
 nlohmann::json CreateMessage::get_conversation() const
 {
     return this->conversation_;
+}
+
+std::string CreateMessage::get_model() const
+{
+    return this->model_;
 }
 
 std::expected<MessagesOutput, Err> CreateMessage::query_api()
