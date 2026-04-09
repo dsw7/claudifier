@@ -6,6 +6,7 @@
 #include <fmt/core.h>
 #include <getopt.h>
 #include <iostream>
+#include <json.hpp>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -41,11 +42,22 @@ void print_special_commands_()
 {
     fmt::print("Commands:\n  [");
     fmt::print(fg(colors::green), "q, x");
-    fmt::print("]: Quit the current chat session\n  [");
+    fmt::print("]: Quit the current chat session.\n  [");
+    fmt::print(fg(colors::green), "i");
+    fmt::print("]: Print conversational turn history.\n  [");
     fmt::print(fg(colors::green), "c");
-    fmt::print("]: Clear existing conversation history\n  [");
+    fmt::print("]: Clear existing conversational turns.\n  [");
     fmt::print(fg(colors::green), "?");
-    fmt::print("]: Print this list of commands\n\n");
+    fmt::print("]: Print this list of commands.\n\n");
+}
+
+void print_conversation_(const nlohmann::json &conversation)
+{
+    if (conversation.empty()) {
+        fmt::print("No conversational turns.\n");
+    } else {
+        fmt::print("{}\n", conversation.dump(4));
+    }
 }
 
 void print_output_to_stdout_(const MessagesOutput &output)
@@ -100,6 +112,9 @@ void run_conversational_loop_(CreateMessage &input, const bool show_usages)
                 break;
             } else if (message == "c") {
                 input.clear_conversation();
+                continue;
+            } else if (message == "i") {
+                print_conversation_(input.get_conversation());
                 continue;
             } else if (message == "?") {
                 print_special_commands_();
