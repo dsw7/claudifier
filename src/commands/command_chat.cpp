@@ -39,9 +39,9 @@ Options:
 
 void print_special_commands_()
 {
-    fmt::print("Commands:\n [");
-    fmt::print(fg(colors::green), "q");
-    fmt::print("]: Quit the current chat session\n [");
+    fmt::print("Commands:\n  [");
+    fmt::print(fg(colors::green), "q, x");
+    fmt::print("]: Quit the current chat session\n  [");
     fmt::print(fg(colors::green), "?");
     fmt::print("]: Print this list of commands\n\n");
 }
@@ -58,7 +58,7 @@ LoopControl parse_special_command_(const std::string &special_command)
         return LoopControl::PROCEED;
     }
 
-    if (special_command == "q") {
+    if (special_command == "q" or special_command == "x") {
         return LoopControl::BREAK;
     }
 
@@ -114,7 +114,7 @@ void run_conversational_loop_(CreateMessage &input, const bool show_usages)
     MessagesOutput output;
     LoopControl loop_controller;
 
-    fmt::print("Claudifier v{} | ({})\n", PROJECT_VERSION, BUILD_DATE_SHORT);
+    fmt::print("Claudifier v{} | ({})\n\n", PROJECT_VERSION, BUILD_DATE_SHORT);
     print_special_commands_();
 
     while (true) {
