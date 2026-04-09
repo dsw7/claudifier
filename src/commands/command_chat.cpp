@@ -31,6 +31,7 @@ Options:
   -l, --limit=LIMIT              Specify token limit
   -t, --temperature              Specify how random the response will be.
                                  The temperature is clamped between 0.0 and 1.0
+  -u, --show-usages              Show net token usage per transaction
 )";
 
     fmt::print("{}\n", messages);
@@ -38,13 +39,11 @@ Options:
 
 void print_special_commands_()
 {
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Commands: \n");
-    fmt::print("[");
+    fmt::print("Commands:\n [");
     fmt::print(fg(colors::green), "q");
-    fmt::print("]: Quit the current chat session\n[");
+    fmt::print("]: Quit the current chat session\n [");
     fmt::print(fg(colors::green), "?");
-    fmt::print("]: Print this list of commands\n");
+    fmt::print("]: Print this list of commands\n\n");
 }
 
 enum class LoopControl {
@@ -60,7 +59,6 @@ LoopControl parse_special_command_(const std::string &special_command)
     }
 
     if (special_command == "q") {
-        fmt::print("Aborting conversation.\n");
         return LoopControl::BREAK;
     }
 
@@ -75,14 +73,11 @@ LoopControl parse_special_command_(const std::string &special_command)
 
 void print_output_to_stdout_(const MessagesOutput &output)
 {
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(colors::green), "{}\n", output.get_latest_text());
+    fmt::print(fg(colors::green), "{}\n\n", output.get_latest_text());
 }
 
 void print_usage_to_stdout_(const MessagesOutput &output)
 {
-    utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage: \n");
     fmt::print("Input tokens: {}\n", output.input_tokens);
     fmt::print("Output tokens: {}\n", output.output_tokens);
@@ -114,17 +109,16 @@ MessagesOutput run_query_(CreateMessage &input)
     throw std::runtime_error(fmt::format("An error occurred when creating message: '{}'", output.error().errmsg));
 }
 
-void run_conversational_loop_(CreateMessage &input)
+void run_conversational_loop_(CreateMessage &input, const bool show_usages)
 {
     MessagesOutput output;
     LoopControl loop_controller;
 
+    fmt::print("Claudifier v{} | ({})\n", PROJECT_VERSION, BUILD_DATE_SHORT);
     print_special_commands_();
 
     while (true) {
-        utils::print_line();
         const std::string message = utils::read_input_from_stdin();
-
         loop_controller = parse_special_command_(message);
 
         if (loop_controller == LoopControl::BREAK) {
@@ -136,7 +130,11 @@ void run_conversational_loop_(CreateMessage &input)
         input.append_user_message(message);
         output = run_query_(input);
         print_output_to_stdout_(output);
-        print_usage_to_stdout_(output);
+
+        if (show_usages) {
+            print_usage_to_stdout_(output);
+        }
+
         if (break_conversation_on_condition_(output)) {
             break;
         }
@@ -153,6 +151,7 @@ void command_chat(const int argc, char **argv)
     float temperature = 1.0f;
     int max_tokens = 1024;
     std::string model = "claude-3-haiku-20240307";
+    bool show_usages = false;
 
     while (true) {
         static struct option long_options[] = {
@@ -160,11 +159,12 @@ void command_chat(const int argc, char **argv)
             { "model", required_argument, 0, 'm' },
             { "limit", required_argument, 0, 'l' },
             { "temperature", required_argument, 0, 't' },
+            { "show-usages", no_argument, 0, 'u' },
             { 0, 0, 0, 0 },
         };
 
         int option_index = 0;
-        const int c = getopt_long(argc, argv, "hm:l:t:", long_options, &option_index);
+        const int c = getopt_long(argc, argv, "hm:l:t:u", long_options, &option_index);
 
         if (c == -1) {
             break;
@@ -183,13 +183,16 @@ void command_chat(const int argc, char **argv)
             case 't':
                 temperature = utils::string_to_float(optarg);
                 break;
+            case 'u':
+                show_usages = true;
+                break;
             default:
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} chat [-h | --help] for more information", argv[0]));
         }
     };
 
     CreateMessage input(max_tokens, temperature, model);
-    run_conversational_loop_(input);
+    run_conversational_loop_(input, show_usages);
 }
 
 } // namespace commands

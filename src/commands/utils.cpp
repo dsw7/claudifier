@@ -44,12 +44,10 @@ std::string read_input_from_stdin()
 {
     std::string input;
     while (true) {
-        fmt::print(fmt::emphasis::bold, "Input: ");
+        fmt::print(">>> ");
         std::getline(std::cin, input);
 
-        if (input.empty()) {
-            fmt::print("Input is empty. Try again.\n");
-        } else {
+        if (not input.empty()) {
             break;
         }
     }
