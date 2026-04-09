@@ -75,14 +75,11 @@ LoopControl parse_special_command_(const std::string &special_command)
 
 void print_output_to_stdout_(const MessagesOutput &output)
 {
-    utils::print_line();
-    fmt::print(fmt::emphasis::bold, "Output: ");
-    fmt::print(fg(colors::green), "{}\n", output.get_latest_text());
+    fmt::print(fg(colors::green), "{}\n\n", output.get_latest_text());
 }
 
 void print_usage_to_stdout_(const MessagesOutput &output)
 {
-    utils::print_line();
     fmt::print(fmt::emphasis::bold, "Usage: \n");
     fmt::print("Input tokens: {}\n", output.input_tokens);
     fmt::print("Output tokens: {}\n", output.output_tokens);
@@ -122,9 +119,7 @@ void run_conversational_loop_(CreateMessage &input)
     print_special_commands_();
 
     while (true) {
-        utils::print_line();
         const std::string message = utils::read_input_from_stdin();
-
         loop_controller = parse_special_command_(message);
 
         if (loop_controller == LoopControl::BREAK) {
