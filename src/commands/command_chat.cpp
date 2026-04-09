@@ -46,31 +46,6 @@ void print_special_commands_()
     fmt::print("]: Print this list of commands\n\n");
 }
 
-enum class LoopControl {
-    BREAK,
-    CONTINUE,
-    PROCEED,
-};
-
-LoopControl parse_special_command_(const std::string &special_command)
-{
-    if (special_command.size() != 1) {
-        return LoopControl::PROCEED;
-    }
-
-    if (special_command == "q" or special_command == "x") {
-        return LoopControl::BREAK;
-    }
-
-    if (special_command == "?") {
-        print_special_commands_();
-        return LoopControl::CONTINUE;
-    }
-
-    fmt::print("Received invalid command: '{}'\n", special_command);
-    return LoopControl::CONTINUE;
-}
-
 void print_output_to_stdout_(const MessagesOutput &output)
 {
     fmt::print(fg(colors::green), "{}\n\n", output.get_latest_text());
@@ -112,19 +87,22 @@ MessagesOutput run_query_(CreateMessage &input)
 void run_conversational_loop_(CreateMessage &input, const bool show_usages)
 {
     MessagesOutput output;
-    LoopControl loop_controller;
-
     fmt::print("Claudifier v{} | ({})\n\n", PROJECT_VERSION, BUILD_DATE_SHORT);
     print_special_commands_();
 
     while (true) {
         const std::string message = utils::read_input_from_stdin();
-        loop_controller = parse_special_command_(message);
 
-        if (loop_controller == LoopControl::BREAK) {
-            break;
-        } else if (loop_controller == LoopControl::CONTINUE) {
-            continue;
+        if (message.size() == 1) {
+            if (message == "q" or message == "x") {
+                break;
+            } else if (message == "?") {
+                print_special_commands_();
+                continue;
+            } else {
+                fmt::print("Received invalid command: '{}'\n", message);
+                continue;
+            }
         }
 
         input.append_user_message(message);
@@ -138,6 +116,7 @@ void run_conversational_loop_(CreateMessage &input, const bool show_usages)
         if (break_conversation_on_condition_(output)) {
             break;
         }
+
         input.append_assistant_message(output.get_latest_text());
     }
 }
