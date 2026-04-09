@@ -42,6 +42,8 @@ void print_special_commands_()
     fmt::print("Commands:\n  [");
     fmt::print(fg(colors::green), "q, x");
     fmt::print("]: Quit the current chat session\n  [");
+    fmt::print(fg(colors::green), "c");
+    fmt::print("]: Clear existing conversation history\n  [");
     fmt::print(fg(colors::green), "?");
     fmt::print("]: Print this list of commands\n\n");
 }
@@ -96,6 +98,9 @@ void run_conversational_loop_(CreateMessage &input, const bool show_usages)
         if (message.size() == 1) {
             if (message == "q" or message == "x") {
                 break;
+            } else if (message == "c") {
+                input.clear_conversation();
+                continue;
             } else if (message == "?") {
                 print_special_commands_();
                 continue;
