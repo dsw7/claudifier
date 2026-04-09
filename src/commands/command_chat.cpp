@@ -101,7 +101,7 @@ MessagesOutput run_query_(CreateMessage &input)
 void run_conversational_loop_(CreateMessage &input, const bool show_usages)
 {
     MessagesOutput output;
-    fmt::print("Claudifier v{} | ({})\n\n", PROJECT_VERSION, BUILD_DATE_SHORT);
+    fmt::print("Claudifier v{} ({}) | Model: {}\n\n", PROJECT_VERSION, BUILD_DATE_SHORT, input.get_model());
     print_special_commands_();
 
     while (true) {

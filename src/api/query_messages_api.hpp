@@ -39,6 +39,7 @@ public:
     void append_assistant_message(const std::string &content);
     void clear_conversation();
     nlohmann::json get_conversation() const;
+    std::string get_model() const;
     std::expected<MessagesOutput, Err> query_api();
 
 private:

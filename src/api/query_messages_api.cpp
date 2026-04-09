@@ -63,6 +63,11 @@ nlohmann::json CreateMessage::get_conversation() const
     return this->conversation_;
 }
 
+std::string CreateMessage::get_model() const
+{
+    return this->model_;
+}
+
 std::expected<MessagesOutput, Err> CreateMessage::query_api()
 {
     curl_easy_setopt(this->curl_, CURLOPT_URL, "https://api.anthropic.com/v1/messages");
