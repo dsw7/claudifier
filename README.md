@@ -11,7 +11,8 @@ is tested on Ubuntu/Debian and macOS.
 
 **Please note that I built this purely because I wanted a program with a very
 small binary footprint. Anthropic already provides numerous CLI tools for
-interacting with its API.**
+interacting with its API. Please use those - they are probably better than mine
+:)**
 
 ## Table of Contents
 - [Installation](#installation)
