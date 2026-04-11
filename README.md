@@ -77,6 +77,22 @@ If so, try running `claudifier` in a new terminal window.
 ## Usage
 
 ### The `run` command
+Create a message from a prompt. **This command is stateless.** The program will
+read in a prompt interactively by default:
+```console
+claudifier run
+```
+A prompt can instead be provided via command line argument:
+```console
+claudifier run --prompt="Why are oranges orange?"
+```
+A file named `Inputfile` can also be used to read long, multiline prompts. If
+`claudifier` finds the file in the current working directory, it will
+automatically read the prompt from this file. The help messages provide
+additional useful options:
+```console
+claudifier run --help
+```
 
 ### The `chat` command
 
