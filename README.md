@@ -15,6 +15,12 @@ interacting with its API.**
 
 ## Table of Contents
 - [Installation](#installation)
+- [Usage](#usage)
+  - [The `run` command](#the-run-command)
+  - [The `models` command](#the-models-command)
+  - [The `chat` command](#the-chat-command)
+- [Administration](#administration)
+  - [The `costs` command](#the-costs-command)
 - [Uninstall Claudifier](#uninstall-claudifier)
 - [License](#license)
 
@@ -67,6 +73,18 @@ some variation of:
 -bash: claudifier: command not found
 ```
 If so, try running `claudifier` in a new terminal window.
+
+## Usage
+
+### The `run` command
+
+### The `chat` command
+
+### The `models` command
+
+## Administration
+
+### The `costs` command
 
 ## Uninstall Claudifier
 Verify that the `claudifier` command in your `$PATH` is the Claudifier binary
