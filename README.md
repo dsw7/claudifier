@@ -110,6 +110,9 @@ This command will also expose several subcommands. For example, one can type
 can be used to clear context in order to switch topics and save on tokens.
 
 ### The `models` command
+The `models` command can be used to print all available Anthropic models. The
+model ID column can be used to specify models to be passed via the `--model` or
+`-m` options for the `chat` and `run` commands.
 
 ## Administration
 
