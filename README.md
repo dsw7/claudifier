@@ -95,6 +95,19 @@ claudifier run --help
 ```
 
 ### The `chat` command
+Participate in an interactive, multi-turn conversation with an Anthropic LLM.
+**This command is stateful.** This command will use more tokens owing to the
+stateful nature of a multi-turn conversation. To use this command, run:
+```console
+claudifier chat
+```
+Or just:
+```console
+claudifier
+```
+This command will also expose several subcommands. For example, one can type
+`i` at any time to inspect the existing conversational turns. The `c` command
+can be used to clear context in order to switch topics and save on tokens.
 
 ### The `models` command
 
