@@ -115,8 +115,18 @@ model ID column can be used to specify models to be passed via the `--model` or
 `-m` options for the `chat` and `run` commands.
 
 ## Administration
+> [!NOTE]
+> The commands in this section assume that a valid `ANTHROPIC_ADMIN_API_KEY` is
+> set as an environment variable.
 
 ### The `costs` command
+The `costs` command can be used to determine overall monetary usage of
+Anthropic resources over a specified number of days. For example:
+```console
+claudifier costs --days=5
+```
+Will return the usage per day over the past 5 days and the overall usage over
+the 5 days.
 
 ## Uninstall Claudifier
 Verify that the `claudifier` command in your `$PATH` is the Claudifier binary
