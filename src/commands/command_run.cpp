@@ -22,11 +22,11 @@ using api::MessagesOutput;
 struct Parameters {
     bool print_json = false;
     bool print_raw_response = false;
-    float temperature = 1.0f;
-    int max_tokens = 1024;
+    std::optional<float> temperature;
+    std::optional<int> max_tokens;
+    std::optional<std::string> model;
     std::optional<std::string> system_prompt;
     std::optional<std::string> user_prompt;
-    std::optional<std::string> model;
 };
 
 void print_help_messages_()
@@ -136,7 +136,7 @@ void print_output_to_stdout_json_(const MessagesOutput &output)
 
 void create_message_(const Parameters &params)
 {
-    CreateMessage input(params.max_tokens, params.temperature, *params.model);
+    CreateMessage input(*params.max_tokens, *params.temperature, *params.model);
 
     std::string user_prompt;
 
@@ -227,6 +227,14 @@ void command_run(const int argc, char **argv, const ConfigsRun &configs)
 
     if (not params.model) {
         params.model = configs.model;
+    }
+
+    if (not params.temperature) {
+        params.temperature = configs.temperature;
+    }
+
+    if (not params.max_tokens) {
+        params.temperature = configs.max_tokens;
     }
 
     create_message_(params);

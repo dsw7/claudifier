@@ -3,6 +3,8 @@
 #include <string>
 
 struct ConfigsRun {
+    float temperature = 1.0f;
+    int max_tokens = 1024;
     std::string model = "claude-3-haiku-20240307";
 };
 
