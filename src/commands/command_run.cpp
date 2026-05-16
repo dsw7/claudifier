@@ -234,7 +234,7 @@ void command_run(const int argc, char **argv, const ConfigsRun &configs)
     }
 
     if (not params.max_tokens) {
-        params.temperature = configs.max_tokens;
+        params.max_tokens = configs.max_tokens;
     }
 
     create_message_(params);
