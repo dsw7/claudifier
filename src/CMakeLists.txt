@@ -49,7 +49,7 @@ set(SRC_FILES
   commands/utils.cpp
   main.cpp
 )
-include_directories(${CMAKE_SOURCE_DIR} api commands external)
+include_directories(api commands core external)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
