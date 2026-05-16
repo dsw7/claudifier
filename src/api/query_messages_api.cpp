@@ -13,7 +13,7 @@ namespace api {
 CreateMessage::CreateMessage() :
     max_tokens_(1024),
     temperature_(1.0f),
-    model_("claude-3-haiku-20240307") {}
+    model_("claude-haiku-4-5") {}
 
 CreateMessage::CreateMessage(
     const int max_tokens,
