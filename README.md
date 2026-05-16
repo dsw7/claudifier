@@ -63,7 +63,14 @@ artifacts:
 make clean
 ```
 
-### Step 2: Test setup
+### Step 2: Copy and edit configurations
+Copy the project configuration directory:
+```console
+cp -rv .claudifier ~
+```
+And edit `~/.claudifier/claudifier.toml` to suit your needs.
+
+### Step 3: Test setup
 Start the program:
 ```console
 claudifier --help
