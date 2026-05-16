@@ -47,9 +47,11 @@ set(SRC_FILES
   commands/command_run.cpp
   commands/command_test.cpp
   commands/utils.cpp
+  core/configs.cpp
+  core/datadir.cpp
   main.cpp
 )
-include_directories(${CMAKE_SOURCE_DIR} api commands external)
+include_directories(api commands core external)
 
 # -----------------------------------------------------------------------------------------------------------
 # External dependencies
@@ -62,8 +64,8 @@ endif()
 
 # nlohmann/json.hpp
 message(STATUS "Checking for nlohmann/json.hpp")
-
 set(NLOHMANN_JSON_HPP_DL "${CMAKE_SOURCE_DIR}/external/json.hpp")
+
 if(EXISTS ${NLOHMANN_JSON_HPP_DL})
   message(STATUS "${NLOHMANN_JSON_HPP_DL} already exists. Skipping download")
 else()
@@ -72,6 +74,22 @@ else()
     DOWNLOAD
     "https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp"
     ${NLOHMANN_JSON_HPP_DL}
+    SHOW_PROGRESS
+  )
+endif()
+
+# toml++
+message(STATUS "Checking for toml++ header file")
+set(TOMLPLUSPLUS_HPP_DL "${CMAKE_SOURCE_DIR}/external/toml.hpp")
+
+if(EXISTS ${TOMLPLUSPLUS_HPP_DL})
+  message(STATUS "${TOMLPLUSPLUS_HPP_DL} already exists. Skipping download")
+else()
+  message(STATUS "Downloading toml.hpp")
+  file(
+    DOWNLOAD
+    "https://raw.githubusercontent.com/marzer/tomlplusplus/master/toml.hpp"
+    ${TOMLPLUSPLUS_HPP_DL}
     SHOW_PROGRESS
   )
 endif()

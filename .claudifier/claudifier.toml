@@ -1,0 +1,18 @@
+# --------------------------------------------------
+# Claudifier
+# See https://github.com/dsw7/claudifier for more information
+# --------------------------------------------------
+
+[run-command]
+# Configurations for `claudifier run`
+
+model = "claude-haiku-4-5"
+max_tokens = 1024
+temperature = 1.00
+
+[chat-command]
+# Configurations for `claudifier chat`
+
+model = "claude-haiku-4-5"
+max_tokens = 4096
+temperature = 1.00

@@ -15,6 +15,7 @@ struct ConfigsChat {
 };
 
 struct Configs {
+    Configs();
     ConfigsRun configs_run;
     ConfigsChat configs_chat;
 };
