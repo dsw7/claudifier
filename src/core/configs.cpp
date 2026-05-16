@@ -18,9 +18,9 @@ Configs::Configs()
 
     configs_run.model = table["run-command"]["model"].value_or("claude-haiku-4-5");
     configs_run.temperature = table["run-command"]["temperature"].value_or(1.0f);
-    configs_run.max_tokens = table["run-command"]["max-tokens"].value_or(1024);
+    configs_run.max_tokens = table["run-command"]["max_tokens"].value_or(1024);
 
     configs_chat.model = table["chat-command"]["model"].value_or("claude-haiku-4-5");
     configs_chat.temperature = table["chat-command"]["temperature"].value_or(1.0f);
-    configs_chat.max_tokens = table["chat-command"]["max-tokens"].value_or(4096);
+    configs_chat.max_tokens = table["chat-command"]["max_tokens"].value_or(4096);
 }
