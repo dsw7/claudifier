@@ -62,15 +62,10 @@ void print_build_information()
     fmt::print("{}\n", data.dump(2));
 }
 
-Configs load_configs()
-{
-    return Configs();
-}
-
 int run_default_command(const int argc, char **argv)
 {
     try {
-        Configs configs = load_configs();
+        const Configs configs;
         commands::command_chat(argc, argv, configs.configs_chat);
     } catch (const std::runtime_error &e) {
 #ifdef TESTING_ENABLED
@@ -86,7 +81,7 @@ int run_default_command(const int argc, char **argv)
 
 void run_command(const int argc, char **argv, const std::string &command)
 {
-    Configs configs = load_configs();
+    const Configs configs;
 
     if (command == "run") {
         commands::command_run(argc, argv, configs.configs_run);
