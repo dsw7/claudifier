@@ -147,8 +147,8 @@ namespace commands {
 
 void command_chat(const int argc, char **argv, const ConfigsChat &configs)
 {
-    float temperature = 1.0f;
-    int max_tokens = 1024;
+    std::optional<int> max_tokens;
+    std::optional<float> temperature;
     std::optional<std::string> model;
     bool show_usages = false;
 
@@ -190,11 +190,19 @@ void command_chat(const int argc, char **argv, const ConfigsChat &configs)
         }
     };
 
+    if (not max_tokens) {
+        max_tokens = configs.max_tokens;
+    }
+
+    if (not temperature) {
+        temperature = configs.temperature;
+    }
+
     if (not model) {
         model = configs.model;
     }
 
-    CreateMessage input(max_tokens, temperature, *model);
+    CreateMessage input(*max_tokens, *temperature, *model);
     run_conversational_loop_(input, show_usages);
 }
 

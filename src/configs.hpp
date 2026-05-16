@@ -9,6 +9,8 @@ struct ConfigsRun {
 };
 
 struct ConfigsChat {
+    float temperature = 1.0f;
+    int max_tokens = 4096;
     std::string model = "claude-3-haiku-20240307";
 };
 
