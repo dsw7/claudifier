@@ -70,7 +70,8 @@ Configs load_configs()
 int run_default_command(const int argc, char **argv)
 {
     try {
-        commands::command_chat(argc, argv);
+        Configs configs = load_configs();
+        commands::command_chat(argc, argv, configs.configs_chat);
     } catch (const std::runtime_error &e) {
 #ifdef TESTING_ENABLED
         fmt::print(stderr, "{}\n", e.what());
@@ -86,12 +87,13 @@ int run_default_command(const int argc, char **argv)
 void run_command(const int argc, char **argv, const std::string &command)
 {
     Configs configs = load_configs();
+
     if (command == "run") {
         commands::command_run(argc, argv, configs.configs_run);
     } else if (command == "models") {
         commands::command_models(argc, argv);
     } else if (command == "chat") {
-        commands::command_chat(argc, argv);
+        commands::command_chat(argc, argv, configs.configs_chat);
     } else if (command == "costs") {
         commands::command_costs(argc, argv);
     } else if (command == "test") {

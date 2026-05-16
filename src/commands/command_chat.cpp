@@ -145,11 +145,11 @@ void run_conversational_loop_(CreateMessage &input, const bool show_usages)
 
 namespace commands {
 
-void command_chat(const int argc, char **argv)
+void command_chat(const int argc, char **argv, const ConfigsChat &configs)
 {
     float temperature = 1.0f;
     int max_tokens = 1024;
-    std::string model = "claude-3-haiku-20240307";
+    std::optional<std::string> model;
     bool show_usages = false;
 
     while (true) {
@@ -190,7 +190,11 @@ void command_chat(const int argc, char **argv)
         }
     };
 
-    CreateMessage input(max_tokens, temperature, model);
+    if (not model) {
+        model = configs.model;
+    }
+
+    CreateMessage input(max_tokens, temperature, *model);
     run_conversational_loop_(input, show_usages);
 }
 
