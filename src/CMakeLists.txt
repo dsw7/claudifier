@@ -47,6 +47,7 @@ set(SRC_FILES
   commands/command_run.cpp
   commands/command_test.cpp
   commands/utils.cpp
+  core/configs.cpp
   core/datadir.cpp
   main.cpp
 )
