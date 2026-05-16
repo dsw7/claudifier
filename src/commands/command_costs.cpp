@@ -43,12 +43,12 @@ void print_costs_(const CostReport &report)
 
     for (const auto &bucket: report.get_cost_buckets()) {
         if (bucket.amount != "-") {
+            fmt::print("{:<25}{:<25}{}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
+        } else {
             const float cost_cents = utils::string_to_float(bucket.amount);
             const float cost_dollars = cost_cents / 100.0f;
             fmt::print("{:<25}{:<25}{}\n", bucket.starting_at, bucket.ending_at, cost_dollars);
             total_cost_dollars += cost_dollars;
-        } else {
-            fmt::print("{:<25}{:<25}{}\n", bucket.starting_at, bucket.ending_at, bucket.amount);
         }
         num_days++;
     }
