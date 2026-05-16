@@ -3,6 +3,7 @@
 #include "command_models.hpp"
 #include "command_run.hpp"
 #include "command_test.hpp"
+#include "configs.hpp"
 
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -61,6 +62,11 @@ void print_build_information()
     fmt::print("{}\n", data.dump(2));
 }
 
+Configs load_configs()
+{
+    return Configs();
+}
+
 int run_default_command(const int argc, char **argv)
 {
     try {
@@ -79,8 +85,9 @@ int run_default_command(const int argc, char **argv)
 
 void run_command(const int argc, char **argv, const std::string &command)
 {
+    Configs configs = load_configs();
     if (command == "run") {
-        commands::command_run(argc, argv);
+        commands::command_run(argc, argv, configs.configs_run);
     } else if (command == "models") {
         commands::command_models(argc, argv);
     } else if (command == "chat") {

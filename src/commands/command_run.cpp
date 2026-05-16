@@ -26,7 +26,7 @@ struct Parameters {
     int max_tokens = 1024;
     std::optional<std::string> system_prompt;
     std::optional<std::string> user_prompt;
-    std::string model = "claude-3-haiku-20240307";
+    std::optional<std::string> model;
 };
 
 void print_help_messages_()
@@ -136,7 +136,7 @@ void print_output_to_stdout_json_(const MessagesOutput &output)
 
 void create_message_(const Parameters &params)
 {
-    CreateMessage input(params.max_tokens, params.temperature, params.model);
+    CreateMessage input(params.max_tokens, params.temperature, *params.model);
 
     std::string user_prompt;
 
@@ -171,7 +171,7 @@ void create_message_(const Parameters &params)
 
 namespace commands {
 
-void command_run(const int argc, char **argv)
+void command_run(const int argc, char **argv, const ConfigsRun &configs)
 {
     Parameters params;
 
@@ -224,6 +224,10 @@ void command_run(const int argc, char **argv)
                 throw std::runtime_error(fmt::format("Unknown argument. Try running {} run [-h | --help] for more information", argv[0]));
         }
     };
+
+    if (not params.model) {
+        params.model = configs.model;
+    }
 
     create_message_(params);
 }
