@@ -7,7 +7,7 @@ BUILD_DIR_TEST = $(BUILD_DIR)/test
 .DEFAULT_GOAL = compile
 
 format:
-	@clang-format -i --verbose --style=file src/*.cpp \
+	@clang-format -i --verbose --style=file src/*.cpp src/*.hpp \
 		src/api/*.cpp src/api/*.hpp \
 		src/commands/*.cpp src/commands/*.hpp
 
