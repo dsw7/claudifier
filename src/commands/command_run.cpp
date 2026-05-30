@@ -106,9 +106,19 @@ MessagesOutput query_api_(CreateMessage &input)
     return *output;
 }
 
-std::string build_outgoing_text_(const std::string &user_prompt, const MessagesOutput &output)
+std::string build_outgoing_text_(const std::optional<std::string> &system_prompt, const std::string &user_prompt, const MessagesOutput &output)
 {
-    std::string body = fmt::format(R"(## User prompt
+    std::string body;
+
+    if (system_prompt) {
+        body += fmt::format(R"(## System prompt
+{}
+
+)",
+            *system_prompt);
+    }
+
+    body += fmt::format(R"(## User prompt
 {}
 
 )",
@@ -144,7 +154,7 @@ std::filesystem::path get_output_filepath_()
     return datadir::get_completions_dir() / fmt::format("claudifier_{}.md", buffer);
 }
 
-void export_completion_to_file_(const std::string &user_prompt, const MessagesOutput &output)
+void export_completion_to_file_(const std::optional<std::string> &system_prompt, const std::string &user_prompt, const MessagesOutput &output)
 {
     fmt::print(fmt::emphasis::bold, "Export:\n");
     char choice = 'n';
@@ -166,7 +176,7 @@ void export_completion_to_file_(const std::string &user_prompt, const MessagesOu
     }
 
     const std::filesystem::path path_output = get_output_filepath_();
-    const std::string body = build_outgoing_text_(user_prompt, output);
+    const std::string body = build_outgoing_text_(system_prompt, user_prompt, output);
     utils::write_to_file(path_output, body);
     fmt::print("Wrote results to: {}\n", path_output.string());
     utils::print_line();
@@ -232,7 +242,7 @@ void create_message_(const Parameters &params)
         print_output_to_stdout_json_(output);
     } else {
         print_output_to_stdout_(output);
-        export_completion_to_file_(user_prompt, output);
+        export_completion_to_file_(params.system_prompt, user_prompt, output);
     }
 }
 
