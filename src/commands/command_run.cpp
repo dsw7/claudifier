@@ -4,6 +4,7 @@
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <fmt/core.h>
 #include <getopt.h>
@@ -135,9 +136,12 @@ Round trip time (seconds): {}
 
 std::filesystem::path get_output_filepath_()
 {
-    const auto t = std::chrono::system_clock::now();
-    const auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(t.time_since_epoch()).count();
-    return datadir::get_completions_dir() / fmt::format("claudifier_{}.md", std::to_string(timestamp));
+    const auto current_time = std::chrono::system_clock::now();
+    const auto current_time_t = std::chrono::system_clock::to_time_t(current_time);
+    std::tm tm = *std::localtime(&current_time_t);
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", &tm);
+    return datadir::get_completions_dir() / fmt::format("claudifier_{}.md", buffer);
 }
 
 void export_completion_to_file_(const std::string &user_prompt, const MessagesOutput &output)
