@@ -101,7 +101,7 @@ std::string read_from_file(const std::filesystem::path &filepath)
         return oss.str();
     }
 
-    throw std::runtime_error(fmt::format("Failed to open file '{}'", (std::string)filepath));
+    throw std::runtime_error(fmt::format("Failed to open file '{}'", filepath.string()));
 }
 
 void write_to_file(const std::filesystem::path &filepath, const std::string &text)
