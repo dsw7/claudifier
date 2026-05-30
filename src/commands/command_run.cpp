@@ -1,5 +1,6 @@
 #include "command_run.hpp"
 
+#include "datadir.hpp"
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
@@ -154,6 +155,8 @@ void export_completion_to_file_(const std::string &user_prompt, const MessagesOu
     }
 
     const std::string body = build_outgoing_text_(user_prompt, output);
+    const std::filesystem::path path_output = datadir::get_completions_dir() / "output.md";
+    utils::write_to_file(path_output, body);
     utils::print_line();
 }
 
