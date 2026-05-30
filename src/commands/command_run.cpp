@@ -104,7 +104,35 @@ MessagesOutput query_api_(CreateMessage &input)
     return *output;
 }
 
-void export_completion_(const MessagesOutput &output)
+std::string build_outgoing_text_(const std::string &user_prompt, const MessagesOutput &output)
+{
+    std::string body = fmt::format(R"(## Input
+{}
+
+)",
+        user_prompt);
+
+    body += fmt::format(R"(## Output
+{}
+
+)",
+        output.get_latest_text());
+
+    body += fmt::format(R"(## Query info
+Model: {}
+Temperature: {}
+Input tokens: {}
+Output tokens: {}
+Stop reason: {}
+Round trip time (seconds): {}
+)",
+        output.llm_model, output.temperature, output.input_tokens,
+        output.output_tokens, output.stop_reason, output.rtt_time);
+
+    return body;
+}
+
+void export_completion_to_file_(const std::string &user_prompt, const MessagesOutput &output)
 {
     fmt::print(fmt::emphasis::bold, "Export:\n");
     char choice = 'n';
@@ -125,14 +153,8 @@ void export_completion_(const MessagesOutput &output)
         return;
     }
 
-    const std::string body = fmt::format(R"(## Query info
-Model: {}
-Temperature: {}
-Input tokens: {}
-Output tokens: {}
-
-)",
-        output.llm_model, output.temperature, output.input_tokens, output.output_tokens);
+    const std::string body = build_outgoing_text_(user_prompt, output);
+    utils::print_line();
 }
 
 void print_output_to_stdout_(const MessagesOutput &output)
@@ -148,8 +170,6 @@ void print_output_to_stdout_(const MessagesOutput &output)
     fmt::print("Output tokens: {}\n", output.output_tokens);
     fmt::print("Stop reason: {}\n", output.stop_reason);
     fmt::print("Round trip time: {} s\n", output.rtt_time);
-    utils::print_line();
-    export_completion_(output);
     utils::print_line();
 }
 
@@ -197,6 +217,7 @@ void create_message_(const Parameters &params)
         print_output_to_stdout_json_(output);
     } else {
         print_output_to_stdout_(output);
+        export_completion_to_file_(user_prompt, output);
     }
 }
 
