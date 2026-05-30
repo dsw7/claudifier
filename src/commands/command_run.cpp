@@ -111,24 +111,11 @@ std::string build_outgoing_text_(const std::optional<std::string> &system_prompt
     std::string body;
 
     if (system_prompt) {
-        body += fmt::format(R"(## System prompt
-{}
-
-)",
-            *system_prompt);
+        body += fmt::format("## System prompt\n{}\n\n", *system_prompt);
     }
 
-    body += fmt::format(R"(## User prompt
-{}
-
-)",
-        user_prompt);
-
-    body += fmt::format(R"(## Completion
-{}
-
-)",
-        output.get_latest_text());
+    body += fmt::format("## User prompt\n{}\n\n", user_prompt);
+    body += fmt::format("## Completion\n{}\n\n", output.get_latest_text());
 
     body += fmt::format(R"(## Query info
 Model: {}
@@ -179,7 +166,6 @@ void export_completion_to_file_(const std::optional<std::string> &system_prompt,
     const std::string body = build_outgoing_text_(system_prompt, user_prompt, output);
     utils::write_to_file(path_output, body);
     fmt::print("Wrote results to: {}\n", path_output.string());
-    utils::print_line();
 }
 
 void print_output_to_stdout_(const MessagesOutput &output)
