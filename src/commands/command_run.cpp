@@ -133,6 +133,13 @@ Round trip time (seconds): {}
     return body;
 }
 
+std::filesystem::path get_output_filepath_()
+{
+    const auto t = std::chrono::system_clock::now();
+    const auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(t.time_since_epoch()).count();
+    return datadir::get_completions_dir() / fmt::format("claudifier_{}.md", std::to_string(timestamp));
+}
+
 void export_completion_to_file_(const std::string &user_prompt, const MessagesOutput &output)
 {
     fmt::print(fmt::emphasis::bold, "Export:\n");
@@ -154,9 +161,10 @@ void export_completion_to_file_(const std::string &user_prompt, const MessagesOu
         return;
     }
 
+    const std::filesystem::path path_output = get_output_filepath_();
     const std::string body = build_outgoing_text_(user_prompt, output);
-    const std::filesystem::path path_output = datadir::get_completions_dir() / "output.md";
     utils::write_to_file(path_output, body);
+    fmt::print("Wrote results to: {}\n", path_output.string());
     utils::print_line();
 }
 
