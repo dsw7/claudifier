@@ -158,14 +158,14 @@ void export_completion_to_file_(const std::optional<std::string> &system_prompt,
     }
 
     if (choice == 'n') {
-        fmt::print("> Not exporting response.\n");
+        fmt::print("> Not exporting results.\n");
         return;
     }
 
     const std::filesystem::path path_output = get_output_filepath_();
     const std::string body = build_outgoing_text_(system_prompt, user_prompt, output);
     utils::write_to_file(path_output, body);
-    fmt::print("Wrote results to: {}\n", path_output.string());
+    fmt::print("> Exported results to: {}\n", path_output.string());
 }
 
 void print_output_to_stdout_(const MessagesOutput &output)
