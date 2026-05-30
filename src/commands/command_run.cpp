@@ -106,13 +106,13 @@ MessagesOutput query_api_(CreateMessage &input)
 
 std::string build_outgoing_text_(const std::string &user_prompt, const MessagesOutput &output)
 {
-    std::string body = fmt::format(R"(## Input
+    std::string body = fmt::format(R"(## User prompt
 {}
 
 )",
         user_prompt);
 
-    body += fmt::format(R"(## Output
+    body += fmt::format(R"(## Completion
 {}
 
 )",
