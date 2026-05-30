@@ -43,4 +43,15 @@ std::filesystem::path get_config_file()
     return config_file;
 }
 
+std::filesystem::path get_completions_dir()
+{
+    static std::filesystem::path dir_completions = get_project_dir_() / "completions";
+
+    if (not std::filesystem::exists(dir_completions)) {
+        std::filesystem::create_directory(dir_completions);
+    }
+
+    return dir_completions;
+}
+
 } // namespace datadir

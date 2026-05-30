@@ -101,7 +101,23 @@ std::string read_from_file(const std::filesystem::path &filepath)
         return oss.str();
     }
 
-    throw std::runtime_error(fmt::format("Failed to open file '{}'", (std::string)filepath));
+    throw std::runtime_error(fmt::format("Failed to open file '{}'", filepath.string()));
+}
+
+void write_to_file(const std::filesystem::path &filepath, const std::string &text)
+{
+    if (filepath.empty()) {
+        throw std::runtime_error("Could not write to file. Filename is empty");
+    }
+
+    std::ofstream outfile(filepath);
+
+    if (not outfile.is_open()) {
+        throw std::runtime_error(fmt::format("Unable to open '{}'", filepath.string()));
+    }
+
+    outfile << text;
+    outfile.close();
 }
 
 } // namespace utils

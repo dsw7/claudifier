@@ -1,8 +1,10 @@
 #include "command_run.hpp"
 
+#include "datadir.hpp"
 #include "query_messages_api.hpp"
 #include "utils.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <fmt/core.h>
 #include <getopt.h>
@@ -104,6 +106,68 @@ MessagesOutput query_api_(CreateMessage &input)
     return *output;
 }
 
+std::string build_outgoing_text_(const std::optional<std::string> &system_prompt, const std::string &user_prompt, const MessagesOutput &output)
+{
+    std::string body;
+
+    if (system_prompt) {
+        body += fmt::format("## System prompt\n{}\n\n", *system_prompt);
+    }
+
+    body += fmt::format("## User prompt\n{}\n\n", user_prompt);
+    body += fmt::format("## Completion\n{}\n\n", output.get_latest_text());
+
+    body += fmt::format(R"(## Query info
+Model: {}
+Temperature: {}
+Input tokens: {}
+Output tokens: {}
+Stop reason: {}
+Round trip time (seconds): {}
+)",
+        output.llm_model, output.temperature, output.input_tokens,
+        output.output_tokens, output.stop_reason, output.rtt_time);
+
+    return body;
+}
+
+std::filesystem::path get_output_filepath_()
+{
+    const auto current_time = std::chrono::system_clock::now();
+    const auto current_time_t = std::chrono::system_clock::to_time_t(current_time);
+    std::tm tm = *std::localtime(&current_time_t);
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", &tm);
+    return datadir::get_completions_dir() / fmt::format("claudifier_{}.md", buffer);
+}
+
+void export_completion_to_file_(const std::optional<std::string> &system_prompt, const std::string &user_prompt, const MessagesOutput &output)
+{
+    fmt::print(fmt::emphasis::bold, "Export:\n");
+    char choice = 'n';
+
+    while (true) {
+        fmt::print("> Write reply to file? [y/n]: ");
+        choice = std::cin.get();
+
+        if (choice == 'y' or choice == 'n') {
+            break;
+        } else {
+            fmt::print("> Invalid choice. Input either 'y' or 'n'!\n");
+        }
+    }
+
+    if (choice == 'n') {
+        fmt::print("> Not exporting results.\n");
+        return;
+    }
+
+    const std::filesystem::path path_output = get_output_filepath_();
+    const std::string body = build_outgoing_text_(system_prompt, user_prompt, output);
+    utils::write_to_file(path_output, body);
+    fmt::print("> Exported results to: {}\n", path_output.string());
+}
+
 void print_output_to_stdout_(const MessagesOutput &output)
 {
     utils::print_line();
@@ -164,6 +228,7 @@ void create_message_(const Parameters &params)
         print_output_to_stdout_json_(output);
     } else {
         print_output_to_stdout_(output);
+        export_completion_to_file_(params.system_prompt, user_prompt, output);
     }
 }
 
